@@ -4,66 +4,187 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>W&S AI MINI SHOP</title>
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --primary: #063B2E;
       --secondary: #00C897;
       --bg: #F8F7F2;
-      --text: #222222;
+      --text: #1F2937;
       --card-bg: #FFFFFF;
+      --border: #E5E7EB;
+      --gray: #6B7280;
     }
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     body {
       background-color: var(--bg);
       color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      padding-bottom: 70px;
+      padding-bottom: 75px;
     }
     header {
       background-color: var(--primary);
       color: white;
       padding: 16px;
       text-align: center;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     header h1 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       letter-spacing: 0.5px;
     }
     header p {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--secondary);
-      margin-top: 4px;
     }
     .container {
-      padding: 16px;
-      flex: 1;
+      padding: 14px;
     }
-    .status-card {
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
+    }
+    /* Search Bar */
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    /* Categories Scroll */
+    .categories-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .cat-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .cat-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .product-card {
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-left: 4px solid var(--secondary);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
     }
-    .user-info {
+    .product-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: #eee;
+    }
+    .product-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .product-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .product-condition {
+      font-size: 0.7rem;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+    .product-price {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-top: auto;
+      margin-bottom: 8px;
+    }
+    .btn-sm {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    /* Forms */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       font-size: 0.9rem;
-      margin-top: 8px;
-      color: #555;
+      background: var(--card-bg);
     }
-    .nav-tabs {
+    .price-calc-box {
+      background: #EBFDF5;
+      border: 1px dashed var(--secondary);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+    }
+    .price-calc-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .price-calc-total {
+      font-weight: bold;
+      color: var(--primary);
+      border-top: 1px solid #C7F2E2;
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+    /* Navigation Bar */
+    .nav-bar {
       position: fixed;
       bottom: 0;
       left: 0;
@@ -73,28 +194,37 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
-      border-top: 1px solid #E5E5E5;
+      border-top: 1px solid var(--border);
+      z-index: 1000;
     }
-    .nav-item {
-      font-size: 0.75rem;
-      color: #777;
-      text-align: center;
-      text-decoration: none;
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--gray);
+      background: none;
+      border: none;
+      cursor: pointer;
+      gap: 2px;
     }
-    .nav-item.active {
+    .nav-btn.active {
       color: var(--primary);
       font-weight: bold;
     }
-    .btn {
-      background-color: var(--secondary);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+    .nav-icon {
+      font-size: 1.1rem;
+    }
+    /* Admin badge */
+    .admin-badge {
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      display: inline-block;
+      margin-bottom: 10px;
       font-weight: bold;
-      width: 100%;
-      cursor: pointer;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -106,21 +236,116 @@
   </header>
 
   <div class="container">
-    <div class="status-card">
-      <h3>የሚኒ አፕ ግንኙነት ሙከራ</h3>
-      <p style="margin-top: 6px; font-size: 0.85rem;">ይህ ገጽ በቴሌግራም ሚኒ አፕ ስክሪን ላይ በተሳካ ሁኔታ እየሰራ ነው።</p>
-      <div class="user-info" id="user-display">የተጠቃሚ መረጃ በመጫን ላይ...</div>
+
+    <!-- HOME VIEW -->
+    <div id="view-home" class="view active">
+      <div class="search-box">
+        <input type="text" id="homeSearch" placeholder="እቃዎችን እዚህ ይፈልጉ..." oninput="filterProducts()">
+      </div>
+
+      <div class="categories-bar" id="categoryBar">
+        <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
+        <div class="cat-pill" onclick="selectCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
+        <div class="cat-pill" onclick="selectCategory('Books & Study Materials', this)">መጽሐፍት</div>
+        <div class="cat-pill" onclick="selectCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
+      </div>
+
+      <h3 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">የቅርብ ጊዜ እቃዎች</h3>
+      <div class="product-grid" id="productGrid">
+        <!-- Products will load dynamically -->
+      </div>
     </div>
 
-    <button class="btn" onclick="sendAlert()">ስርዓቱን ፈትሽ</button>
+    <!-- SELL VIEW -->
+    <div id="view-sell" class="view">
+      <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--primary);">አዲስ እቃ ለመሸጥ መመዝገቢያ</h3>
+      <form id="sellForm" onsubmit="handleProductSubmit(event)">
+        <div class="form-group">
+          <label>የእቃው ዘርፍ (Category)</label>
+          <select id="prodCategory" required>
+            <option value="Clothes & Shoes">Clothes & Shoes</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Books & Study Materials">Books & Study Materials</option>
+            <option value="Dorm & Household Items">Dorm & Household Items</option>
+            <option value="Other Products">Other Products</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>የእቃው ስም (Product Title)</label>
+          <input type="text" id="prodTitle" placeholder="ለምሳሌ: Samsung Galaxy A12" required>
+        </div>
+
+        <div class="form-group">
+          <label>የእቃው ሁኔታ (Condition)</label>
+          <select id="prodCondition" required>
+            <option value="Brand New">አዲስ (Brand New)</option>
+            <option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option>
+            <option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>የእርስዎ የመሸጫ ዋጋ በብር (Asking Price)</label>
+          <input type="number" id="sellerPrice" placeholder="0.00 ETB" required oninput="calculateCommission()">
+        </div>
+
+        <div class="price-calc-box">
+          <div class="price-calc-row">
+            <span>የእርስዎ ዋጋ:</span>
+            <span id="dispSellerPrice">0 ETB</span>
+          </div>
+          <div class="price-calc-row">
+            <span>የሲስተም ኮሚሽን (<span id="dispRate">0%</span>):</span>
+            <span id="dispCommission">0 ETB</span>
+          </div>
+          <div class="price-calc-row price-calc-total">
+            <span>ለገዢ የሚቀርበው የመጨረሻ ዋጋ:</span>
+            <span id="dispFinalPrice">0 ETB</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>የእቃው መግለጫ (Description)</label>
+          <textarea id="prodDesc" rows="3" placeholder="ስለ እቃው ዝርዝር ሁኔታ ይጻፉ..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-sm" style="padding: 12px; font-size: 0.9rem;">እቃውን መዝግብ (Submit)</button>
+      </form>
+    </div>
+
+    <!-- PROFILE & ADMIN VIEW -->
+    <div id="view-profile" class="view">
+      <div style="background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px;">
+        <h3 id="profileName" style="color: var(--primary);">ተጠቃሚ</h3>
+        <p id="profileId" style="font-size: 0.8rem; color: var(--gray);">ID: -</p>
+      </div>
+
+      <div id="adminPanel" style="display: none; background: #FFFBEB; border: 1px solid #FDE68A; padding: 14px; border-radius: 12px;">
+        <span class="admin-badge">Admin Mode Active</span>
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
+        <div id="adminPendingList" style="font-size: 0.85rem;">የሚጠብቅ እቃ የለም።</div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="nav-tabs">
-    <div class="nav-item active">Home</div>
-    <div class="nav-item">Shop</div>
-    <div class="nav-item">Sell</div>
-    <div class="nav-item">Favorites</div>
-    <div class="nav-item">Profile</div>
+  <!-- BOTTOM NAVIGATION -->
+  <div class="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('home', this)">
+      <span class="nav-icon">🏠</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('sell', this)">
+      <span class="nav-icon">➕</span>
+      <span>Sell</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('profile', this)">
+      <span class="nav-icon">👤</span>
+      <span>Profile</span>
+    </button>
   </div>
 
   <script>
@@ -128,21 +353,190 @@
     tg.ready();
     tg.expand();
 
-    const user = tg.initDataUnsafe?.user;
-    const userDisplay = document.getElementById('user-display');
-    if (user) {
-      userDisplay.innerText = `እንኳን ደህና መጡ፣ ${user.first_name}! (ID: ${user.id})`;
-    } else {
-      userDisplay.innerText = "አፑ በብሮውዘር ላይ ተከፍቷል (ከቴሌግራም ውጭ)";
+    // The Admin ID configured from your Telegram account
+    const ADMIN_TELEGRAM_ID = 8356035160;
+
+    const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer" };
+
+    // Initial dummy data
+    let products = [
+      {
+        id: "WS-101",
+        title: "Calculus Early Transcendentals Book",
+        category: "Books & Study Materials",
+        condition: "Slightly Used",
+        sellerPrice: 300,
+        finalPrice: 315,
+        status: "approved",
+        sellerUsername: "student_wolkite",
+        img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300"
+      },
+      {
+        id: "WS-102",
+        title: "Electric Kettle (የዶርም ሻይ ማፍያ)",
+        category: "Dorm & Household Items",
+        condition: "Brand New",
+        sellerPrice: 600,
+        finalPrice: 618,
+        status: "approved",
+        sellerUsername: "wolkite_seller",
+        img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=300"
+      }
+    ];
+
+    let currentCategory = 'All';
+
+    function initApp() {
+      document.getElementById('profileName').innerText = currentUser.first_name;
+      document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id}`;
+
+      if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) {
+        document.getElementById('adminPanel').style.display = 'block';
+      }
+
+      renderProducts();
+      renderAdminPending();
     }
 
-    function sendAlert() {
-      if (tg.showAlert) {
-        tg.showAlert("W&S AI MINI SHOP በትክክል እየሰራ ነው!");
-      } else {
-        alert("W&S AI MINI SHOP በትክክል እየሰራ ነው!");
-      }
+    function switchTab(viewName, btn) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      btn.classList.add('active');
     }
+
+    function selectCategory(cat, el) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      filterProducts();
+    }
+
+    function renderProducts(items = products.filter(p => p.status === 'approved')) {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+      if (items.length === 0) {
+        grid.innerHTML = '<p style="grid-column: span 2; font-size: 0.85rem; color: #888; text-align: center;">ምንም እቃ አልተገኘም።</p>';
+        return;
+      }
+      items.forEach(p => {
+        grid.innerHTML += `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="product">
+            <div class="product-info">
+              <div class="product-title">${p.title}</div>
+              <div class="product-condition">${p.condition}</div>
+              <div class="product-price">${p.finalPrice} ETB</div>
+              <button class="btn-sm" onclick="contactSeller('${p.sellerUsername}')">ሻጭን አናግር</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterProducts() {
+      const q = document.getElementById('homeSearch').value.toLowerCase();
+      const filtered = products.filter(p => {
+        const matchesCat = (currentCategory === 'All' || p.category === currentCategory);
+        const matchesSearch = p.title.toLowerCase().includes(q);
+        return p.status === 'approved' && matchesCat && matchesSearch;
+      });
+      renderProducts(filtered);
+    }
+
+    // Exact Commission Logic
+    function getCommissionRate(price) {
+      if (price <= 200) return 0.10;
+      if (price <= 500) return 0.05;
+      if (price <= 2000) return 0.03;
+      if (price <= 5000) return 0.025;
+      return 0.02;
+    }
+
+    function calculateCommission() {
+      const price = parseFloat(document.getElementById('sellerPrice').value) || 0;
+      const rate = getCommissionRate(price);
+      const commission = Math.round(price * rate);
+      const finalPrice = price + commission;
+
+      document.getElementById('dispSellerPrice').innerText = `${price} ETB`;
+      document.getElementById('dispRate').innerText = `${(rate * 100)}%`;
+      document.getElementById('dispCommission').innerText = `${commission} ETB`;
+      document.getElementById('dispFinalPrice').innerText = `${finalPrice} ETB`;
+    }
+
+    function handleProductSubmit(e) {
+      e.preventDefault();
+      const price = parseFloat(document.getElementById('sellerPrice').value) || 0;
+      const rate = getCommissionRate(price);
+      const commission = Math.round(price * rate);
+
+      const newProduct = {
+        id: `WS-${Date.now().toString().slice(-4)}`,
+        title: document.getElementById('prodTitle').value,
+        category: document.getElementById('prodCategory').value,
+        condition: document.getElementById('prodCondition').value,
+        sellerPrice: price,
+        finalPrice: price + commission,
+        status: (Number(currentUser.id) === ADMIN_TELEGRAM_ID) ? 'approved' : 'pending',
+        sellerUsername: currentUser.username || currentUser.first_name,
+        img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"
+      };
+
+      products.push(newProduct);
+      document.getElementById('sellForm').reset();
+      calculateCommission();
+
+      if (tg.showAlert) {
+        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ወዲያውኑ ጸድቆ ተለጥፏል!' : 'እቃው በተሳካ ሁኔታ ተልኳል! አድሚኑ ሲያጸድቀው ገበያው ላይ ይወጣል።');
+      } else {
+        alert('እቃው ተመዝግቧል!');
+      }
+
+      renderProducts();
+      renderAdminPending();
+      switchTab('home', document.querySelector('.nav-btn'));
+    }
+
+    function renderAdminPending() {
+      const list = document.getElementById('adminPendingList');
+      const pending = products.filter(p => p.status === 'pending');
+      if (pending.length === 0) {
+        list.innerHTML = '<p style="color: #666; margin-top: 6px;">የሚጠብቅ እቃ የለም።</p>';
+        return;
+      }
+      list.innerHTML = '';
+      pending.forEach(p => {
+        list.innerHTML += `
+          <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd;">
+            <strong>${p.title}</strong> (${p.finalPrice} ETB)
+            <div style="margin-top: 6px; display: flex; gap: 6px;">
+              <button class="btn-sm" style="background: #00C897;" onclick="adminApprove('${p.id}')">አጽድቅ (Approve)</button>
+              <button class="btn-sm" style="background: #EF4444;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function adminApprove(id) {
+      const item = products.find(p => p.id === id);
+      if (item) item.status = 'approved';
+      renderProducts();
+      renderAdminPending();
+    }
+
+    function adminReject(id) {
+      const item = products.find(p => p.id === id);
+      if (item) item.status = 'rejected';
+      renderAdminPending();
+    }
+
+    function contactSeller(username) {
+      tg.openTelegramLink(`https://t.me/${username}`);
+    }
+
+    initApp();
   </script>
 </body>
 </html>
