@@ -121,9 +121,6 @@
     }
     .badge-active { background-color: var(--secondary); }
     .badge-sold { background-color: var(--danger); }
-    .badge-pending { background-color: var(--warning); }
-    .badge-rejected { background-color: var(--gray); }
-
     .product-img {
       width: 100%;
       height: 120px;
@@ -197,6 +194,29 @@
       border-radius: 8px;
       font-size: 0.9rem;
       background: var(--card-bg);
+    }
+    .image-preview-box {
+      width: 100%;
+      height: 140px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #fafafa;
+      margin-top: 6px;
+      position: relative;
+    }
+    .image-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .image-preview-box span {
+      font-size: 0.8rem;
+      color: var(--gray);
     }
     .price-calc-box {
       background: #EBFDF5;
@@ -295,6 +315,16 @@
     <div id="view-sell" class="view">
       <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--primary);">አዲስ እቃ ለመሸጥ መመዝገቢያ</h3>
       <form id="sellForm" onsubmit="handleProductSubmit(event)">
+        
+        <div class="form-group">
+          <label>የእቃው ፎቶ (Product Photo)</label>
+          <input type="file" id="prodPhotoInput" accept="image/*" onchange="handleImageUpload(event)" required>
+          <div class="image-preview-box" id="previewBox">
+            <span id="previewPlaceholder">ምንም ፎቶ አልተመረጠም</span>
+            <img id="imagePreview" alt="preview">
+          </div>
+        </div>
+
         <div class="form-group">
           <label>የእቃው ዘርፍ (Category)</label>
           <select id="prodCategory" required>
@@ -361,20 +391,17 @@
 
     <!-- PROFILE & ADMIN VIEW -->
     <div id="view-profile" class="view">
-      <!-- User Info -->
       <div class="section-card">
         <h3 id="profileName" style="color: var(--primary);">ተጠቃሚ</h3>
         <p id="profileId" style="font-size: 0.8rem; color: var(--gray);">ID: -</p>
       </div>
 
-      <!-- Admin Panel -->
       <div id="adminPanel" style="display: none;" class="section-card">
         <span class="admin-badge">Admin Dashboard</span>
         <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
         <div id="adminPendingList" style="font-size: 0.85rem;">የሚጠብቅ እቃ የለም።</div>
       </div>
 
-      <!-- My Listings Section -->
       <div class="section-card">
         <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">📦 የኔ እቃዎች (My Listings)</h4>
         <div id="myListingsContainer">
@@ -422,7 +449,7 @@
         sellerId: 8356035160,
         sellerUsername: "sorataju1",
         sellerPhone: "0948944979",
-        img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300"
+        img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400"
       },
       {
         id: "WS-102",
@@ -436,12 +463,12 @@
         sellerId: 8356035160,
         sellerUsername: "sorataju1",
         sellerPhone: "0948944979",
-        img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=300"
+        img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=400"
       }
     ];
 
-    // Load from LocalStorage or use defaults
     let products = JSON.parse(localStorage.getItem('ws_products')) || defaultProducts;
+    let uploadedImageBase64 = "";
 
     function saveState() {
       localStorage.setItem('ws_products', JSON.stringify(products));
@@ -485,6 +512,47 @@
       filterProducts();
     }
 
+    // Photo compress and preview
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 500;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to lightweight JPEG
+          uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+          // Display preview
+          const previewImg = document.getElementById('imagePreview');
+          previewImg.src = uploadedImageBase64;
+          previewImg.style.display = 'block';
+          document.getElementById('previewPlaceholder').style.display = 'none';
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     function renderProducts(items = products.filter(p => p.status === 'approved')) {
       const grid = document.getElementById('productGrid');
       grid.innerHTML = '';
@@ -510,7 +578,6 @@
           `;
         }
 
-        // Admin Actions (Toggle Sold & Delete)
         let adminButtons = '';
         if (isAdmin) {
           adminButtons = `
@@ -541,7 +608,6 @@
       });
     }
 
-    // Render My Listings under Profile tab
     function renderMyListings() {
       const container = document.getElementById('myListingsContainer');
       const myList = products.filter(p => String(p.sellerId) === String(currentUser.id));
@@ -554,16 +620,19 @@
       container.innerHTML = '';
       myList.forEach(p => {
         let statusBadge = '';
-        if (p.status === 'pending') statusBadge = '<span style="color: var(--warning); font-weight:bold;">⏳ በማጽደቅ ላይ (Pending)</span>';
-        else if (p.status === 'rejected') statusBadge = '<span style="color: var(--danger); font-weight:bold;">❌ ውድቅ የተደረገ (Rejected)</span>';
-        else if (p.isSold) statusBadge = '<span style="color: var(--danger); font-weight:bold;">🏷️ የተሸጠ (Sold)</span>';
-        else statusBadge = '<span style="color: var(--secondary); font-weight:bold;">✅ ገበያ ላይ ያለ (Active)</span>';
+        if (p.status === 'pending') statusBadge = '<span style="color: var(--warning); font-weight:bold;">⏳ በማጽደቅ ላይ</span>';
+        else if (p.status === 'rejected') statusBadge = '<span style="color: var(--danger); font-weight:bold;">❌ ውድቅ የተደረገ</span>';
+        else if (p.isSold) statusBadge = '<span style="color: var(--danger); font-weight:bold;">🏷️ የተሸጠ</span>';
+        else statusBadge = '<span style="color: var(--secondary); font-weight:bold;">✅ ገበያ ላይ ያለ</span>';
 
         container.innerHTML += `
           <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <strong style="font-size: 0.85rem;">${p.title}</strong><br>
-              <span style="font-size: 0.75rem; color: var(--gray);">${p.finalPrice} ETB | ${statusBadge}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="${p.img}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+              <div>
+                <strong style="font-size: 0.85rem;">${p.title}</strong><br>
+                <span style="font-size: 0.75rem; color: var(--gray);">${p.finalPrice} ETB | ${statusBadge}</span>
+              </div>
             </div>
             <div>
               <button class="btn-action btn-delete" style="padding: 4px 8px;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
@@ -573,7 +642,6 @@
       });
     }
 
-    // Toggle Sold / Active
     function toggleSoldStatus(id) {
       const item = products.find(p => p.id === id);
       if (item) {
@@ -584,7 +652,6 @@
       }
     }
 
-    // Complete Delete Function
     function deleteProduct(id) {
       if (confirm("እቃውን ሙሉ በሙሉ ማጥፋት ይፈልጋሉ?")) {
         products = products.filter(p => p.id !== id);
@@ -627,6 +694,13 @@
 
     function handleProductSubmit(e) {
       e.preventDefault();
+
+      if (!uploadedImageBase64) {
+        if (tg.showAlert) tg.showAlert("እባክዎ የእቃውን ፎቶ ያስገቡ!");
+        else alert("እባክዎ የእቃውን ፎቶ ያስገቡ!");
+        return;
+      }
+
       const price = parseFloat(document.getElementById('sellerPrice').value) || 0;
       const rate = getCommissionRate(price);
       const commission = Math.round(price * rate);
@@ -646,16 +720,21 @@
         sellerId: currentUser.id,
         sellerUsername: cleanUser || 'sorataju1',
         sellerPhone: phone || '0948944979',
-        img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"
+        img: uploadedImageBase64
       };
 
       products.push(newProduct);
       saveState();
+
+      // Reset Form & Preview
       document.getElementById('sellForm').reset();
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('previewPlaceholder').style.display = 'block';
+      uploadedImageBase64 = "";
       calculateCommission();
 
       if (tg.showAlert) {
-        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ወዲያውኑ ጸድቆ ተለጥፏል!' : 'እቃው ተልኳል! አድሚኑ ሲያጸድቀው ገበያው ላይ ይወጣል።');
+        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ከፎቶው ጋር ተለጥፏል!' : 'እቃው ተልኳል! አድሚኑ ሲያጸድቀው ይለጠፋል።');
       } else {
         alert('እቃው ተመዝግቧል!');
       }
@@ -676,13 +755,16 @@
       list.innerHTML = '';
       pending.forEach(p => {
         list.innerHTML += `
-          <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd;">
-            <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
-            <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
-            <div style="margin-top: 6px; display: flex; gap: 6px;">
-              <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ</button>
-              <button class="btn-action" style="background: var(--warning); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
-              <button class="btn-action btn-delete" style="flex:0.6;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
+          <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; display:flex; gap:10px;">
+            <img src="${p.img}" style="width:60px; height:60px; border-radius:6px; object-fit:cover;">
+            <div style="flex:1;">
+              <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
+              <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
+              <div style="margin-top: 6px; display: flex; gap: 6px;">
+                <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ</button>
+                <button class="btn-action" style="background: var(--warning); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
+                <button class="btn-action btn-delete" style="flex:0.6;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
+              </div>
             </div>
           </div>
         `;
