@@ -14,6 +14,7 @@
       --card-bg: #FFFFFF;
       --border: #E5E7EB;
       --gray: #6B7280;
+      --danger: #EF4444;
     }
     * {
       box-sizing: border-box;
@@ -53,7 +54,6 @@
     .view.active {
       display: block;
     }
-    /* Search Bar */
     .search-box {
       display: flex;
       gap: 8px;
@@ -67,7 +67,6 @@
       font-size: 0.9rem;
       outline: none;
     }
-    /* Categories Scroll */
     .categories-bar {
       display: flex;
       gap: 8px;
@@ -90,7 +89,6 @@
       color: white;
       border-color: var(--primary);
     }
-    /* Product Grid */
     .product-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -103,6 +101,28 @@
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      position: relative;
+    }
+    .product-card.sold-out {
+      opacity: 0.85;
+      border: 1px dashed var(--danger);
+    }
+    .status-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      color: white;
+      z-index: 2;
+    }
+    .badge-active {
+      background-color: var(--secondary);
+    }
+    .badge-sold {
+      background-color: var(--danger);
     }
     .product-img {
       width: 100%;
@@ -134,16 +154,42 @@
       margin-top: auto;
       margin-bottom: 8px;
     }
-    .btn-sm {
-      background: var(--secondary);
-      color: white;
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .btn-action {
       border: none;
       padding: 6px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: bold;
       cursor: pointer;
-      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+    .btn-tg {
+      background: var(--secondary);
+      color: white;
+    }
+    .btn-call {
+      background: #2563EB;
+      color: white;
+    }
+    .btn-toggle-sold {
+      background: #4B5563;
+      color: white;
+      margin-top: 4px;
+      font-size: 0.65rem;
+    }
+    .sold-text {
+      text-align: center;
+      color: var(--danger);
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 6px 0;
     }
     /* Forms */
     .form-group {
@@ -183,7 +229,6 @@
       padding-top: 4px;
       margin-top: 4px;
     }
-    /* Navigation Bar */
     .nav-bar {
       position: fixed;
       bottom: 0;
@@ -215,7 +260,6 @@
     .nav-icon {
       font-size: 1.1rem;
     }
-    /* Admin badge */
     .admin-badge {
       background: #FEE2E2;
       color: #991B1B;
@@ -252,10 +296,8 @@
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
 
-      <h3 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">የቅርብ ጊዜ እቃዎች</h3>
-      <div class="product-grid" id="productGrid">
-        <!-- Products will load dynamically -->
-      </div>
+      <h3 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">የእቃዎች ዝርዝር</h3>
+      <div class="product-grid" id="productGrid"></div>
     </div>
 
     <!-- SELL VIEW -->
@@ -275,7 +317,17 @@
 
         <div class="form-group">
           <label>የእቃው ስም (Product Title)</label>
-          <input type="text" id="prodTitle" placeholder="ለምሳሌ: Samsung Galaxy A12" required>
+          <input type="text" id="prodTitle" placeholder="ለምሳሌ: Calculus Book" required>
+        </div>
+
+        <div class="form-group">
+          <label>የእርስዎ የቴሌግራም Username (@username)</label>
+          <input type="text" id="sellerTgUsername" value="@sorataju1" required>
+        </div>
+
+        <div class="form-group">
+          <label>የእርስዎ ስልክ ቁጥር (Phone Number)</label>
+          <input type="tel" id="sellerPhone" value="0948944979" placeholder="09..." required>
         </div>
 
         <div class="form-group">
@@ -312,7 +364,7 @@
           <textarea id="prodDesc" rows="3" placeholder="ስለ እቃው ዝርዝር ሁኔታ ይጻፉ..." required></textarea>
         </div>
 
-        <button type="submit" class="btn-sm" style="padding: 12px; font-size: 0.9rem;">እቃውን መዝግብ (Submit)</button>
+        <button type="submit" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem; width: 100%;">እቃውን መዝግብ (Submit)</button>
       </form>
     </div>
 
@@ -324,8 +376,8 @@
       </div>
 
       <div id="adminPanel" style="display: none; background: #FFFBEB; border: 1px solid #FDE68A; padding: 14px; border-radius: 12px;">
-        <span class="admin-badge">Admin Mode Active</span>
-        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
+        <span class="admin-badge">Admin Dashboard Active</span>
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending)</h4>
         <div id="adminPendingList" style="font-size: 0.85rem;">የሚጠብቅ እቃ የለም።</div>
       </div>
     </div>
@@ -353,12 +405,10 @@
     tg.ready();
     tg.expand();
 
-    // The Admin ID configured from your Telegram account
     const ADMIN_TELEGRAM_ID = 8356035160;
+    const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer" };
-
-    // Initial dummy data
+    // Initial dummy data with phone and active/sold status
     let products = [
       {
         id: "WS-101",
@@ -368,7 +418,9 @@
         sellerPrice: 300,
         finalPrice: 315,
         status: "approved",
-        sellerUsername: "student_wolkite",
+        isSold: false,
+        sellerUsername: "sorataju1",
+        sellerPhone: "0948944979",
         img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300"
       },
       {
@@ -379,7 +431,9 @@
         sellerPrice: 600,
         finalPrice: 618,
         status: "approved",
-        sellerUsername: "wolkite_seller",
+        isSold: false,
+        sellerUsername: "sorataju1",
+        sellerPhone: "0948944979",
         img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=300"
       }
     ];
@@ -387,7 +441,7 @@
     let currentCategory = 'All';
 
     function initApp() {
-      document.getElementById('profileName').innerText = currentUser.first_name;
+      document.getElementById('profileName').innerText = currentUser.first_name || "ተጠቃሚ";
       document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id}`;
 
       if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) {
@@ -419,19 +473,62 @@
         grid.innerHTML = '<p style="grid-column: span 2; font-size: 0.85rem; color: #888; text-align: center;">ምንም እቃ አልተገኘም።</p>';
         return;
       }
+
+      const isAdmin = (Number(currentUser.id) === ADMIN_TELEGRAM_ID);
+
       items.forEach(p => {
+        const badgeClass = p.isSold ? 'badge-sold' : 'badge-active';
+        const badgeText = p.isSold ? 'ተሽጧል (Sold)' : 'አለ (Active)';
+        const cardSoldClass = p.isSold ? 'sold-out' : '';
+
+        let buyerButtons = '';
+        if (p.isSold) {
+          buyerButtons = `<div class="sold-text">❌ ይህ እቃ ተሽጧል</div>`;
+        } else {
+          buyerButtons = `
+            <button class="btn-action btn-tg" onclick="contactSeller('${p.sellerUsername}')">ቴሌግራም 💬</button>
+            <a class="btn-action btn-call" href="tel:${p.sellerPhone}">ደውል 📞</a>
+          `;
+        }
+
+        // Admin Toggle Button
+        let adminToggleBtn = '';
+        if (isAdmin) {
+          adminToggleBtn = `
+            <button class="btn-action btn-toggle-sold" onclick="toggleSoldStatus('${p.id}')">
+              🔄 ${p.isSold ? 'ወደ Active መልስ' : 'Sold አድርግ (Mark Sold)'}
+            </button>
+          `;
+        }
+
         grid.innerHTML += `
-          <div class="product-card">
+          <div class="product-card ${cardSoldClass}">
+            <span class="status-badge ${badgeClass}">${badgeText}</span>
             <img src="${p.img}" class="product-img" alt="product">
             <div class="product-info">
               <div class="product-title">${p.title}</div>
               <div class="product-condition">${p.condition}</div>
               <div class="product-price">${p.finalPrice} ETB</div>
-              <button class="btn-sm" onclick="contactSeller('${p.sellerUsername}')">ሻጭን አናግር</button>
+              <div class="action-buttons">
+                ${buyerButtons}
+                ${adminToggleBtn}
+              </div>
             </div>
           </div>
         `;
       });
+    }
+
+    // Toggle Sold / Active by Admin
+    function toggleSoldStatus(id) {
+      const item = products.find(p => p.id === id);
+      if (item) {
+        item.isSold = !item.isSold;
+        renderProducts();
+        if (tg.showAlert) {
+          tg.showAlert(`የእቃው ሁኔታ ወደ ${item.isSold ? 'Sold' : 'Active'} ተቀይሯል!`);
+        }
+      }
     }
 
     function filterProducts() {
@@ -444,7 +541,6 @@
       renderProducts(filtered);
     }
 
-    // Exact Commission Logic
     function getCommissionRate(price) {
       if (price <= 200) return 0.10;
       if (price <= 500) return 0.05;
@@ -471,6 +567,9 @@
       const rate = getCommissionRate(price);
       const commission = Math.round(price * rate);
 
+      let cleanUser = document.getElementById('sellerTgUsername').value.trim().replace(/^@/, '');
+      let phone = document.getElementById('sellerPhone').value.trim();
+
       const newProduct = {
         id: `WS-${Date.now().toString().slice(-4)}`,
         title: document.getElementById('prodTitle').value,
@@ -479,12 +578,16 @@
         sellerPrice: price,
         finalPrice: price + commission,
         status: (Number(currentUser.id) === ADMIN_TELEGRAM_ID) ? 'approved' : 'pending',
-        sellerUsername: currentUser.username || currentUser.first_name,
+        isSold: false,
+        sellerUsername: cleanUser || 'sorataju1',
+        sellerPhone: phone || '0948944979',
         img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"
       };
 
       products.push(newProduct);
       document.getElementById('sellForm').reset();
+      document.getElementById('sellerTgUsername').value = "@sorataju1";
+      document.getElementById('sellerPhone').value = "0948944979";
       calculateCommission();
 
       if (tg.showAlert) {
@@ -509,10 +612,11 @@
       pending.forEach(p => {
         list.innerHTML += `
           <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd;">
-            <strong>${p.title}</strong> (${p.finalPrice} ETB)
+            <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
+            <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
             <div style="margin-top: 6px; display: flex; gap: 6px;">
-              <button class="btn-sm" style="background: #00C897;" onclick="adminApprove('${p.id}')">አጽድቅ (Approve)</button>
-              <button class="btn-sm" style="background: #EF4444;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
+              <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ (Approve)</button>
+              <button class="btn-action" style="background: var(--danger); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
             </div>
           </div>
         `;
@@ -533,7 +637,13 @@
     }
 
     function contactSeller(username) {
-      tg.openTelegramLink(`https://t.me/${username}`);
+      const cleanUser = username.replace(/^@/, '');
+      const link = `https://t.me/${cleanUser}`;
+      if (tg.openTelegramLink) {
+        tg.openTelegramLink(link);
+      } else {
+        window.open(link, '_blank');
+      }
     }
 
     initApp();
