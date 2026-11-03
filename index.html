@@ -15,6 +15,7 @@
       --border: #E5E7EB;
       --gray: #6B7280;
       --danger: #EF4444;
+      --warning: #F59E0B;
     }
     * {
       box-sizing: border-box;
@@ -118,12 +119,11 @@
       color: white;
       z-index: 2;
     }
-    .badge-active {
-      background-color: var(--secondary);
-    }
-    .badge-sold {
-      background-color: var(--danger);
-    }
+    .badge-active { background-color: var(--secondary); }
+    .badge-sold { background-color: var(--danger); }
+    .badge-pending { background-color: var(--warning); }
+    .badge-rejected { background-color: var(--gray); }
+
     .product-img {
       width: 100%;
       height: 120px;
@@ -170,28 +170,17 @@
       text-decoration: none;
       display: block;
     }
-    .btn-tg {
-      background: var(--secondary);
-      color: white;
-    }
-    .btn-call {
-      background: #2563EB;
-      color: white;
-    }
-    .btn-toggle-sold {
-      background: #4B5563;
-      color: white;
-      margin-top: 4px;
-      font-size: 0.65rem;
-    }
+    .btn-tg { background: var(--secondary); color: white; }
+    .btn-call { background: #2563EB; color: white; }
+    .btn-toggle-sold { background: #4B5563; color: white; font-size: 0.65rem; }
+    .btn-delete { background: #EF4444; color: white; font-size: 0.65rem; }
     .sold-text {
       text-align: center;
       color: var(--danger);
       font-weight: bold;
       font-size: 0.8rem;
-      padding: 6px 0;
+      padding: 4px 0;
     }
-    /* Forms */
     .form-group {
       margin-bottom: 12px;
     }
@@ -253,13 +242,8 @@
       cursor: pointer;
       gap: 2px;
     }
-    .nav-btn.active {
-      color: var(--primary);
-      font-weight: bold;
-    }
-    .nav-icon {
-      font-size: 1.1rem;
-    }
+    .nav-btn.active { color: var(--primary); font-weight: bold; }
+    .nav-icon { font-size: 1.1rem; }
     .admin-badge {
       background: #FEE2E2;
       color: #991B1B;
@@ -269,6 +253,13 @@
       display: inline-block;
       margin-bottom: 10px;
       font-weight: bold;
+    }
+    .section-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 14px;
+      margin-bottom: 14px;
     }
   </style>
 </head>
@@ -370,15 +361,25 @@
 
     <!-- PROFILE & ADMIN VIEW -->
     <div id="view-profile" class="view">
-      <div style="background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px;">
+      <!-- User Info -->
+      <div class="section-card">
         <h3 id="profileName" style="color: var(--primary);">ተጠቃሚ</h3>
         <p id="profileId" style="font-size: 0.8rem; color: var(--gray);">ID: -</p>
       </div>
 
-      <div id="adminPanel" style="display: none; background: #FFFBEB; border: 1px solid #FDE68A; padding: 14px; border-radius: 12px;">
-        <span class="admin-badge">Admin Dashboard Active</span>
-        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending)</h4>
+      <!-- Admin Panel -->
+      <div id="adminPanel" style="display: none;" class="section-card">
+        <span class="admin-badge">Admin Dashboard</span>
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
         <div id="adminPendingList" style="font-size: 0.85rem;">የሚጠብቅ እቃ የለም።</div>
+      </div>
+
+      <!-- My Listings Section -->
+      <div class="section-card">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">📦 የኔ እቃዎች (My Listings)</h4>
+        <div id="myListingsContainer">
+          <p style="font-size: 0.8rem; color: var(--gray);">እስካሁን የለጠፉት እቃ የለም።</p>
+        </div>
       </div>
     </div>
 
@@ -408,8 +409,7 @@
     const ADMIN_TELEGRAM_ID = 8356035160;
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    // Initial dummy data with phone and active/sold status
-    let products = [
+    const defaultProducts = [
       {
         id: "WS-101",
         title: "Calculus Early Transcendentals Book",
@@ -419,6 +419,7 @@
         finalPrice: 315,
         status: "approved",
         isSold: false,
+        sellerId: 8356035160,
         sellerUsername: "sorataju1",
         sellerPhone: "0948944979",
         img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300"
@@ -432,11 +433,19 @@
         finalPrice: 618,
         status: "approved",
         isSold: false,
+        sellerId: 8356035160,
         sellerUsername: "sorataju1",
         sellerPhone: "0948944979",
         img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=300"
       }
     ];
+
+    // Load from LocalStorage or use defaults
+    let products = JSON.parse(localStorage.getItem('ws_products')) || defaultProducts;
+
+    function saveState() {
+      localStorage.setItem('ws_products', JSON.stringify(products));
+    }
 
     let currentCategory = 'All';
 
@@ -444,12 +453,17 @@
       document.getElementById('profileName').innerText = currentUser.first_name || "ተጠቃሚ";
       document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id}`;
 
+      if (currentUser.username) {
+        document.getElementById('sellerTgUsername').value = `@${currentUser.username}`;
+      }
+
       if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) {
         document.getElementById('adminPanel').style.display = 'block';
       }
 
       renderProducts();
       renderAdminPending();
+      renderMyListings();
     }
 
     function switchTab(viewName, btn) {
@@ -457,6 +471,11 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`view-${viewName}`).classList.add('active');
       btn.classList.add('active');
+
+      if (viewName === 'profile') {
+        renderMyListings();
+        renderAdminPending();
+      }
     }
 
     function selectCategory(cat, el) {
@@ -491,12 +510,15 @@
           `;
         }
 
-        // Admin Toggle Button
-        let adminToggleBtn = '';
+        // Admin Actions (Toggle Sold & Delete)
+        let adminButtons = '';
         if (isAdmin) {
-          adminToggleBtn = `
+          adminButtons = `
             <button class="btn-action btn-toggle-sold" onclick="toggleSoldStatus('${p.id}')">
-              🔄 ${p.isSold ? 'ወደ Active መልስ' : 'Sold አድርግ (Mark Sold)'}
+              🔄 ${p.isSold ? 'ወደ Active መልስ' : 'Sold አድርግ'}
+            </button>
+            <button class="btn-action btn-delete" onclick="deleteProduct('${p.id}')">
+              🗑️ ሙሉ በሙሉ አጥፋ
             </button>
           `;
         }
@@ -511,7 +533,7 @@
               <div class="product-price">${p.finalPrice} ETB</div>
               <div class="action-buttons">
                 ${buyerButtons}
-                ${adminToggleBtn}
+                ${adminButtons}
               </div>
             </div>
           </div>
@@ -519,15 +541,57 @@
       });
     }
 
-    // Toggle Sold / Active by Admin
+    // Render My Listings under Profile tab
+    function renderMyListings() {
+      const container = document.getElementById('myListingsContainer');
+      const myList = products.filter(p => String(p.sellerId) === String(currentUser.id));
+
+      if (myList.length === 0) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: var(--gray);">እስካሁን የለጠፉት እቃ የለም።</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      myList.forEach(p => {
+        let statusBadge = '';
+        if (p.status === 'pending') statusBadge = '<span style="color: var(--warning); font-weight:bold;">⏳ በማጽደቅ ላይ (Pending)</span>';
+        else if (p.status === 'rejected') statusBadge = '<span style="color: var(--danger); font-weight:bold;">❌ ውድቅ የተደረገ (Rejected)</span>';
+        else if (p.isSold) statusBadge = '<span style="color: var(--danger); font-weight:bold;">🏷️ የተሸጠ (Sold)</span>';
+        else statusBadge = '<span style="color: var(--secondary); font-weight:bold;">✅ ገበያ ላይ ያለ (Active)</span>';
+
+        container.innerHTML += `
+          <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size: 0.85rem;">${p.title}</strong><br>
+              <span style="font-size: 0.75rem; color: var(--gray);">${p.finalPrice} ETB | ${statusBadge}</span>
+            </div>
+            <div>
+              <button class="btn-action btn-delete" style="padding: 4px 8px;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Toggle Sold / Active
     function toggleSoldStatus(id) {
       const item = products.find(p => p.id === id);
       if (item) {
         item.isSold = !item.isSold;
+        saveState();
         renderProducts();
-        if (tg.showAlert) {
-          tg.showAlert(`የእቃው ሁኔታ ወደ ${item.isSold ? 'Sold' : 'Active'} ተቀይሯል!`);
-        }
+        renderMyListings();
+      }
+    }
+
+    // Complete Delete Function
+    function deleteProduct(id) {
+      if (confirm("እቃውን ሙሉ በሙሉ ማጥፋት ይፈልጋሉ?")) {
+        products = products.filter(p => p.id !== id);
+        saveState();
+        renderProducts();
+        renderAdminPending();
+        renderMyListings();
       }
     }
 
@@ -579,25 +643,26 @@
         finalPrice: price + commission,
         status: (Number(currentUser.id) === ADMIN_TELEGRAM_ID) ? 'approved' : 'pending',
         isSold: false,
+        sellerId: currentUser.id,
         sellerUsername: cleanUser || 'sorataju1',
         sellerPhone: phone || '0948944979',
         img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"
       };
 
       products.push(newProduct);
+      saveState();
       document.getElementById('sellForm').reset();
-      document.getElementById('sellerTgUsername').value = "@sorataju1";
-      document.getElementById('sellerPhone').value = "0948944979";
       calculateCommission();
 
       if (tg.showAlert) {
-        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ወዲያውኑ ጸድቆ ተለጥፏል!' : 'እቃው በተሳካ ሁኔታ ተልኳል! አድሚኑ ሲያጸድቀው ገበያው ላይ ይወጣል።');
+        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ወዲያውኑ ጸድቆ ተለጥፏል!' : 'እቃው ተልኳል! አድሚኑ ሲያጸድቀው ገበያው ላይ ይወጣል።');
       } else {
         alert('እቃው ተመዝግቧል!');
       }
 
       renderProducts();
       renderAdminPending();
+      renderMyListings();
       switchTab('home', document.querySelector('.nav-btn'));
     }
 
@@ -615,8 +680,9 @@
             <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
             <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
             <div style="margin-top: 6px; display: flex; gap: 6px;">
-              <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ (Approve)</button>
-              <button class="btn-action" style="background: var(--danger); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
+              <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ</button>
+              <button class="btn-action" style="background: var(--warning); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
+              <button class="btn-action btn-delete" style="flex:0.6;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
             </div>
           </div>
         `;
@@ -626,14 +692,19 @@
     function adminApprove(id) {
       const item = products.find(p => p.id === id);
       if (item) item.status = 'approved';
+      saveState();
       renderProducts();
       renderAdminPending();
+      renderMyListings();
     }
 
     function adminReject(id) {
       const item = products.find(p => p.id === id);
       if (item) item.status = 'rejected';
+      saveState();
+      renderProducts();
       renderAdminPending();
+      renderMyListings();
     }
 
     function contactSeller(username) {
