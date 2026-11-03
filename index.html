@@ -195,28 +195,30 @@
       font-size: 0.9rem;
       background: var(--card-bg);
     }
+    .photo-upload-container {
+      background: #F0FDF4;
+      border: 2px dashed var(--secondary);
+      padding: 14px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
     .image-preview-box {
       width: 100%;
       height: 140px;
-      border: 2px dashed var(--border);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #fafafa;
-      margin-top: 6px;
-      position: relative;
+      background: #E5E7EB;
+      margin-top: 8px;
     }
     .image-preview-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: none;
-    }
-    .image-preview-box span {
-      font-size: 0.8rem;
-      color: var(--gray);
     }
     .price-calc-box {
       background: #EBFDF5;
@@ -281,6 +283,12 @@
       padding: 14px;
       margin-bottom: 14px;
     }
+    .loading-banner {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
   </style>
 </head>
 <body>
@@ -307,7 +315,12 @@
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
 
-      <h3 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">የእቃዎች ዝርዝር</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <h3 style="font-size: 0.95rem; color: var(--primary);">የእቃዎች ዝርዝር</h3>
+        <button onclick="fetchFromCloud()" style="background:none; border:none; color:var(--secondary); font-size:0.8rem; font-weight:bold; cursor:pointer;">🔄 እደስ (Refresh)</button>
+      </div>
+
+      <div id="loadingIndicator" class="loading-banner">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       <div class="product-grid" id="productGrid"></div>
     </div>
 
@@ -315,12 +328,12 @@
     <div id="view-sell" class="view">
       <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--primary);">አዲስ እቃ ለመሸጥ መመዝገቢያ</h3>
       <form id="sellForm" onsubmit="handleProductSubmit(event)">
-        
-        <div class="form-group">
-          <label>የእቃው ፎቶ (Product Photo)</label>
+
+        <div class="photo-upload-container">
+          <label style="font-weight: bold; color: var(--primary); display:block; margin-bottom: 6px;">📸 የእቃው ፎቶ (Product Photo)</label>
           <input type="file" id="prodPhotoInput" accept="image/*" onchange="handleImageUpload(event)" required>
-          <div class="image-preview-box" id="previewBox">
-            <span id="previewPlaceholder">ምንም ፎቶ አልተመረጠም</span>
+          <div class="image-preview-box">
+            <span id="previewPlaceholder" style="font-size: 0.8rem; color: #666;">ፎቶ ሲመርጡ እዚህ ይታያል</span>
             <img id="imagePreview" alt="preview">
           </div>
         </div>
@@ -385,7 +398,7 @@
           <textarea id="prodDesc" rows="3" placeholder="ስለ እቃው ዝርዝር ሁኔታ ይጻፉ..." required></textarea>
         </div>
 
-        <button type="submit" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem; width: 100%;">እቃውን መዝግብ (Submit)</button>
+        <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem; width: 100%;">እቃውን መዝግብ (Submit)</button>
       </form>
     </div>
 
@@ -433,50 +446,17 @@
     tg.ready();
     tg.expand();
 
+    // Firebase Cloud Realtime Database Endpoint
+    const FIREBASE_ENDPOINT = "https://wolkite-shop-default-rtdb.firebaseio.com/products";
     const ADMIN_TELEGRAM_ID = 8356035160;
+
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    const defaultProducts = [
-      {
-        id: "WS-101",
-        title: "Calculus Early Transcendentals Book",
-        category: "Books & Study Materials",
-        condition: "Slightly Used",
-        sellerPrice: 300,
-        finalPrice: 315,
-        status: "approved",
-        isSold: false,
-        sellerId: 8356035160,
-        sellerUsername: "sorataju1",
-        sellerPhone: "0948944979",
-        img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400"
-      },
-      {
-        id: "WS-102",
-        title: "Electric Kettle (የዶርም ሻይ ማፍያ)",
-        category: "Dorm & Household Items",
-        condition: "Brand New",
-        sellerPrice: 600,
-        finalPrice: 618,
-        status: "approved",
-        isSold: false,
-        sellerId: 8356035160,
-        sellerUsername: "sorataju1",
-        sellerPhone: "0948944979",
-        img: "https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=400"
-      }
-    ];
-
-    let products = JSON.parse(localStorage.getItem('ws_products')) || defaultProducts;
+    let products = [];
     let uploadedImageBase64 = "";
-
-    function saveState() {
-      localStorage.setItem('ws_products', JSON.stringify(products));
-    }
-
     let currentCategory = 'All';
 
-    function initApp() {
+    async function initApp() {
       document.getElementById('profileName').innerText = currentUser.first_name || "ተጠቃሚ";
       document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id}`;
 
@@ -488,9 +468,29 @@
         document.getElementById('adminPanel').style.display = 'block';
       }
 
-      renderProducts();
-      renderAdminPending();
-      renderMyListings();
+      await fetchFromCloud();
+    }
+
+    // Fetch live products from Cloud Database
+    async function fetchFromCloud() {
+      document.getElementById('loadingIndicator').style.display = 'block';
+      try {
+        const res = await fetch(`${FIREBASE_ENDPOINT}.json`);
+        const data = await res.json();
+        products = [];
+        if (data) {
+          Object.keys(data).forEach(key => {
+            products.push({ id: key, ...data[key] });
+          });
+        }
+      } catch (err) {
+        console.error("Cloud fetch error:", err);
+      } finally {
+        document.getElementById('loadingIndicator').style.display = 'none';
+        renderProducts();
+        renderAdminPending();
+        renderMyListings();
+      }
     }
 
     function switchTab(viewName, btn) {
@@ -512,7 +512,6 @@
       filterProducts();
     }
 
-    // Photo compress and preview
     function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -522,7 +521,7 @@
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const maxDim = 500;
+          const maxDim = 400;
           let width = img.width;
           let height = img.height;
 
@@ -539,10 +538,8 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Compress to lightweight JPEG
-          uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
-          // Display preview
           const previewImg = document.getElementById('imagePreview');
           previewImg.src = uploadedImageBase64;
           previewImg.style.display = 'block';
@@ -581,7 +578,7 @@
         let adminButtons = '';
         if (isAdmin) {
           adminButtons = `
-            <button class="btn-action btn-toggle-sold" onclick="toggleSoldStatus('${p.id}')">
+            <button class="btn-action btn-toggle-sold" onclick="toggleSoldStatus('${p.id}', ${p.isSold})">
               🔄 ${p.isSold ? 'ወደ Active መልስ' : 'Sold አድርግ'}
             </button>
             <button class="btn-action btn-delete" onclick="deleteProduct('${p.id}')">
@@ -593,7 +590,7 @@
         grid.innerHTML += `
           <div class="product-card ${cardSoldClass}">
             <span class="status-badge ${badgeClass}">${badgeText}</span>
-            <img src="${p.img}" class="product-img" alt="product">
+            <img src="${p.img || 'https://via.placeholder.com/150'}" class="product-img" alt="product">
             <div class="product-info">
               <div class="product-title">${p.title}</div>
               <div class="product-condition">${p.condition}</div>
@@ -628,7 +625,7 @@
         container.innerHTML += `
           <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <img src="${p.img}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+              <img src="${p.img || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
               <div>
                 <strong style="font-size: 0.85rem;">${p.title}</strong><br>
                 <span style="font-size: 0.75rem; color: var(--gray);">${p.finalPrice} ETB | ${statusBadge}</span>
@@ -642,23 +639,21 @@
       });
     }
 
-    function toggleSoldStatus(id) {
-      const item = products.find(p => p.id === id);
-      if (item) {
-        item.isSold = !item.isSold;
-        saveState();
-        renderProducts();
-        renderMyListings();
-      }
+    async function toggleSoldStatus(id, currentSoldState) {
+      await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isSold: !currentSoldState })
+      });
+      await fetchFromCloud();
     }
 
-    function deleteProduct(id) {
+    async function deleteProduct(id) {
       if (confirm("እቃውን ሙሉ በሙሉ ማጥፋት ይፈልጋሉ?")) {
-        products = products.filter(p => p.id !== id);
-        saveState();
-        renderProducts();
-        renderAdminPending();
-        renderMyListings();
+        await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, {
+          method: 'DELETE'
+        });
+        await fetchFromCloud();
       }
     }
 
@@ -692,7 +687,7 @@
       document.getElementById('dispFinalPrice').innerText = `${finalPrice} ETB`;
     }
 
-    function handleProductSubmit(e) {
+    async function handleProductSubmit(e) {
       e.preventDefault();
 
       if (!uploadedImageBase64) {
@@ -701,6 +696,10 @@
         return;
       }
 
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerText = "እቃውን በመላክ ላይ...";
+      submitBtn.disabled = true;
+
       const price = parseFloat(document.getElementById('sellerPrice').value) || 0;
       const rate = getCommissionRate(price);
       const commission = Math.round(price * rate);
@@ -708,8 +707,8 @@
       let cleanUser = document.getElementById('sellerTgUsername').value.trim().replace(/^@/, '');
       let phone = document.getElementById('sellerPhone').value.trim();
 
+      const newId = `WS-${Date.now().toString().slice(-6)}`;
       const newProduct = {
-        id: `WS-${Date.now().toString().slice(-4)}`,
         title: document.getElementById('prodTitle').value,
         category: document.getElementById('prodCategory').value,
         condition: document.getElementById('prodCondition').value,
@@ -723,26 +722,34 @@
         img: uploadedImageBase64
       };
 
-      products.push(newProduct);
-      saveState();
+      try {
+        // Save to Firebase Cloud
+        await fetch(`${FIREBASE_ENDPOINT}/${newId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProduct)
+        });
 
-      // Reset Form & Preview
-      document.getElementById('sellForm').reset();
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('previewPlaceholder').style.display = 'block';
-      uploadedImageBase64 = "";
-      calculateCommission();
+        document.getElementById('sellForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('previewPlaceholder').style.display = 'block';
+        uploadedImageBase64 = "";
+        calculateCommission();
 
-      if (tg.showAlert) {
-        tg.showAlert(newProduct.status === 'approved' ? 'እቃው ከፎቶው ጋር ተለጥፏል!' : 'እቃው ተልኳል! አድሚኑ ሲያጸድቀው ይለጠፋል።');
-      } else {
-        alert('እቃው ተመዝግቧል!');
+        if (tg.showAlert) {
+          tg.showAlert(newProduct.status === 'approved' ? 'እቃው በቀጥታ ወደ ገበያው ተለጥፏል!' : 'እቃው ተልኳል! አድሚኑ ሲያጸድቀው ገበያው ላይ ይወጣል።');
+        } else {
+          alert('እቃው ተመዝግቧል!');
+        }
+
+        await fetchFromCloud();
+        switchTab('home', document.querySelector('.nav-btn'));
+      } catch (err) {
+        alert("የኔትወርክ ስህተት አጋጥሟል፤ እባክዎ እንደገና ይሞክሩ።");
+      } finally {
+        submitBtn.innerText = "እቃውን መዝግብ (Submit)";
+        submitBtn.disabled = false;
       }
-
-      renderProducts();
-      renderAdminPending();
-      renderMyListings();
-      switchTab('home', document.querySelector('.nav-btn'));
     }
 
     function renderAdminPending() {
@@ -756,7 +763,7 @@
       pending.forEach(p => {
         list.innerHTML += `
           <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; display:flex; gap:10px;">
-            <img src="${p.img}" style="width:60px; height:60px; border-radius:6px; object-fit:cover;">
+            <img src="${p.img || 'https://via.placeholder.com/60'}" style="width:60px; height:60px; border-radius:6px; object-fit:cover;">
             <div style="flex:1;">
               <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
               <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
@@ -771,22 +778,22 @@
       });
     }
 
-    function adminApprove(id) {
-      const item = products.find(p => p.id === id);
-      if (item) item.status = 'approved';
-      saveState();
-      renderProducts();
-      renderAdminPending();
-      renderMyListings();
+    async function adminApprove(id) {
+      await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'approved' })
+      });
+      await fetchFromCloud();
     }
 
-    function adminReject(id) {
-      const item = products.find(p => p.id === id);
-      if (item) item.status = 'rejected';
-      saveState();
-      renderProducts();
-      renderAdminPending();
-      renderMyListings();
+    async function adminReject(id) {
+      await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'rejected' })
+      });
+      await fetchFromCloud();
     }
 
     function contactSeller(username) {
