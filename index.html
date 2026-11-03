@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>W&S AI MINI SHOP</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --primary: #063B2E;
+      --secondary: #00C897;
+      --bg: #F8F7F2;
+      --text: #222222;
+      --card-bg: #FFFFFF;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    header h1 {
+      font-size: 1.25rem;
+      letter-spacing: 0.5px;
+    }
+    header p {
+      font-size: 0.8rem;
+      color: var(--secondary);
+      margin-top: 4px;
+    }
+    .container {
+      padding: 16px;
+      flex: 1;
+    }
+    .status-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--secondary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .user-info {
+      font-size: 0.9rem;
+      margin-top: 8px;
+      color: #555;
+    }
+    .nav-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--card-bg);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #E5E5E5;
+    }
+    .nav-item {
+      font-size: 0.75rem;
+      color: #777;
+      text-align: center;
+      text-decoration: none;
+    }
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+    .btn {
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>W&S AI MINI SHOP</h1>
+    <p>Wolkite University Student Marketplace</p>
+  </header>
+
+  <div class="container">
+    <div class="status-card">
+      <h3>የሚኒ አፕ ግንኙነት ሙከራ</h3>
+      <p style="margin-top: 6px; font-size: 0.85rem;">ይህ ገጽ በቴሌግራም ሚኒ አፕ ስክሪን ላይ በተሳካ ሁኔታ እየሰራ ነው።</p>
+      <div class="user-info" id="user-display">የተጠቃሚ መረጃ በመጫን ላይ...</div>
+    </div>
+
+    <button class="btn" onclick="sendAlert()">ስርዓቱን ፈትሽ</button>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-item active">Home</div>
+    <div class="nav-item">Shop</div>
+    <div class="nav-item">Sell</div>
+    <div class="nav-item">Favorites</div>
+    <div class="nav-item">Profile</div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const user = tg.initDataUnsafe?.user;
+    const userDisplay = document.getElementById('user-display');
+    if (user) {
+      userDisplay.innerText = `እንኳን ደህና መጡ፣ ${user.first_name}! (ID: ${user.id})`;
+    } else {
+      userDisplay.innerText = "አፑ በብሮውዘር ላይ ተከፍቷል (ከቴሌግራም ውጭ)";
+    }
+
+    function sendAlert() {
+      if (tg.showAlert) {
+        tg.showAlert("W&S AI MINI SHOP በትክክል እየሰራ ነው!");
+      } else {
+        alert("W&S AI MINI SHOP በትክክል እየሰራ ነው!");
+      }
+    }
+  </script>
+</body>
+</html>
