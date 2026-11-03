@@ -355,16 +355,6 @@
         </div>
 
         <div class="form-group">
-          <label>የእርስዎ የቴሌግራም Username (@username)</label>
-          <input type="text" id="sellerTgUsername" value="@sorataju1" required>
-        </div>
-
-        <div class="form-group">
-          <label>የእርስዎ ስልክ ቁጥር (Phone Number)</label>
-          <input type="tel" id="sellerPhone" value="0948944979" placeholder="09..." required>
-        </div>
-
-        <div class="form-group">
           <label>የእቃው ሁኔታ (Condition)</label>
           <select id="prodCondition" required>
             <option value="Brand New">አዲስ (Brand New)</option>
@@ -409,6 +399,7 @@
         <p id="profileId" style="font-size: 0.8rem; color: var(--gray);">ID: -</p>
       </div>
 
+      <!-- ADMIN DASHBOARD -->
       <div id="adminPanel" style="display: none;" class="section-card">
         <span class="admin-badge">Admin Dashboard</span>
         <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
@@ -446,9 +437,9 @@
     tg.ready();
     tg.expand();
 
-    // Firebase Cloud Realtime Database Endpoint
     const FIREBASE_ENDPOINT = "https://wolkite-shop-default-rtdb.firebaseio.com/products";
     const ADMIN_TELEGRAM_ID = 8356035160;
+    const ADMIN_PHONE = "+251948944979"; // Your Admin Contact Phone
 
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
@@ -458,11 +449,7 @@
 
     async function initApp() {
       document.getElementById('profileName').innerText = currentUser.first_name || "ተጠቃሚ";
-      document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id}`;
-
-      if (currentUser.username) {
-        document.getElementById('sellerTgUsername').value = `@${currentUser.username}`;
-      }
+      document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id} ${currentUser.username ? '(@' + currentUser.username + ')' : ''}`;
 
       if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) {
         document.getElementById('adminPanel').style.display = 'block';
@@ -471,7 +458,6 @@
       await fetchFromCloud();
     }
 
-    // Fetch live products from Cloud Database
     async function fetchFromCloud() {
       document.getElementById('loadingIndicator').style.display = 'block';
       try {
@@ -570,8 +556,8 @@
           buyerButtons = `<div class="sold-text">❌ ይህ እቃ ተሽጧል</div>`;
         } else {
           buyerButtons = `
-            <button class="btn-action btn-tg" onclick="contactSeller('${p.sellerUsername}')">ቴሌግራም 💬</button>
-            <a class="btn-action btn-call" href="tel:${p.sellerPhone}">ደውል 📞</a>
+            <a class="btn-action btn-call" href="tel:${ADMIN_PHONE}">ደውል 📞</a>
+            <button class="btn-action btn-tg" onclick="contactSeller('${p.sellerUsername}', '${p.sellerId}')">ቴሌግራም 💬</button>
           `;
         }
 
@@ -704,26 +690,24 @@
       const rate = getCommissionRate(price);
       const commission = Math.round(price * rate);
 
-      let cleanUser = document.getElementById('sellerTgUsername').value.trim().replace(/^@/, '');
-      let phone = document.getElementById('sellerPhone').value.trim();
-
       const newId = `WS-${Date.now().toString().slice(-6)}`;
+      
       const newProduct = {
         title: document.getElementById('prodTitle').value,
         category: document.getElementById('prodCategory').value,
         condition: document.getElementById('prodCondition').value,
+        desc: document.getElementById('prodDesc').value,
         sellerPrice: price,
         finalPrice: price + commission,
         status: (Number(currentUser.id) === ADMIN_TELEGRAM_ID) ? 'approved' : 'pending',
         isSold: false,
         sellerId: currentUser.id,
-        sellerUsername: cleanUser || 'sorataju1',
-        sellerPhone: phone || '0948944979',
+        sellerName: currentUser.first_name || "ተማሪ",
+        sellerUsername: currentUser.username ? currentUser.username.replace(/^@/, '') : '',
         img: uploadedImageBase64
       };
 
       try {
-        // Save to Firebase Cloud
         await fetch(`${FIREBASE_ENDPOINT}/${newId}.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -761,13 +745,22 @@
       }
       list.innerHTML = '';
       pending.forEach(p => {
+        const hasUsername = p.sellerUsername && p.sellerUsername !== '';
+        const sellerContactHtml = hasUsername 
+          ? `<a href="https://t.me/${p.sellerUsername}" target="_blank" style="color: #2563EB; font-weight: bold; text-decoration: underline;">@${p.sellerUsername} (ቻት ክፈት 💬)</a>`
+          : `<span style="color: #666;">የለውም (ስም: ${p.sellerName || 'ተጠቃሚ'})</span>`;
+
         list.innerHTML += `
-          <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; display:flex; gap:10px;">
-            <img src="${p.img || 'https://via.placeholder.com/60'}" style="width:60px; height:60px; border-radius:6px; object-fit:cover;">
+          <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; display:flex; gap:10px;">
+            <img src="${p.img || 'https://via.placeholder.com/60'}" style="width:70px; height:70px; border-radius:6px; object-fit:cover;">
             <div style="flex:1;">
-              <strong>${p.title}</strong> (${p.finalPrice} ETB)<br>
-              <small>ሻጭ፡ @${p.sellerUsername} | ስልክ፡ ${p.sellerPhone}</small>
-              <div style="margin-top: 6px; display: flex; gap: 6px;">
+              <strong>${p.title}</strong><br>
+              <span style="font-size:0.8rem; color:#444;">ዋጋ: <b>${p.finalPrice} ETB</b> (የሻጭ: ${p.sellerPrice} ETB)</span><br>
+              <div style="margin: 4px 0; font-size:0.8rem; background:#F3F4F6; padding:4px 6px; border-radius:4px;">
+                👤 <b>ሻጭ:</b> ${sellerContactHtml}<br>
+                🆔 <b>ID:</b> <code>${p.sellerId}</code>
+              </div>
+              <div style="margin-top: 8px; display: flex; gap: 6px;">
                 <button class="btn-action btn-tg" style="flex:1;" onclick="adminApprove('${p.id}')">አጽድቅ</button>
                 <button class="btn-action" style="background: var(--warning); color: white; flex:1;" onclick="adminReject('${p.id}')">ውድቅ አድርግ</button>
                 <button class="btn-action btn-delete" style="flex:0.6;" onclick="deleteProduct('${p.id}')">አጥፋ</button>
@@ -796,13 +789,14 @@
       await fetchFromCloud();
     }
 
-    function contactSeller(username) {
-      const cleanUser = username.replace(/^@/, '');
-      const link = `https://t.me/${cleanUser}`;
-      if (tg.openTelegramLink) {
-        tg.openTelegramLink(link);
+    function contactSeller(username, userId) {
+      if (username && username !== '') {
+        const link = `https://t.me/${username}`;
+        if (tg.openTelegramLink) tg.openTelegramLink(link);
+        else window.open(link, '_blank');
       } else {
-        window.open(link, '_blank');
+        if (tg.showAlert) tg.showAlert("ይህ ሻጭ በቴሌግራም ላይ Username አላወጣም፤ እባክዎ በቀጥታ በስልክ ይደውሉ።");
+        else alert("ይህ ሻጭ በቴሌግራም ላይ Username አላወጣም፤ እባክዎ በቀጥታ በስልክ ይደውሉ።");
       }
     }
 
