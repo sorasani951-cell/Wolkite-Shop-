@@ -247,9 +247,8 @@
     tg.ready();
     tg.expand();
 
-    // ⚠️ ማሳሰቢያ፡ ይህንን "YOUR_BOT_TOKEN_HERE" አጥፍተው የእርስዎን ትክክለኛ ቦት ቶከን ያስገቡ!!
-    // ለምሳሌ: "1234567890:AAH...etc"
-    const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
+    // የተስተካከለው የቦት ቶከን (Bot Token) እና ቻናል
+    const BOT_TOKEN = "8848336833:AAHfsAdWgblfweZUkJHlgwAxuGhVOdaIW3w"; 
     const CHANNEL_USERNAME = "@wolkiteshop";
     
     const FIREBASE_ENDPOINT = "https://wolkite-shop-default-rtdb.firebaseio.com/products";
@@ -496,13 +495,9 @@
       await fetchFromCloud();
     }
 
-    // New Pre-filled Telegram Message Function
     function contactSeller(productId) {
       const p = products.find(x => x.id === productId);
       if(!p) return;
-      // You can decide whether buyers chat with you (admin) or the seller directly.
-      // Since admin phone is used, we direct telegram to ADMIN as well for full control.
-      // If you want it to go to seller, change "sorataju1" to p.sellerUsername.
       const ADMIN_USER = "sorataju1"; 
       
       const message = `ሰላም፣ ይህንን እቃ መግዛት ፈልጌ ነበር፦ \n\n📌 ስም: ${p.title}\n💰 ዋጋ: ${p.finalPrice} ETB\n📦 ሁኔታ: ${p.condition}`;
@@ -512,18 +507,17 @@
       else window.open(link, '_blank');
     }
 
-    // Post Product to Channel via Bot API
     async function postToChannel(id) {
       const p = products.find(x => x.id === id);
       if(!p) return;
-      if(BOT_TOKEN === "8848336833:AAHfsAdWgblfweZUkJHlgwAxuGhVOdaIW3w" || BOT_TOKEN === "") {
+      if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || BOT_TOKEN === "") {
         alert("እባክዎ ቻናል ላይ ከመፖሰትዎ በፊት የቦትዎን ቶከን (Bot Token) በኮዱ ውስጥ ያስገቡ!");
         return;
       }
 
       if(!confirm(`ይህንን እቃ ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
 
-      const caption = `🛒 አዲስ እቃ ገበያ ላይ ወጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${p.finalPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkiteshopbot ይጠቀሙ።`;
+      const caption = `🛒 አዲስ እቃ ገበያ ላይ ወጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${p.finalPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
 
       try {
         const res = await fetch(p.img);
