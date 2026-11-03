@@ -115,6 +115,13 @@
     .admin-badge { background: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; display: inline-block; margin-bottom: 10px; font-weight: bold; }
     .section-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
     .loading-banner { text-align: center; padding: 10px; font-size: 0.8rem; color: var(--gray); }
+    
+    /* Analytics Stats Box */
+    .stats-box {
+      background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 12px;
+    }
+    .stats-number { font-size: 1.8rem; font-weight: bold; color: var(--primary); margin: 4px 0; }
+    .stats-label { font-size: 0.8rem; color: var(--gray); font-weight: bold; }
   </style>
 </head>
 <body>
@@ -207,11 +214,21 @@
         <h3 id="profileName" style="color: var(--primary);">ተጠቃሚ</h3>
         <p id="profileId" style="font-size: 0.8rem; color: var(--gray);">ID: -</p>
       </div>
+
+      <!-- ADMIN DASHBOARD -->
       <div id="adminPanel" style="display: none;" class="section-card">
         <span class="admin-badge">Admin Dashboard</span>
+        
+        <!-- አዲስ የተጨመረው የተጠቃሚዎች ቁጥር ማሳያ (Analytics) -->
+        <div class="stats-box">
+          <div class="stats-label">📊 አፑን የከፈቱ ጠቅላላ ተጠቃሚዎች</div>
+          <div id="analyticsUsersCount" class="stats-number">0</div>
+        </div>
+
         <h4 style="font-size: 0.9rem; margin-bottom: 8px;">የአድሚን ማጽደቂያ ክፍል (Pending Items)</h4>
         <div id="adminPendingList" style="font-size: 0.85rem;">የሚጠብቅ እቃ የለም።</div>
       </div>
+
       <div class="section-card">
         <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--primary);">📦 የኔ እቃዎች (My Listings)</h4>
         <div id="myListingsContainer"><p style="font-size: 0.8rem; color: var(--gray);">እስካሁን የለጠፉት እቃ የለም።</p></div>
@@ -247,11 +264,14 @@
     tg.ready();
     tg.expand();
 
-    // የተስተካከለው የቦት ቶከን (Bot Token) እና ቻናል
+    // 100% የገባው የቦት ቶከን (ወደ ቻናል ለመላክ)
     const BOT_TOKEN = "8848336833:AAHfsAdWgblfweZUkJHlgwAxuGhVOdaIW3w"; 
     const CHANNEL_USERNAME = "@wolkiteshop";
     
+    // የ Firebase ዳታቤዞች ማገናኛዎች
     const FIREBASE_ENDPOINT = "https://wolkite-shop-default-rtdb.firebaseio.com/products";
+    const FIREBASE_USERS = "https://wolkite-shop-default-rtdb.firebaseio.com/users";
+    
     const ADMIN_TELEGRAM_ID = 8356035160;
     const ADMIN_PHONE = "+251948944979"; 
 
@@ -264,8 +284,44 @@
     async function initApp() {
       document.getElementById('profileName').innerText = currentUser.first_name || "ተጠቃሚ";
       document.getElementById('profileId').innerText = `Telegram ID: ${currentUser.id} ${currentUser.username ? '(@' + currentUser.username + ')' : ''}`;
-      if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) document.getElementById('adminPanel').style.display = 'block';
+      
+      // አፑ ሲከፈት የተጠቃሚውን መረጃ ወደ Firebase Users ይመዘግባል
+      trackUser();
+
+      if (Number(currentUser.id) === ADMIN_TELEGRAM_ID) {
+        document.getElementById('adminPanel').style.display = 'block';
+        fetchAnalytics(); // ለአድሚን ብቻ የ Users ቁጥር ይቆጥራል
+      }
+      
       await fetchFromCloud();
+    }
+
+    // አዲስ የተጨመረ - ማንኛውም ሰው አፑን ሲከፍት መረጃውን ይይዛል (Analytics)
+    async function trackUser() {
+      const userData = {
+        name: currentUser.first_name || "Unknown",
+        username: currentUser.username || "None",
+        last_seen: new Date().toISOString()
+      };
+      try {
+        await fetch(`${FIREBASE_USERS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+      } catch(e) { console.log("Analytics Error:", e); }
+    }
+
+    // አዲስ የተጨመረ - አድሚን ዳሽቦርድ ላይ ስንት ሰው እንደተጠቀመ ያሰላል
+    async function fetchAnalytics() {
+      try {
+        const res = await fetch(`${FIREBASE_USERS}.json`);
+        const data = await res.json();
+        if(data) {
+          const totalUsers = Object.keys(data).length;
+          document.getElementById('analyticsUsersCount').innerText = totalUsers;
+        }
+      } catch(e) { console.log("Analytics Fetch Error:", e); }
     }
 
     async function fetchFromCloud() {
@@ -288,7 +344,11 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`view-${viewName}`).classList.add('active');
       btn.classList.add('active');
-      if (viewName === 'profile') { renderMyListings(); renderAdminPending(); }
+      if (viewName === 'profile') { 
+        renderMyListings(); 
+        renderAdminPending(); 
+        if(Number(currentUser.id) === ADMIN_TELEGRAM_ID) fetchAnalytics();
+      }
     }
 
     function selectCategory(cat, el) {
@@ -510,10 +570,6 @@
     async function postToChannel(id) {
       const p = products.find(x => x.id === id);
       if(!p) return;
-      if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || BOT_TOKEN === "") {
-        alert("እባክዎ ቻናል ላይ ከመፖሰትዎ በፊት የቦትዎን ቶከን (Bot Token) በኮዱ ውስጥ ያስገቡ!");
-        return;
-      }
 
       if(!confirm(`ይህንን እቃ ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
 
