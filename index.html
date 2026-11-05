@@ -128,8 +128,7 @@
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
         <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
-        <!-- እዚህ ጋር loadAllData() ተብሎ ተስተካክሏል -->
-        <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+        <button onclick="fetchFromCloud()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
       </div>
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       <div class="product-grid" id="productGrid"></div>
@@ -235,6 +234,9 @@
         <div class="analytics-grid">
           <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
           <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
+          <!-- ⚠️ Missing Boxes Restored! -->
+          <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
+          <div class="stat-box"><div class="stat-num" id="st-cancelled-orders" style="color:var(--gray);">0</div><div class="stat-title">Cancelled Orders</div></div>
         </div>
         
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; margin-top:10px;">
@@ -597,7 +599,11 @@
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
       document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
-      document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
+      
+      // ✅ ትክክለኛው የሳጥን ማዘመኛ ኮድ ተመልሷል!
+      document.getElementById('st-completed-orders').innerText = compO; 
+      document.getElementById('st-cancelled-orders').innerText = cancO;
+      
       document.getElementById('st-active-sellers').innerText = tSellers; 
       document.getElementById('st-gold-sellers').innerText = gSellers;
       document.getElementById('st-silver-sellers').innerText = silSellers;
@@ -668,18 +674,18 @@
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
 
-    // ✅ የ Category ማጣሪያ ፈንክሽን በትክክል ተመልሷል!
-    function selectCategory(cat, btn) {
-      currentCategory = cat;
-      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      filterProducts();
-    }
+    function selectCategory(cat, btn) { currentCategory = cat; document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); btn.classList.add('active'); filterProducts(); }
+    function fetchFromCloud() { loadAllData(); }
 
-    function filterProducts() {
-      const q = document.getElementById('homeSearch').value.toLowerCase();
-      const filtered = products.filter(p => (currentCategory === 'All' || p.category === currentCategory) && p.title.toLowerCase().includes(q) && p.status === 'approved');
-      renderProducts(filtered);
+    async function likeProduct(id) {
+      if(currentUser.id !== ADMIN_ID) {
+        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
+        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
+        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
+      }
+      const p = products.find(x => x.id === id); if(!p) return;
+      const newLikes = (p.likes || 0) + 1;
+      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); p.likes = newLikes; filterProducts(); } catch(e) {}
     }
 
     async function handleProductSubmit(e) {
@@ -725,7 +731,7 @@
           alert("ስህተት: ቦቱ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description);
           if (tgData.error_code === 401 || tgData.error_code === 404) { localStorage.removeItem('admin_bot_token'); }
         }
-      } catch(e) { alert("መፖሰት አልተቻለም!"); }
+      } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
     }
     
     initApp();
