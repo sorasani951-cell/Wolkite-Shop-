@@ -2,77 +2,126 @@
 <html lang="am">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>W&S AI MINI SHOP (Marketplace)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>W&S AI MINI SHOP (Pro Marketplace)</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --primary: #063B2E; --secondary: #00C897; --bg: #F8F7F2; --text: #1F2937;
-      --card-bg: #FFFFFF; --border: #E5E7EB; --gray: #6B7280; --danger: #EF4444; --warning: #F59E0B; --gold: #F59E0B;
+      --primary: #063B2E; --primary-2: #0B5A45; --secondary: #00C897; --bg: #F4F5F0; --text: #1B2430;
+      --card-bg: #FFFFFF; --border: #E7E9E4; --gray: #6B7280; --danger: #EF4444;
+      --warning: #F59E0B; --gold: #D97706; --gold-bg: #FEF3C7; --soft: #F1F4F1;
+      --shadow: 0 2px 10px rgba(6,59,46,.07); --shadow-lg: 0 8px 24px rgba(6,59,46,.14);
+      --radius: 16px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; }
-    header { background-color: var(--primary); color: white; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.2rem; }
-    header p { font-size: 0.75rem; color: var(--secondary); }
-    .container { padding: 14px; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0C1512; --text: #E8EEEA; --card-bg: #15211C; --border: #24342D; --gray: #93A39B;
+        --soft: #1B2923; --gold-bg: #3A2D12; --shadow: 0 2px 10px rgba(0,0,0,.3); --shadow-lg: 0 8px 24px rgba(0,0,0,.45);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, "Noto Sans Ethiopic", "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); line-height: 1.4; }
+
+    /* Header */
+    header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%); color: white; padding: calc(18px + env(safe-area-inset-top, 0px)) 16px 22px; text-align: center; position: sticky; top: 0; z-index: 100; border-radius: 0 0 24px 24px; box-shadow: var(--shadow-lg); }
+    header h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: .6px; }
+    header h1::before { content: "🛍️ "; }
+    header p { font-size: 0.72rem; color: var(--secondary); margin-top: 2px; letter-spacing: .3px; }
+
+    .container { padding: 16px 14px; max-width: 640px; margin: 0 auto; }
     .view { display: none; }
-    .view.active { display: block; }
-    
+    .view.active { display: block; animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
     /* Search & Categories */
     .search-box { display: flex; gap: 8px; margin-bottom: 14px; }
-    .search-box input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; }
-    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; scrollbar-width: none; }
-    .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
-    .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
-    
+    .search-box input { flex: 1; padding: 13px 16px 13px 42px; border: 1px solid var(--border); border-radius: 14px; outline: none; font-size: .9rem; background: var(--card-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center; color: var(--text); box-shadow: var(--shadow); transition: border-color .2s, box-shadow .2s; }
+    .search-box input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(0,200,151,.18); }
+    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin-bottom: 8px; scrollbar-width: none; }
+    .categories-bar::-webkit-scrollbar { display: none; }
+    .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 16px; border-radius: 22px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--gray); transition: all .2s; }
+    .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(6,59,46,.25); }
+
     /* Product Grid */
     .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; }
+    .product-grid:empty::before { content: "🔍 ምንም እቃ አልተገኘም"; grid-column: 1 / -1; text-align: center; padding: 40px 10px; color: var(--gray); font-size: .85rem; background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius); }
+    .product-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; box-shadow: var(--shadow); transition: transform .15s, box-shadow .2s; }
+    .product-card:active { transform: scale(.985); }
     .product-card.sold-out { opacity: 0.7; border: 1px dashed var(--danger); }
-    .product-card.pinned { border: 2px solid var(--gold); box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
-    
-    .status-badge { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; color: white; z-index: 2; }
+    .product-card.pinned { border: 2px solid var(--gold); box-shadow: 0 6px 18px rgba(217, 119, 6, 0.25); }
+
+    .status-badge { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; color: white; z-index: 2; }
     .badge-active { background-color: var(--secondary); }
     .badge-sold { background-color: var(--danger); }
-    .badge-pinned { background-color: var(--gold); left: 8px; right: auto; }
-    
-    .like-btn { position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 14px; z-index: 2; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .like-btn.liked { color: var(--danger); }
+    .badge-pinned { background-color: var(--gold); left: 8px; right: auto; top: 8px; }
 
-    .product-img { width: 100%; height: 120px; object-fit: cover; background: #eee; cursor: pointer; }
-    .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; }
-    .product-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
-    .product-shop { font-size: 0.7rem; color: var(--primary); font-weight:bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;}
-    .pro-badge { background: var(--gold); color: white; padding: 1px 4px; border-radius: 4px; font-size: 0.6rem; }
-    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--text); margin-top: auto; margin-bottom: 8px; }
-    
+    .like-btn { position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.95); border: none; border-radius: 14px; height: 28px; min-width: 28px; padding: 0 9px; font-size: 12px; font-weight: 700; color: #374151; z-index: 2; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.18); transition: transform .15s; }
+    .like-btn:active { transform: scale(1.15); }
+    .like-btn.liked { color: var(--danger); }
+    .pinned .like-btn { top: 38px; }
+
+    .product-img { width: 100%; height: 130px; object-fit: cover; background: linear-gradient(135deg, #e6ece8, #d5dfd9); cursor: pointer; display: block; }
+    .product-info { padding: 11px 11px 12px; display: flex; flex-direction: column; flex: 1; }
+    .product-title { font-size: 0.86rem; font-weight: 700; margin-bottom: 3px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-shop { font-size: 0.7rem; color: var(--gray); font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .pro-badge { background: linear-gradient(135deg, #F59E0B, #D97706); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.58rem; font-weight: 800; letter-spacing: .4px; }
+    .product-price { font-size: 1.02rem; font-weight: 800; color: var(--primary-2); margin-top: auto; margin-bottom: 9px; }
+    @media (prefers-color-scheme: dark) { .product-price { color: var(--secondary); } }
+
     .action-buttons { display: flex; flex-direction: column; gap: 4px; }
-    .btn-action { border: none; padding: 7px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; }
-    .btn-tg { background: var(--secondary); color: white; }
+    .btn-action { border: none; padding: 9px; border-radius: 10px; font-size: 0.76rem; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; transition: transform .12s, filter .2s; }
+    .btn-action:active { transform: scale(.96); filter: brightness(.92); }
+    .btn-action:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-tg { background: var(--secondary); color: #04261c; }
     .btn-call { background: #2563EB; color: white; }
-    
-    /* Forms & Modals */
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
-    
+    .btn-order { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; box-shadow: 0 4px 10px rgba(6,59,46,.25); }
+    .btn-channel { background: #0EA5E9; color: white; }
+    .btn-toggle-sold { background: var(--soft); color: var(--text); }
+    .btn-delete { background: #FEE2E2; color: #B91C1C; }
+    .sold-text { text-align: center; padding: 9px; border-radius: 10px; background: #FEE2E2; color: #B91C1C; font-size: .78rem; font-weight: 700; }
+
     /* Navigation */
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 2px; }
-    .nav-btn.active { color: var(--primary); font-weight: bold; }
-    
-    .section-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
-    .shop-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .shop-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-    .shop-avatar.pro-avatar { border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
-    
-    /* Profile Tabs */
-    .profile-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
-    .p-tab { padding: 6px 12px; background: #eee; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap;}
-    .p-tab.active { background: var(--primary); color: white; }
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: calc(66px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: color-mix(in srgb, var(--card-bg) 92%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; box-shadow: 0 -6px 20px rgba(6,59,46,.08); z-index: 1000; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.68rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 3px; flex: 1; padding: 6px 0; font-weight: 600; }
+    .nav-icon { font-size: 1.15rem; padding: 3px 18px; border-radius: 14px; transition: background .2s, transform .2s; }
+    .nav-btn.active { color: var(--primary-2); font-weight: 800; }
+    .nav-btn.active .nav-icon { background: rgba(0,200,151,.2); transform: translateY(-2px); }
+    @media (prefers-color-scheme: dark) { .nav-btn.active { color: var(--secondary); } }
+
+    /* Shop Profile & Cards */
+    .section-card { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
+    .shop-profile-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: linear-gradient(135deg, var(--card-bg), var(--soft)); }
+    .shop-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); background: #e5e7eb; }
+    .shop-avatar.pro-avatar { border-color: var(--gold); box-shadow: 0 0 14px rgba(217,119,6,.55); }
+
+    .profile-tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; background: var(--soft); padding: 5px; border-radius: 14px; }
+    .profile-tabs::-webkit-scrollbar { display: none; }
+    .p-tab { padding: 8px 14px; background: transparent; border-radius: 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; color: var(--gray); transition: all .2s; }
+    .p-tab.active { background: var(--card-bg); color: var(--primary-2); box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    @media (prefers-color-scheme: dark) { .p-tab.active { color: var(--secondary); } }
     .p-content { display: none; }
     .p-content.active { display: block; }
+
+    /* Lists rendered by JS (override inline styles) */
+    #myListingsContainer > div, #myOrdersContainer > div, #adminPendingList > div, #adminSellersList > div { border-radius: 12px !important; }
+    #myOrdersContainer > div, #adminPendingList > div, #adminSellersList > div { background: var(--card-bg) !important; border: 1px solid var(--border) !important; padding: 12px !important; }
+    #myListingsContainer > div { border-bottom: 1px solid var(--border) !important; }
+
+    /* Admin Analytics Grid */
+    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .stat-box { background: var(--soft); border-radius: 14px; padding: 12px 8px; text-align: center; border: 1px solid var(--border); }
+    .stat-box.pro { background: var(--gold-bg); border-color: var(--gold); }
+    .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--primary-2); margin-bottom: 2px; }
+    .stat-title { font-size: 0.62rem; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: .3px; }
+
+    /* Forms */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; font-size: 0.9rem; background: var(--card-bg); color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(0,200,151,.18); }
+    .form-group input[type=file] { padding: 10px; border-style: dashed; background: var(--soft); }
+    #submitBtn, #sellForm .btn-action, #shopSetupBox .btn-action { padding: 14px !important; font-size: .92rem !important; border-radius: 14px; }
+    #loadingIndicator { background: var(--soft); border-radius: 12px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -91,11 +140,15 @@
         <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
         <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
         <div class="cat-pill" onclick="selectCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Books & Study Materials', this)">መጽሐፍት</div>
+        <div class="cat-pill" onclick="selectCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-        <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በ Like ብዛት የተደረደሩ)</small></h3>
+        <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
         <button onclick="fetchFromCloud()" style="background:none; border:none; color:var(--secondary); font-weight:bold;">🔄 እደስ</button>
       </div>
+      <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       <div class="product-grid" id="productGrid"></div>
     </div>
 
@@ -106,30 +159,33 @@
         <p style="font-size:0.8rem; color:var(--gray); margin:10px 0;">እቃ ለመለጠፍ የሱቅ ስም እና አድራሻዎን መመዝገብ አለብዎት።</p>
         <button class="btn-action btn-tg" onclick="switchTab('profile', document.getElementById('navProfile'))">ወደ ፕሮፋይል ይሂዱ</button>
       </div>
-      
+
       <div id="sellFormContainer" style="display:none;">
-        <div class="section-card" style="background:#FEF3C7; border-color:#FDE68A; margin-bottom:14px;">
-          <h4 style="color:#92400E; font-size:0.9rem;">📊 የእርስዎ እቅድ (Plan)</h4>
-          <p style="font-size:0.8rem; margin-top:4px;" id="planStatusText">ነጻ እቅድ: (0/5) እቃዎች ተጠቅመዋል</p>
+        <div class="section-card" id="planStatusBox" style="background:var(--soft); margin-bottom:14px; text-align:center;">
+          <h4 style="color:var(--text); font-size:0.9rem;" id="planStatusTitle">📊 የእርስዎ እቅድ: Standard (ነጻ)</h4>
+          <p style="font-size:0.8rem; margin-top:4px;" id="planStatusText">(0/5) እቃዎች ተጠቅመዋል</p>
         </div>
         <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
-        <form id="sellForm" onsubmit="handleProductSubmit(event)">
-          <div class="form-group"><label>የእቃው ፎቶ</label><input type="file" id="prodPhotoInput" accept="image/*" required></div>
-          <div class="form-group"><label>የእቃው ዘርፍ</label><select id="prodCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option></select></div>
+        <form id="sellForm" class="section-card" onsubmit="handleProductSubmit(event)">
+          <div class="form-group">
+            <label>የእቃው ፎቶ</label>
+            <input type="file" id="prodPhotoInput" accept="image/*" onchange="handleImageUpload(event)" required>
+            <img id="imagePreview" style="display:none; width:100%; height:160px; object-fit:cover; border-radius:12px; margin-top:8px;">
+          </div>
+          <div class="form-group"><label>የእቃው ዘርፍ</label><select id="prodCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other</option></select></div>
+          <div class="form-group"><label>የእቃው ሁኔታ</label><select id="prodCondition"><option value="አዲስ (New)">አዲስ (New)</option><option value="ያገለገለ (Used)">ያገለገለ (Used)</option></select></div>
           <div class="form-group"><label>የእቃው ስም</label><input type="text" id="prodTitle" required></div>
           <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="sellerPrice" required></div>
           <div class="form-group"><label>መግለጫ</label><textarea id="prodDesc" rows="3" required></textarea></div>
-          <!-- ኮሚሽን የለም! ቀጥታ ዋጋው ይለጠፋል -->
-          <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem;">እቃውን ለጥፍ</button>
+          <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem;">እቃውን ለጥፍ (Upload)</button>
         </form>
       </div>
     </div>
 
-    <!-- PROFILE / SHOP VIEW -->
+    <!-- SELLER PROFILE / SHOP VIEW -->
     <div id="view-profile" class="view">
-      <!-- Shop Setup Form (If no shop) -->
       <div id="shopSetupBox" class="section-card">
-        <h3 style="color:var(--primary); margin-bottom:10px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
+        <h3 style="color:var(--primary-2); margin-bottom:12px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
         <form onsubmit="handleShopSetup(event)">
           <div class="form-group"><label>የሱቁ ስም (Shop Name)</label><input type="text" id="shopName" placeholder="Ex. Sora Electronics" required></div>
           <div class="form-group"><label>ስልክ ቁጥር (ለገዢዎች የሚታይ)</label><input type="tel" id="shopPhone" placeholder="09..." required></div>
@@ -138,40 +194,80 @@
         </form>
       </div>
 
-      <!-- Shop Dashboard (If shop exists) -->
       <div id="shopDashboardBox" style="display:none;">
         <div class="section-card shop-profile-header">
           <img id="shopAvatarDisplay" src="https://via.placeholder.com/60" class="shop-avatar">
-          <div>
-            <h3 id="shopNameDisplay" style="font-size:1.1rem;">ሱቅ</h3>
-            <span id="shopProBadge" class="pro-badge" style="display:none;">PRO SELLER</span>
-            <p id="shopIdDisplay" style="font-size:0.75rem; color:var(--gray);">ID: -</p>
+          <div style="flex:1;">
+            <h3 id="shopNameDisplay" style="font-size:1.1rem; margin-bottom:2px;">ሱቅ</h3>
+            <span id="shopProBadge" class="pro-badge" style="display:none;">👑 PRO SELLER</span>
+            <p id="shopIdDisplay" style="font-size:0.75rem; color:var(--gray); margin-top:2px;">ID: -</p>
           </div>
         </div>
 
         <div class="profile-tabs">
           <div class="p-tab active" onclick="switchProfileTab('p-products', this)">📦 My Products</div>
-          <div class="p-tab" onclick="switchProfileTab('p-orders', this)">🛍️ Orders</div>
+          <div class="p-tab" onclick="switchProfileTab('p-orders', this)">🛍️ My Orders</div>
+          <div class="p-tab" id="upgradeTabBtn" onclick="switchProfileTab('p-upgrade', this)">⭐ PRO Subscription</div>
         </div>
 
+        <!-- 1. My Products Tab -->
         <div id="p-products" class="p-content active section-card">
-          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">የለጠፉት እቃዎች ብዛት: <b id="myProdCount">0</b>/5</p>
+          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">የለጠፉት እቃዎች ብዛት: <b id="myProdCount">0</b></p>
           <div id="myListingsContainer"></div>
         </div>
-        
+
+        <!-- 2. My Orders Tab -->
         <div id="p-orders" class="p-content section-card">
-          <p style="font-size:0.85rem; color:var(--gray); text-align:center; padding:20px;">የትዕዛዝ ስርአት (Orders) በቅርቡ ይጨመራል።</p>
+          <h4 style="font-size:0.9rem; margin-bottom:10px; color:var(--primary-2);">ገዢዎች ያዘዙዎት እቃዎች</h4>
+          <div id="myOrdersContainer"></div>
+        </div>
+
+        <!-- 3. PRO Upgrade Tab -->
+        <div id="p-upgrade" class="p-content section-card" style="text-align:center;">
+          <h3 style="color:var(--gold); margin-bottom:10px;">👑 የ PRO ሻጭ ይሁኑ!</h3>
+          <p style="font-size:0.85rem; color:var(--gray); margin-bottom:15px; line-height:1.5;">የ 5 እቃዎች ገደብዎን በማንሳት ያለገደብ ይሽጡ። እንዲሁም ወርቃማው የ PRO ባጅ ደንበኞችዎ አመኔታ እንዲያሳድሩ ያደርጋል።</p>
+          <div style="background:var(--gold-bg); padding:12px; border-radius:12px; border:1px dashed var(--gold); margin-bottom:15px; font-size:0.8rem; line-height:1.6;">
+            <b>ወርሃዊ ክፍያ:</b> 200 ETB<br>
+            ለአድሚኑ በቴሌግራም አናግረው ክፍያ ይፈጽሙና ወዲያውኑ አካውንትዎ ወደ PRO ያድጋል!
+          </div>
+          <a class="btn-action btn-tg" href="https://t.me/sorataju1" target="_blank">አድሚንን ያናግሩ (Contact Admin)</a>
         </div>
       </div>
-      
-      <!-- ADMIN Dashboard -->
+
+      <!-- ADMIN DASHBOARD -->
       <div id="adminPanel" style="display:none;" class="section-card">
-        <h3 style="color:var(--danger); border-bottom:1px solid var(--danger); padding-bottom:5px; margin-bottom:10px;">👑 Admin Dashboard</h3>
-        <!-- Admin Analytics placeholders for Phase 2 -->
-        <p style="font-size:0.8rem;">ይህ ክፍል ለ Phase 2 የተዘጋጀ ነው። እቃዎችን አጽድቅ/ውድቅ ማድረግ እዚህ ይቀጥላል...</p>
-        <div id="adminPendingList" style="margin-top:10px;"></div>
+        <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Admin Control Center</h3>
+
+        <!-- Analytics Grid -->
+        <h4 style="font-size:0.85rem; color:var(--gray); margin-bottom:8px;">📊 የገበያ ትንታኔ (Analytics)</h4>
+        <div class="analytics-grid">
+          <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
+          <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">New / Pending Orders</div></div>
+          <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
+          <div class="stat-box"><div class="stat-num" id="st-cancelled-orders" style="color:var(--gray);">0</div><div class="stat-title">Cancelled Orders</div></div>
+        </div>
+
+        <h4 style="font-size:0.85rem; color:var(--gray); margin-bottom:8px; margin-top:10px;">👥 የሻጮች መረጃ (Sellers)</h4>
+        <div class="analytics-grid">
+          <div class="stat-box"><div class="stat-num" id="st-active-sellers">0</div><div class="stat-title">Active Sellers</div></div>
+          <div class="stat-box pro"><div class="stat-num" id="st-pro-sellers" style="color:var(--gold);">0</div><div class="stat-title">Founding / PRO Sellers</div></div>
+          <div class="stat-box"><div class="stat-num" id="st-standard-sellers">0</div><div class="stat-title">Standard Sellers</div></div>
+        </div>
+
+        <div class="profile-tabs" style="margin-top:15px;">
+          <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending Products</div>
+          <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Manage Sellers</div>
+        </div>
+
+        <div id="a-pending" class="p-content active">
+          <div id="adminPendingList"></div>
+        </div>
+
+        <div id="a-sellers" class="p-content">
+          <div id="adminSellersList"></div>
+        </div>
       </div>
-      
+
     </div>
   </div>
 
@@ -183,25 +279,60 @@
 
   <script>
     const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
-    const FIREBASE_ENDPOINT = "https://wolkite-shop-default-rtdb.firebaseio.com/products";
-    const FIREBASE_SHOPS = "https://wolkite-shop-default-rtdb.firebaseio.com/shops";
+    
+    // የቦት ቶከንዎ ቀድሞ ገብቷል!
+    const BOT_TOKEN = "8848336833:AAHfsAdWgblfweZUkJHlgwAxuGhVOdaIW3w"; 
+    const CHANNEL_USERNAME = "@wolkiteshop";
+    
+    const DB_BASE = "https://wolkite-shop-default-rtdb.firebaseio.com";
+    const FIREBASE_PRODUCTS = `${DB_BASE}/products`;
+    const FIREBASE_SHOPS = `${DB_BASE}/shops`;
+    const FIREBASE_ORDERS = `${DB_BASE}/orders`;
+    
     const ADMIN_ID = 8356035160;
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
     let products = [];
-    let myShop = null; // Store user's shop info
-    
+    let shops = {};
+    let orders = {};
+    let myShop = null; 
+    let uploadedImageBase64 = "";
+    let currentCategory = 'All';
+
     async function initApp() {
       if(currentUser.id === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
-      
-      // 1. Load User's Shop Profile
+      await loadAllData();
+    }
+
+    async function loadAllData() {
+      document.getElementById('loadingIndicator').style.display = 'block';
       try {
-        const res = await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`);
-        myShop = await res.json();
-      } catch(e){}
+        const [resP, resS, resO] = await Promise.all([
+          fetch(`${FIREBASE_PRODUCTS}.json`),
+          fetch(`${FIREBASE_SHOPS}.json`),
+          fetch(`${FIREBASE_ORDERS}.json`)
+        ]);
+        
+        const dataP = await resP.json();
+        const dataS = await resS.json();
+        const dataO = await resO.json();
+        
+        products = [];
+        if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
+        shops = dataS || {};
+        orders = dataO || {};
+        
+        myShop = shops[currentUser.id] || null;
+        
+      } catch(e) {}
+      
+      document.getElementById('loadingIndicator').style.display = 'none';
       
       renderShopUI();
-      await fetchFromCloud();
+      renderProducts();
+      renderMyListings();
+      renderMyOrders();
+      if(currentUser.id === ADMIN_ID) renderAdminDashboard();
     }
 
     function renderShopUI() {
@@ -213,9 +344,17 @@
         
         document.getElementById('shopNameDisplay').innerText = myShop.name;
         document.getElementById('shopIdDisplay').innerText = `Seller ID: ${currentUser.id}`;
+        
         if(myShop.isPro) {
           document.getElementById('shopProBadge').style.display = 'inline-block';
           document.getElementById('shopAvatarDisplay').classList.add('pro-avatar');
+          document.getElementById('planStatusBox').style.background = 'var(--gold-bg)';
+          document.getElementById('planStatusBox').style.border = '1px solid var(--gold)';
+          document.getElementById('planStatusTitle').innerHTML = '👑 የእርስዎ እቅድ: PRO (ያለገደብ)';
+          document.getElementById('upgradeTabBtn').style.display = 'none'; // Hide upgrade tab
+        } else {
+          document.getElementById('shopProBadge').style.display = 'none';
+          document.getElementById('shopAvatarDisplay').classList.remove('pro-avatar');
         }
       } else {
         document.getElementById('shopSetupBox').style.display = 'block';
@@ -226,72 +365,147 @@
       }
     }
 
-    async function handleShopSetup(e) {
-      e.preventDefault();
-      const shopData = {
-        name: document.getElementById('shopName').value,
-        phone: document.getElementById('shopPhone').value,
-        tg: document.getElementById('shopTg').value.replace(/^@/, ''),
-        isPro: false, // Starts as free
-        createdAt: new Date().toISOString()
+    function handleImageUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 400; let width = img.width; let height = img.height;
+          if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } 
+          else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+          canvas.width = width; canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+          document.getElementById('imagePreview').src = uploadedImageBase64;
+          document.getElementById('imagePreview').style.display = 'block';
+        };
+        img.src = event.target.result;
       };
-      
-      try {
-        await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(shopData) });
-        myShop = shopData;
-        renderShopUI();
-        alert("ሱቅዎ በተሳካ ሁኔታ ተፈጥሯል! አሁን እቃ መለጠፍ ይችላሉ።");
-      } catch(err) { alert("ስህተት ተፈጥሯል"); }
+      reader.readAsDataURL(file);
     }
 
-    async function fetchFromCloud() {
-      try {
-        const res = await fetch(`${FIREBASE_ENDPOINT}.json`);
-        const data = await res.json();
-        products = [];
-        if (data) Object.keys(data).forEach(key => products.push({ id: key, ...data[key] }));
-      } catch (err) {}
-      renderProducts(); renderMyListings();
-    }
-
-    // Likes Sorting & Handling
     function renderProducts(items = products.filter(p => p.status === 'approved')) {
       const grid = document.getElementById('productGrid'); grid.innerHTML = '';
       
-      // Sort by Likes (Highest first), then by Pinned
       items.sort((a, b) => {
         if(a.isPinned && !b.isPinned) return -1;
         if(!a.isPinned && b.isPinned) return 1;
         return (b.likes || 0) - (a.likes || 0);
       });
 
+      const isAdmin = (Number(currentUser.id) === ADMIN_ID);
+
       items.forEach(p => {
-        const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌 ፒን የተደረገ</span>` : '';
-        const proHtml = p.sellerIsPro ? `<span class="pro-badge">PRO</span>` : '';
+        const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
+        const sellerShop = shops[p.sellerId];
+        const isPro = sellerShop && sellerShop.isPro;
+        const proHtml = isPro ? `<span class="pro-badge">PRO</span>` : '';
         const likeCount = p.likes || 0;
         
         let actionHtml = '';
         if(p.isSold) actionHtml = `<div class="sold-text">❌ ተሽጧል</div>`;
         else actionHtml = `
-          <a class="btn-action btn-call" href="tel:${p.sellerPhone}">📞 ወደ ሻጩ ደውል</a>
-          <button class="btn-action btn-tg" onclick="contactDirect('${p.sellerTg}', '${p.title}')">💬 ቴሌግራም አናግር</button>
+          <button class="btn-action btn-order" onclick="placeOrder('${p.id}')">🛒 አሁን አዝዝ (Order)</button>
+          <div style="display:flex; gap:4px; margin-top:4px;">
+            <a class="btn-action btn-call" style="flex:1;" href="tel:${p.sellerPhone}">📞 ደውል</a>
+            <button class="btn-action btn-tg" style="flex:1;" onclick="contactDirect('${p.sellerTg}', '${p.title}')">💬 ቻት</button>
+          </div>
         `;
+
+        let adminActions = '';
+        if(isAdmin) {
+          adminActions = `
+            <div style="margin-top:6px; padding:6px; background:#f9f9f9; border-radius:6px; font-size:0.7rem;">
+              <button class="btn-action" style="background:#4F46E5; color:white; margin-bottom:4px;" onclick="togglePin('${p.id}', ${p.isPinned})">📌 ${p.isPinned ? 'Unpin' : 'Pin to Top'}</button>
+              <button class="btn-action btn-channel" onclick="postToChannel('${p.id}')">📢 ቻናል ላክ</button>
+            </div>
+          `;
+        }
 
         grid.innerHTML += `
           <div class="product-card ${p.isPinned ? 'pinned' : ''}">
             ${isPinnedHtml}
             <button class="like-btn" onclick="likeProduct('${p.id}')">❤️ ${likeCount}</button>
-            <img src="https://via.placeholder.com/150" class="product-img">
+            <img src="${p.img || 'https://via.placeholder.com/150'}" class="product-img">
             <div class="product-info">
               <div class="product-title">${p.title}</div>
               <div class="product-shop">🏪 ${p.sellerName} ${proHtml}</div>
               <div class="product-price">${p.price} ETB</div>
-              <div class="action-buttons">${actionHtml}</div>
+              <div class="action-buttons">${actionHtml}${adminActions}</div>
             </div>
           </div>
         `;
       });
     }
+
+    // ----------------- ORDER SYSTEM -----------------
+    async function placeOrder(productId) {
+      const p = products.find(x => x.id === productId); if(!p) return;
+      
+      const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
+      if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ የትዕዛዝ ማሳወቂያ ይደርሰዋል።`)) {
+        const orderId = `ORD-${Date.now().toString().slice(-6)}`;
+        const orderData = {
+          productId: p.id,
+          productTitle: p.title,
+          price: p.price,
+          sellerId: p.sellerId,
+          buyerId: currentUser.id,
+          buyerName: buyerName,
+          buyerTg: currentUser.username || "የለውም",
+          status: "Pending", // Pending, Completed, Cancelled
+          date: new Date().toISOString()
+        };
+        
+        try {
+          await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PUT', body: JSON.stringify(orderData) });
+          if(tg.showAlert) tg.showAlert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል! አሁን በቀጥታ ሻጩን በቴሌግራም አናግረው ይረከቡ።");
+          else alert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!");
+          
+          contactDirect(p.sellerTg, p.title);
+          await loadAllData();
+        } catch(e) { alert("ትዕዛዝ መላክ አልተቻለም።"); }
+      }
+    }
+
+    function renderMyOrders() {
+      if(!myShop) return;
+      const myOrderKeys = Object.keys(orders).filter(k => String(orders[k].sellerId) === String(currentUser.id));
+      const container = document.getElementById('myOrdersContainer');
+      
+      if(myOrderKeys.length === 0) { container.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">ምንም አዲስ ትዕዛዝ የለም።</p>'; return; }
+      
+      container.innerHTML = '';
+      myOrderKeys.reverse().forEach(key => {
+        const o = orders[key];
+        let statusColor = o.status === 'Pending' ? 'var(--danger)' : o.status === 'Completed' ? 'var(--secondary)' : 'var(--gray)';
+        
+        container.innerHTML += `
+          <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <strong style="font-size:0.85rem;">🛒 ${o.productTitle}</strong>
+              <span style="font-size:0.75rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px; font-weight:bold;">${o.status}</span>
+            </div>
+            <div style="font-size:0.8rem; margin-bottom:8px;">
+              ገዢ: <b>${o.buyerName}</b> (@${o.buyerTg})<br>
+              ዋጋ: ${o.price} ETB
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action" style="background:var(--secondary); color:white; flex:1;" onclick="updateOrderStatus('${key}', 'Completed')">✅ Completed</button>
+              <button class="btn-action" style="background:var(--gray); color:white; flex:1;" onclick="updateOrderStatus('${key}', 'Cancelled')">❌ Cancelled</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
+      await loadAllData();
+    }
+    // ------------------------------------------------
 
     function renderMyListings() {
       if(!myShop) return;
@@ -299,36 +513,140 @@
       document.getElementById('myProdCount').innerText = myList.length;
       
       if(!myShop.isPro) {
-        document.getElementById('planStatusText').innerText = `ነጻ እቅድ: (${myList.length}/5) እቃዎች ተጠቅመዋል`;
+        document.getElementById('planStatusText').innerText = `(${myList.length}/5) እቃዎች ተጠቅመዋል`;
         if(myList.length >= 5) document.getElementById('submitBtn').disabled = true;
       }
       
-      const container = document.getElementById('myListingsContainer');
-      container.innerHTML = '';
+      const container = document.getElementById('myListingsContainer'); container.innerHTML = '';
       myList.forEach(p => {
+        let statusBadge = p.status === 'pending' ? '<span style="color:var(--warning);">⏳ Pending</span>' : 
+                          p.status === 'rejected' ? '<span style="color:var(--danger);">❌ Rejected</span>' : 
+                          p.isSold ? '<span style="color:var(--danger);">🏷️ Sold</span>' : '<span style="color:var(--secondary);">✅ Active</span>';
         container.innerHTML += `
-          <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between;">
-            <div>
-              <strong>${p.title}</strong><br>
-              <span style="font-size:0.75rem;">${p.price} ETB | ❤️ ${p.likes || 0}</span>
+          <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <img src="${p.img || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+              <div>
+                <strong>${p.title}</strong><br>
+                <span style="font-size:0.75rem;">${p.price} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span>
+              </div>
             </div>
             <div>
-              <button class="btn-action btn-toggle-sold" style="padding:4px;" onclick="toggleSold('${p.id}', ${p.isSold})">${p.isSold ? 'Active' : 'Sold'}</button>
+              <button class="btn-action btn-toggle-sold" style="padding:4px 8px; margin-bottom:4px;" onclick="toggleSold('${p.id}', ${p.isSold})">${p.isSold ? 'Active' : 'Sold'}</button>
+              <button class="btn-action btn-delete" style="padding:4px 8px;" onclick="deleteProduct('${p.id}')">Delete</button>
             </div>
           </div>`;
       });
     }
 
+    // ---------------- ADMIN ANALYTICS & DASHBOARD ----------------
+    function renderAdminDashboard() {
+      const pKeys = products.map(p => p.id);
+      const sKeys = Object.keys(shops);
+      const oKeys = Object.keys(orders);
+      
+      // Calculate Stats
+      let tOrders = oKeys.length;
+      let newO = 0, compO = 0, cancO = 0;
+      oKeys.forEach(k => {
+        if(orders[k].status === 'Pending') newO++;
+        else if(orders[k].status === 'Completed') compO++;
+        else if(orders[k].status === 'Cancelled') cancO++;
+      });
+      
+      let tSellers = sKeys.length;
+      let proSellers = 0;
+      sKeys.forEach(k => { if(shops[k].isPro) proSellers++; });
+      
+      // Update UI Stats
+      document.getElementById('st-total-orders').innerText = tOrders;
+      document.getElementById('st-new-orders').innerText = newO;
+      document.getElementById('st-completed-orders').innerText = compO;
+      document.getElementById('st-cancelled-orders').innerText = cancO;
+      
+      document.getElementById('st-active-sellers').innerText = tSellers;
+      document.getElementById('st-pro-sellers').innerText = proSellers;
+      document.getElementById('st-standard-sellers').innerText = tSellers - proSellers;
+
+      // Pending Products List
+      const pendingList = document.getElementById('adminPendingList');
+      const pendProducts = products.filter(p => p.status === 'pending');
+      pendingList.innerHTML = '';
+      if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
+      pendProducts.forEach(p => {
+        pendingList.innerHTML += `
+          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
+            <img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+            <div style="flex:1;">
+              <strong>${p.title}</strong> (${p.price} ETB)<br>
+              <small>ሻጭ: ${p.sellerName}</small>
+              <div style="display:flex; gap:4px; margin-top:6px;">
+                <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'approved')">አጽድቅ</button>
+                <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'rejected')">ውድቅ</button>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      // Sellers Management List
+      const sellersList = document.getElementById('adminSellersList');
+      sellersList.innerHTML = '';
+      sKeys.forEach(k => {
+        const s = shops[k];
+        const badge = s.isPro ? '<span class="pro-badge">PRO</span>' : '<span style="font-size:0.6rem; color:var(--gray); border:1px solid var(--gray); padding:1px 4px; border-radius:4px;">FREE</span>';
+        const actionBtn = s.isPro 
+          ? `<button class="btn-action" style="background:var(--gray); color:white; padding:4px;" onclick="adminTogglePro('${k}', true)">Downgrade to Free</button>`
+          : `<button class="btn-action" style="background:var(--gold); color:white; padding:4px;" onclick="adminTogglePro('${k}', false)">🌟 Upgrade to PRO</button>`;
+          
+        sellersList.innerHTML += `
+          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <strong>${s.name}</strong> ${badge}
+            </div>
+            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:6px;">
+              📞 ${s.phone} | 💬 @${s.tg}
+            </div>
+            ${actionBtn}
+          </div>`;
+      });
+    }
+
+    async function adminUpdateProd(id, status) {
+      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) });
+      await loadAllData();
+    }
+    
+    async function adminTogglePro(sellerId, isCurrentlyPro) {
+      if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${isCurrentlyPro ? 'FREE' : 'PRO'} መቀየር ይፈልጋሉ?`)) {
+        await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ isPro: !isCurrentlyPro }) });
+        await loadAllData();
+      }
+    }
+    
+    async function togglePin(id, isPinned) {
+      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) });
+      await loadAllData();
+    }
+    // -----------------------------------------------------------
+
+    async function handleShopSetup(e) {
+      e.preventDefault();
+      const shopData = { name: document.getElementById('shopName').value, phone: document.getElementById('shopPhone').value, tg: document.getElementById('shopTg').value.replace(/^@/, ''), isPro: false, createdAt: new Date().toISOString() };
+      try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); alert("ሱቅዎ ተፈጥሯል!"); await loadAllData(); } catch(err) {}
+    }
+
     async function likeProduct(id) {
       const p = products.find(x => x.id === id); if(!p) return;
-      const newLikes = (p.likes || 0) + 1;
-      await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) });
-      await fetchFromCloud();
+      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: (p.likes || 0) + 1 }) });
+      await loadAllData();
     }
     
     async function toggleSold(id, isSold) {
-      await fetch(`${FIREBASE_ENDPOINT}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) });
-      await fetchFromCloud();
+      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) });
+      await loadAllData();
+    }
+    async function deleteProduct(id) {
+      if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); }
     }
 
     function contactDirect(username, itemTitle) {
@@ -345,35 +663,61 @@
     }
     
     function switchProfileTab(tabId, btn) {
-      document.querySelectorAll('.p-tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.p-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active'); document.getElementById(tabId).classList.add('active');
+    }
+    
+    function switchAdminTab(tabId, btn) {
+      document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active'); document.getElementById(tabId).classList.add('active');
     }
 
     async function handleProductSubmit(e) {
       e.preventDefault();
       if(!myShop) return;
-      
       const myList = products.filter(p => String(p.sellerId) === String(currentUser.id));
-      if(!myShop.isPro && myList.length >= 5) {
-        alert("የነጻ እቅድ (5 እቃዎች) ሞልቷል! እባክዎ ተጨማሪ ለመጫን ወደ PRO ያሳድጉ።"); return;
-      }
-
+      if(!myShop.isPro && myList.length >= 5) { alert("የነጻ እቅድ (5 እቃዎች) ሞልቷል! ወደ PRO ያሳድጉ።"); return; }
+      if(!uploadedImageBase64) { alert("እባክዎ ፎቶ ያስገቡ"); return; }
+      
+      document.getElementById('submitBtn').innerText = "በመላክ ላይ..."; document.getElementById('submitBtn').disabled = true;
       const newId = `WS-${Date.now().toString().slice(-6)}`;
       const newProduct = {
-        title: document.getElementById('prodTitle').value,
-        price: document.getElementById('sellerPrice').value,
-        status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending',
-        isSold: false, likes: 0, isPinned: false,
-        sellerId: currentUser.id, sellerName: myShop.name,
-        sellerPhone: myShop.phone, sellerTg: myShop.tg, sellerIsPro: myShop.isPro
+        title: document.getElementById('prodTitle').value, price: document.getElementById('sellerPrice').value,
+        category: document.getElementById('prodCategory').value, condition: document.getElementById('prodCondition').value,
+        desc: document.getElementById('prodDesc').value, status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending',
+        isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, sellerName: myShop.name,
+        sellerPhone: myShop.phone, sellerTg: myShop.tg, sellerIsPro: myShop.isPro, img: uploadedImageBase64
       };
-
       try {
-        await fetch(`${FIREBASE_ENDPOINT}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
-        alert('እቃው ተልኳል!'); document.getElementById('sellForm').reset();
-        await fetchFromCloud(); switchTab('home', document.getElementById('navHome'));
-      } catch(e) {}
+        await fetch(`${FIREBASE_PRODUCTS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
+        alert('እቃው ተልኳል!'); document.getElementById('sellForm').reset(); document.getElementById('imagePreview').style.display='none'; uploadedImageBase64="";
+        await loadAllData(); switchTab('home', document.getElementById('navHome'));
+      } catch(e) {} finally {
+        document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false;
+      }
+    }
+    
+    async function postToChannel(id) {
+      const p = products.find(x => x.id === id); if(!p) return;
+      if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || BOT_TOKEN === "") { alert("የቦት ቶከን አላስገቡም!"); return; }
+      if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
+      
+      const caption = `🛒 አዲስ እቃ <b>${p.sellerName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${p.price} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
+      try {
+        const res = await fetch(p.img); const blob = await res.blob();
+        const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
+        const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+        const tgData = await tgRes.json();
+        if(tgData.ok) alert("ቻናል ላይ ተለጥፏል! 🎉"); else alert("ስህተት: " + tgData.description);
+      } catch(e) { alert("መፖሰት አልተቻለም!"); }
+    }
+    
+    function filterProducts() {
+      const q = document.getElementById('homeSearch').value.toLowerCase();
+      const filtered = products.filter(p => (currentCategory === 'All' || p.category === currentCategory) && p.title.toLowerCase().includes(q) && p.status === 'approved');
+      renderProducts(filtered);
     }
     
     initApp();
