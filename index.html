@@ -167,7 +167,6 @@
     <!-- SELLER PROFILE / SHOP VIEW -->
     <div id="view-profile" class="view">
       
-      <!-- Initial Setup Shop Box -->
       <div id="shopSetupBox" class="section-card">
         <h3 style="color:var(--primary); margin-bottom:10px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
         <form onsubmit="handleShopSetup(event)">
@@ -178,7 +177,6 @@
         </form>
       </div>
 
-      <!-- Main Shop Dashboard -->
       <div id="shopDashboardBox" style="display:none;">
         <div class="section-card shop-profile-header">
           <img id="shopAvatarDisplay" src="https://via.placeholder.com/65" class="shop-avatar">
@@ -238,7 +236,11 @@
           <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
         </div>
         
-        <h4 style="font-size:0.85rem; color:var(--gray); margin-bottom:8px; margin-top:10px;">👥 የሻጮች መረጃ (Sellers)</h4>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; margin-top:10px;">
+          <h4 style="font-size:0.85rem; color:var(--gray); margin:0;">👥 የሻጮች መረጃ (Sellers)</h4>
+          <button class="btn-action" id="syncBtn" style="background:var(--primary); color:white; width:auto; padding:4px 10px; font-size:0.7rem;" onclick="syncOldSellers()">🔄 የድሮ ሻጮችን ፈልግ</button>
+        </div>
+        
         <div class="analytics-grid">
           <div class="stat-box"><div class="stat-num" id="st-active-sellers">0</div><div class="stat-title">Total Sellers</div></div>
           <div class="stat-box gold"><div class="stat-num" id="st-gold-sellers" style="color:var(--gold);">0</div><div class="stat-title">Gold Sellers</div></div>
@@ -317,7 +319,7 @@
       
       <!-- Public Comments Section -->
       <div class="comment-box">
-        <h4 style="font-size:0.85rem; color:var(--primary);">💬 አስተያየቶች</h4>
+        <h4 style="font-size:0.85rem; color:var(--primary);">💬 አስተያየቶች (Reviews)</h4>
         <div id="modalCommentsList" style="max-height:120px; overflow-y:auto; background:#f9f9f9; border-radius:6px; padding:6px;"></div>
         <div style="display:flex; gap:6px; margin-top:6px;">
           <input type="text" id="newCommentInput" placeholder="አስተያየትዎን ይጻፉ..." style="flex:1; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:0.8rem;">
@@ -327,7 +329,6 @@
     </div>
   </div>
 
-  <!-- FIXED BOTTOM NAVIGATION BAR -->
   <div class="nav-bar">
     <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
     <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
@@ -375,27 +376,47 @@
         products = [];
         if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
         shops = dataS || {}; orders = dataO || {};
-
-        // ⚠️ AUTO-MIGRATE PHASE 1 SELLERS TO PHASE 2 SHOPS
-        products.forEach(p => {
-          if(p.sellerId && !shops[p.sellerId]) {
-            shops[p.sellerId] = {
-              name: p.sellerName || "ተማሪ ሻጭ",
-              phone: p.sellerPhone || "",
-              tg: p.sellerTg || "",
-              tier: "Free",
-              totalUploads: 1, 
-              totalOrdersReceived: 0,
-              avatar: "https://via.placeholder.com/65"
-            };
-          }
-        });
-
         myShop = shops[currentUser.id] || null;
       } catch(e) {}
       document.getElementById('loadingIndicator').style.display = 'none';
       renderShopUI(); renderProducts(); renderMyListings(); renderMyOrders();
       if(currentUser.id === ADMIN_ID) renderAdminDashboard();
+    }
+
+    // 🌟 SYNC OLD SELLERS FROM PHASE 1 TO DATABASE 🌟
+    async function syncOldSellers() {
+      const btn = document.getElementById('syncBtn');
+      if(btn) { btn.innerText = "በመፈለግ ላይ..."; btn.disabled = true; }
+      let foundCount = 0;
+      
+      for (let p of products) {
+        if (p.sellerId && !shops[p.sellerId]) {
+          const shopData = { 
+            name: p.sellerName || "ተማሪ ሻጭ", 
+            phone: p.sellerPhone || "", 
+            tg: p.sellerTg || "", 
+            tier: 'Free', 
+            totalUploads: 1, 
+            totalOrdersReceived: 0, 
+            avatar: "https://via.placeholder.com/65",
+            createdAt: new Date().toISOString() 
+          };
+          try {
+            await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PUT', body: JSON.stringify(shopData) });
+            shops[p.sellerId] = shopData;
+            foundCount++;
+          } catch(e) {}
+        }
+      }
+      
+      if(foundCount > 0) {
+        if(tg.showAlert) tg.showAlert(`${foundCount} የድሮ ሻጮች ተገኝተው ወደ ዳታቤዝ ገብተዋል! ✅`);
+        else alert(`${foundCount} የድሮ ሻጮች ተገኝተው ወደ ዳታቤዝ ገብተዋል! ✅`);
+      } else {
+        alert("ሁሉም ሻጮች አስቀድመው ተመዝግበዋል (አዲስ የለም)።");
+      }
+      if(btn) { btn.innerText = "🔄 የድሮ ሻጮችን ፈልግ"; btn.disabled = false; }
+      await loadAllData();
     }
 
     function renderShopUI() {
@@ -412,7 +433,6 @@
         
         const tier = myShop.tier || 'Free';
         const upCount = myShop.totalUploads || 0;
-        
         const badgeEl = document.getElementById('shopProBadge');
         const planBox = document.getElementById('planStatusBox');
         
@@ -425,7 +445,7 @@
         } else if (tier === 'Silver') {
           badgeEl.style.display = 'inline-block'; badgeEl.className = 'pro-badge badge-silver'; badgeEl.innerText = '🥈 SILVER SELLER';
           document.getElementById('shopAvatarDisplay').className = 'shop-avatar avatar-silver';
-          planBox.style.background = 'var(--silver-bg)'; planBox.style.border = '1px solid var(--silver)';
+          planBox.style.background = 'var(--silver-bg)'; planBox.style.border = '1px solid #D1D5DB';
           document.getElementById('planStatusTitle').innerHTML = '🥈 የእርስዎ እቅድ: SILVER';
           document.getElementById('planStatusText').innerText = `ጠቅላላ የጫኑት: ${upCount} / 15`;
         } else {
@@ -681,12 +701,13 @@
       
       const container = document.getElementById('myListingsContainer'); container.innerHTML = '';
       myList.forEach(p => {
+        const displayPrice = p.price || p.finalPrice || 0;
         let statusBadge = p.status === 'pending' ? '<span style="color:var(--warning);">⏳ Pending</span>' : p.status === 'rejected' ? '<span style="color:var(--danger);">❌ Rejected</span>' : p.isSold ? '<span style="color:var(--danger);">🏷️ Sold</span>' : '<span style="color:var(--secondary);">✅ Active</span>';
         container.innerHTML += `
           <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; gap:8px; align-items:center;">
               <img src="${p.img || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
-              <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${p.price || p.finalPrice || 0} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
+              <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${displayPrice} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
             </div>
             <div>
               <button class="btn-action" style="background:var(--blue); color:white; padding:4px 8px; margin-bottom:4px;" onclick="openEditProductModal('${p.id}')">⚙️ Edit</button>
@@ -799,7 +820,7 @@
     async function postToChannel(id) {
       const p = products.find(x => x.id === id); if(!p) return;
       const displayPrice = p.price || p.finalPrice || 0;
-      const sShop = shops[p.sellerId]; const sName = sShop ? sShop.name : (p.sellerName || 'ተማሪ');
+      const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
       if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
       const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
       try {
