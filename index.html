@@ -117,7 +117,11 @@
 
     <!-- HOME VIEW -->
     <div id="view-home" class="view active">
-      <div class="search-box"><input type="text" id="homeSearch" placeholder="እቃዎችን እዚህ ይፈልጉ..." oninput="filterProducts()"></div>
+      <!-- ✅ Search Box -->
+      <div class="search-box">
+        <input type="text" id="homeSearch" placeholder="እቃዎችን እዚህ ይፈልጉ..." onkeyup="filterProducts()">
+      </div>
+      <!-- ✅ Categories -->
       <div class="categories-bar" id="categoryBar">
         <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
         <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
@@ -128,7 +132,7 @@
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
         <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
-        <button onclick="fetchFromCloud()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+        <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
       </div>
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       <div class="product-grid" id="productGrid"></div>
@@ -154,7 +158,8 @@
             <input type="file" id="prodPhotoInput" accept="image/*" onchange="handleImageUpload(event)" required>
             <img id="imagePreview" style="display:none; width:100%; height:140px; object-fit:cover; border-radius:8px; margin-top:8px;">
           </div>
-          <div class="form-group"><label>የእቃው ዘርፍ</label><select id="prodCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other</option></select></div>
+          <!-- ✅ Add/Edit Category Match -->
+          <div class="form-group"><label>የእቃው ዘርፍ</label><select id="prodCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other Products</option></select></div>
           <div class="form-group"><label>የእቃው ስም</label><input type="text" id="prodTitle" required></div>
           <div class="form-group"><label>የእቃው ሁኔታ</label><select id="prodCondition" required><option value="Brand New">አዲስ (Brand New)</option><option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option></select></div>
           <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="sellerPrice" required></div>
@@ -234,7 +239,6 @@
         <div class="analytics-grid">
           <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
           <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
-          <!-- ⚠️ Missing Boxes Restored! -->
           <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
           <div class="stat-box"><div class="stat-num" id="st-cancelled-orders" style="color:var(--gray);">0</div><div class="stat-title">Cancelled Orders</div></div>
         </div>
@@ -297,7 +301,7 @@
           <img id="editProdImagePreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
           <input type="file" accept="image/*" onchange="handleEditProductImageUpload(event)" style="font-size:0.75rem;">
         </div>
-        <div class="form-group"><label>ዘርፍ</label><select id="editProdCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other</option></select></div>
+        <div class="form-group"><label>ዘርፍ</label><select id="editProdCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other Products</option></select></div>
         <div class="form-group"><label>የእቃው ስም</label><input type="text" id="editProdTitle" required></div>
         <div class="form-group"><label>የእቃው ሁኔታ</label><select id="editProdCondition" required><option value="Brand New">አዲስ</option><option value="Slightly Used">ትንሽ የተጠቀመ</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ</option></select></div>
         <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="editProdPrice" required></div>
@@ -381,7 +385,9 @@
         myShop = shops[currentUser.id] || null;
       } catch(e) {}
       document.getElementById('loadingIndicator').style.display = 'none';
-      renderShopUI(); renderProducts(); renderMyListings(); renderMyOrders();
+      renderShopUI(); 
+      filterProducts(); // Ensure initial render uses filters!
+      renderMyListings(); renderMyOrders();
       if(currentUser.id === ADMIN_ID) renderAdminDashboard();
     }
 
@@ -430,7 +436,7 @@
         }; img.src = event.target.result;
       }; reader.readAsDataURL(file);
     }
-    async function saveShopProfile(e) { e.preventDefault(); document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveShopBtn').disabled = true; const updatedShop = { name: document.getElementById('editShopName').value, desc: document.getElementById('editShopDesc').value, phone: document.getElementById('editShopPhone').value, tg: document.getElementById('editShopTg').value.replace(/^@/, ''), avatar: uploadedAvatarBase64 }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify(updatedShop) }); myShop = { ...myShop, ...updatedShop }; shops[currentUser.id] = myShop; if(tg.showAlert) tg.showAlert("ፕሮፋይልዎ ተስተካክሏል! ✅"); else alert("ፕሮፋይልዎ ተስተካክሏል! ✅"); closeEditShopModal(); renderShopUI(); renderProducts(); } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveShopBtn').disabled = false; } }
+    async function saveShopProfile(e) { e.preventDefault(); document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveShopBtn').disabled = true; const updatedShop = { name: document.getElementById('editShopName').value, desc: document.getElementById('editShopDesc').value, phone: document.getElementById('editShopPhone').value, tg: document.getElementById('editShopTg').value.replace(/^@/, ''), avatar: uploadedAvatarBase64 }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify(updatedShop) }); myShop = { ...myShop, ...updatedShop }; shops[currentUser.id] = myShop; if(tg.showAlert) tg.showAlert("ፕሮፋይልዎ ተስተካክሏል! ✅"); else alert("ፕሮፋይልዎ ተስተካክሏል! ✅"); closeEditShopModal(); renderShopUI(); filterProducts(); } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveShopBtn').disabled = false; } }
     
     function openEditProductModal(id) { const p = products.find(x => x.id === id); if(!p) return; editingProductId = id; editingProductImageBase64 = p.img || ""; document.getElementById('editProdImagePreview').src = p.img || "https://via.placeholder.com/150"; document.getElementById('editProdCategory').value = p.category || "Electronics"; document.getElementById('editProdTitle').value = p.title || ""; document.getElementById('editProdCondition').value = p.condition || "Brand New"; document.getElementById('editProdPrice').value = p.price || p.finalPrice || ""; document.getElementById('editProdDesc').value = p.desc || ""; document.getElementById('editProductModal').style.display = 'block'; }
     function closeEditProductModal() { document.getElementById('editProductModal').style.display = 'none'; editingProductId = null; }
@@ -473,8 +479,56 @@
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
-    function renderProducts(items = products.filter(p => p.status === 'approved')) {
+    // ✅ CATEGORY AND SEARCH FILTER (FIXED!)
+    function selectCategory(cat, btn) { 
+      currentCategory = cat; 
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
+      btn.classList.add('active'); 
+      filterProducts(); 
+    }
+
+    function filterProducts() {
+      const q = document.getElementById('homeSearch').value.toLowerCase().trim();
+      
+      const filtered = products.filter(p => {
+        // 1. Check Approval Status
+        if (p.status !== 'approved') return false;
+        
+        // 2. Fix old category names that might not match exactly
+        let pCat = (p.category || "").trim();
+        let matchesCategory = false;
+        
+        if (currentCategory === 'All') {
+          matchesCategory = true;
+        } else if (currentCategory === 'Other Products' && pCat === 'Other') { 
+          // Fix for old items that were saved as just "Other"
+          matchesCategory = true;
+        } else {
+          matchesCategory = pCat === currentCategory;
+        }
+        
+        // 3. Search text (Case insensitive)
+        let matchesSearch = true;
+        if (q !== "") {
+           const pTitle = (p.title || "").toLowerCase();
+           const pDesc = (p.desc || "").toLowerCase();
+           matchesSearch = pTitle.includes(q) || pDesc.includes(q);
+        }
+        
+        return matchesCategory && matchesSearch;
+      });
+      
+      renderProducts(filtered);
+    }
+
+    function renderProducts(items) {
       const grid = document.getElementById('productGrid'); grid.innerHTML = '';
+      
+      if(items.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>';
+        return;
+      }
+      
       items.sort((a, b) => { if(a.isPinned && !b.isPinned) return -1; if(!a.isPinned && b.isPinned) return 1; return (b.likes || 0) - (a.likes || 0); });
       const isAdmin = (Number(currentUser.id) === ADMIN_ID);
       
@@ -599,15 +653,8 @@
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
       document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
-      
-      // ✅ ትክክለኛው የሳጥን ማዘመኛ ኮድ ተመልሷል!
-      document.getElementById('st-completed-orders').innerText = compO; 
-      document.getElementById('st-cancelled-orders').innerText = cancO;
-      
-      document.getElementById('st-active-sellers').innerText = tSellers; 
-      document.getElementById('st-gold-sellers').innerText = gSellers;
-      document.getElementById('st-silver-sellers').innerText = silSellers;
-      document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
+      document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
+      document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
 
       const pendingList = document.getElementById('adminPendingList'); const pendProducts = products.filter(p => p.status === 'pending');
       pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
@@ -673,20 +720,6 @@
     function switchTab(viewName, btn) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); btn.classList.add('active'); }
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
-
-    function selectCategory(cat, btn) { currentCategory = cat; document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); btn.classList.add('active'); filterProducts(); }
-    function fetchFromCloud() { loadAllData(); }
-
-    async function likeProduct(id) {
-      if(currentUser.id !== ADMIN_ID) {
-        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
-        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
-      }
-      const p = products.find(x => x.id === id); if(!p) return;
-      const newLikes = (p.likes || 0) + 1;
-      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); p.likes = newLikes; filterProducts(); } catch(e) {}
-    }
 
     async function handleProductSubmit(e) {
       e.preventDefault(); if(!myShop) return;
