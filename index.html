@@ -9,7 +9,7 @@
     :root {
       --primary: #063B2E; --secondary: #00C897; --bg: #F8F7F2; --text: #1F2937;
       --card-bg: #FFFFFF; --border: #E5E7EB; --gray: #6B7280; --danger: #EF4444; 
-      --warning: #F59E0B; --gold: #D97706; --gold-bg: #FEF3C7;
+      --warning: #F59E0B; --gold: #D97706; --gold-bg: #FEF3C7; --blue: #3B82F6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
@@ -146,6 +146,7 @@
           </div>
           <div class="form-group"><label>የእቃው ዘርፍ</label><select id="prodCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other</option></select></div>
           <div class="form-group"><label>የእቃው ስም</label><input type="text" id="prodTitle" required></div>
+          <div class="form-group"><label>የእቃው ሁኔታ</label><select id="prodCondition" required><option value="Brand New">አዲስ (Brand New)</option><option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option></select></div>
           <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="sellerPrice" required></div>
           <div class="form-group"><label>መግለጫ</label><textarea id="prodDesc" rows="3" required></textarea></div>
           <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem;">እቃውን ለጥፍ (Upload)</button>
@@ -177,7 +178,6 @@
             <span id="shopProBadge" class="pro-badge" style="display:none;">👑 PRO SELLER</span>
             <p id="shopIdDisplay" style="font-size:0.7rem; color:var(--gray); margin-top:2px;">ID: -</p>
           </div>
-          <!-- Edit Profile Button -->
           <button class="btn-edit-shop" onclick="openEditShopModal()">⚙️ Edit</button>
         </div>
 
@@ -246,7 +246,7 @@
 
   <!-- EDIT SHOP MODAL -->
   <div id="editShopModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
       <span class="close-modal" onclick="closeEditShopModal()">&times;</span>
       <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">⚙️ ሱቅዎን ማስተካከያ</h3>
       <form id="editShopForm" onsubmit="saveShopProfile(event)">
@@ -264,9 +264,30 @@
     </div>
   </div>
 
+  <!-- EDIT PRODUCT MODAL -->
+  <div id="editProductModal" class="modal">
+    <div class="modal-content" style="max-height:85vh; overflow-y:auto;">
+      <span class="close-modal" onclick="closeEditProductModal()">&times;</span>
+      <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">⚙️ እቃውን ማስተካከያ</h3>
+      <form id="editProductForm" onsubmit="saveProductChanges(event)">
+        <div class="form-group">
+          <label>የእቃው ፎቶ (መቀየር ከፈለጉ)</label>
+          <img id="editProdImagePreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
+          <input type="file" accept="image/*" onchange="handleEditProductImageUpload(event)" style="font-size:0.75rem;">
+        </div>
+        <div class="form-group"><label>የእቃው ዘርፍ</label><select id="editProdCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Other Products">Other</option></select></div>
+        <div class="form-group"><label>የእቃው ስም</label><input type="text" id="editProdTitle" required></div>
+        <div class="form-group"><label>የእቃው ሁኔታ</label><select id="editProdCondition" required><option value="Brand New">አዲስ (Brand New)</option><option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option></select></div>
+        <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="editProdPrice" required></div>
+        <div class="form-group"><label>መግለጫ (Description)</label><textarea id="editProdDesc" rows="3" required></textarea></div>
+        <button type="submit" class="btn-action btn-tg" id="saveProdBtn" style="padding:10px; width:100%;">ሴቭ አድርግ (Save Changes)</button>
+      </form>
+    </div>
+  </div>
+
   <!-- PRODUCT DETAILS MODAL (POPUP) -->
   <div id="productModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-height:85vh; overflow-y:auto;">
       <span class="close-modal" onclick="closeModal()">&times;</span>
       <img id="modalImg" class="modal-img" src="" alt="Product">
       <h2 id="modalTitle" style="font-size:1.1rem; margin-bottom:5px; color:var(--primary);"></h2>
@@ -309,6 +330,11 @@
     let myShop = null; 
     let uploadedImageBase64 = "";
     let uploadedAvatarBase64 = "";
+    
+    // Edit Product Variables
+    let editingProductId = null;
+    let editingProductImageBase64 = "";
+    
     let currentCategory = 'All';
 
     async function initApp() {
@@ -390,7 +416,6 @@
       document.getElementById('editShopAvatarPreview').src = uploadedAvatarBase64 || "https://via.placeholder.com/65";
       document.getElementById('editShopModal').style.display = 'block';
     }
-    
     function closeEditShopModal() { document.getElementById('editShopModal').style.display = 'none'; }
     
     function handleShopAvatarUpload(e) {
@@ -415,31 +440,15 @@
     
     async function saveShopProfile(e) {
       e.preventDefault();
-      document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ...";
-      document.getElementById('saveShopBtn').disabled = true;
-      
-      const updatedShop = {
-        name: document.getElementById('editShopName').value,
-        desc: document.getElementById('editShopDesc').value,
-        phone: document.getElementById('editShopPhone').value,
-        tg: document.getElementById('editShopTg').value.replace(/^@/, ''),
-        avatar: uploadedAvatarBase64
-      };
-      
+      document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveShopBtn').disabled = true;
+      const updatedShop = { name: document.getElementById('editShopName').value, desc: document.getElementById('editShopDesc').value, phone: document.getElementById('editShopPhone').value, tg: document.getElementById('editShopTg').value.replace(/^@/, ''), avatar: uploadedAvatarBase64 };
       try {
         await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify(updatedShop) });
-        myShop = { ...myShop, ...updatedShop };
-        shops[currentUser.id] = myShop; // Update locally
-        if(tg.showAlert) tg.showAlert("ፕሮፋይልዎ በተሳካ ሁኔታ ተስተካክሏል! ✅");
-        else alert("ፕሮፋይልዎ ተስተካክሏል! ✅");
-        closeEditShopModal();
-        renderShopUI();
-        renderProducts(); // Refresh to show new name/avatar
+        myShop = { ...myShop, ...updatedShop }; shops[currentUser.id] = myShop;
+        if(tg.showAlert) tg.showAlert("ፕሮፋይልዎ በተሳካ ሁኔታ ተስተካክሏል! ✅"); else alert("ፕሮፋይልዎ ተስተካክሏል! ✅");
+        closeEditShopModal(); renderShopUI(); renderProducts();
       } catch(err) { alert("ስህተት ተፈጥሯል"); } 
-      finally {
-        document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ (Save Changes)";
-        document.getElementById('saveShopBtn').disabled = false;
-      }
+      finally { document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ (Save Changes)"; document.getElementById('saveShopBtn').disabled = false; }
     }
     
     async function handleShopSetup(e) {
@@ -469,12 +478,80 @@
       reader.readAsDataURL(file);
     }
 
+    /* EDIT PRODUCT LOGIC */
+    function openEditProductModal(id) {
+      const p = products.find(x => x.id === id); if(!p) return;
+      editingProductId = id;
+      editingProductImageBase64 = p.img || "";
+      
+      document.getElementById('editProdImagePreview').src = p.img || "https://via.placeholder.com/150";
+      document.getElementById('editProdCategory').value = p.category || "Electronics";
+      document.getElementById('editProdTitle').value = p.title || "";
+      document.getElementById('editProdCondition').value = p.condition || "Brand New";
+      document.getElementById('editProdPrice').value = p.price || p.finalPrice || "";
+      document.getElementById('editProdDesc').value = p.desc || "";
+      
+      document.getElementById('editProductModal').style.display = 'block';
+    }
+    
+    function closeEditProductModal() {
+      document.getElementById('editProductModal').style.display = 'none';
+      editingProductId = null;
+    }
+    
+    function handleEditProductImageUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 400; let width = img.width; let height = img.height;
+          if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } 
+          else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+          canvas.width = width; canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          editingProductImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+          document.getElementById('editProdImagePreview').src = editingProductImageBase64;
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    async function saveProductChanges(e) {
+      e.preventDefault();
+      if(!editingProductId) return;
+      
+      document.getElementById('saveProdBtn').innerText = "በማስቀመጥ ላይ...";
+      document.getElementById('saveProdBtn').disabled = true;
+      
+      const updatedProd = {
+        title: document.getElementById('editProdTitle').value,
+        price: document.getElementById('editProdPrice').value,
+        category: document.getElementById('editProdCategory').value,
+        condition: document.getElementById('editProdCondition').value,
+        desc: document.getElementById('editProdDesc').value,
+        img: editingProductImageBase64
+      };
+      
+      try {
+        await fetch(`${FIREBASE_PRODUCTS}/${editingProductId}.json`, { method: 'PATCH', body: JSON.stringify(updatedProd) });
+        if(tg.showAlert) tg.showAlert("እቃው በተሳካ ሁኔታ ተስተካክሏል! ✅"); else alert("እቃው ተስተካክሏል! ✅");
+        closeEditProductModal();
+        await loadAllData();
+      } catch(err) { alert("ስህተት ተፈጥሯል"); } 
+      finally {
+        document.getElementById('saveProdBtn').innerText = "ሴቭ አድርግ (Save Changes)";
+        document.getElementById('saveProdBtn').disabled = false;
+      }
+    }
+
     function openModal(id) {
       const p = products.find(x => x.id === id); if(!p) return;
       document.getElementById('modalImg').src = p.img || 'https://via.placeholder.com/400';
       document.getElementById('modalTitle').innerText = p.title;
       document.getElementById('modalCondition').innerText = p.condition;
-      
       const displayPrice = p.price || p.finalPrice || 0;
       document.getElementById('modalPrice').innerText = displayPrice + " ETB";
       document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
@@ -494,12 +571,14 @@
     }
     function closeModal() { document.getElementById('productModal').style.display = "none"; }
     
-    // Close modals when clicking outside
+    // Handle outside clicks for all modals
     window.onclick = function(event) { 
       const pModal = document.getElementById('productModal'); 
       const sModal = document.getElementById('editShopModal');
+      const eProdModal = document.getElementById('editProductModal');
       if (event.target === pModal) pModal.style.display = "none"; 
       if (event.target === sModal) sModal.style.display = "none"; 
+      if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
     function renderProducts(items = products.filter(p => p.status === 'approved')) {
@@ -514,8 +593,6 @@
       items.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
         const sellerShop = shops[p.sellerId];
-        
-        // Dynamically get shop info
         const shopName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
         const shopAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50';
         const sPhone = sellerShop ? sellerShop.phone : p.sellerPhone;
@@ -524,7 +601,6 @@
         const isPro = sellerShop && sellerShop.isPro;
         const proHtml = isPro ? `<span class="pro-badge">PRO</span>` : '';
         const likeCount = p.likes || 0;
-        
         const displayPrice = p.price || p.finalPrice || 0;
         
         let actionHtml = p.isSold ? `<div class="sold-text">❌ ተሽጧል</div>` : `
@@ -566,17 +642,14 @@
       const displayPrice = p.price || p.finalPrice || 0;
       const sellerShop = shops[p.sellerId];
       const sTg = sellerShop ? sellerShop.tg : p.sellerTg;
-      
       const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
       if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ የትዕዛዝ ማሳወቂያ ይደርሰዋል።`)) {
         const orderId = `ORD-${Date.now().toString().slice(-6)}`;
         const orderData = { productId: p.id, productTitle: p.title, price: displayPrice, sellerId: p.sellerId, buyerId: currentUser.id, buyerName: buyerName, buyerTg: currentUser.username || "የለውም", status: "Pending", date: new Date().toISOString() };
         try {
           await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PUT', body: JSON.stringify(orderData) });
-          if(tg.showAlert) tg.showAlert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል! አሁን በቀጥታ ሻጩን በቴሌግራም አናግረው ይረከቡ።");
-          else alert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!");
-          contactDirect(sTg, p.title);
-          await loadAllData();
+          if(tg.showAlert) tg.showAlert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል! አሁን በቀጥታ ሻጩን በቴሌግራም አናግረው ይረከቡ።"); else alert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!");
+          contactDirect(sTg, p.title); await loadAllData();
         } catch(e) { alert("ትዕዛዝ መላክ አልተቻለም።"); }
       }
     }
@@ -626,6 +699,7 @@
               <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${displayPrice} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
             </div>
             <div>
+              <button class="btn-action" style="background:var(--blue); color:white; padding:4px 8px; margin-bottom:4px;" onclick="openEditProductModal('${p.id}')">⚙️ Edit</button>
               <button class="btn-action btn-toggle-sold" style="padding:4px 8px; margin-bottom:4px;" onclick="toggleSold('${p.id}', ${p.isSold})">${p.isSold ? 'Active' : 'Sold'}</button>
               <button class="btn-action btn-delete" style="padding:4px 8px;" onclick="deleteProduct('${p.id}')">Delete</button>
             </div>
