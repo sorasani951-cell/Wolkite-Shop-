@@ -2,7 +2,7 @@
 <html lang="am">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>W&S AI MINI SHOP (Pro Marketplace)</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -12,7 +12,7 @@
       --warning: #F59E0B; --gold: #D97706; --gold-bg: #FEF3C7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
     header { background-color: var(--primary); color: white; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     header h1 { font-size: 1.2rem; }
     header p { font-size: 0.75rem; color: var(--secondary); }
@@ -55,10 +55,25 @@
     .btn-call { background: #2563EB; color: white; }
     .btn-order { background: #10B981; color: white; }
     
-    /* Navigation */
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 2px; }
+    /* Strong Bottom Navigation (Fixed) */
+    .nav-bar { 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      height: 65px; 
+      background: var(--card-bg); 
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center; 
+      border-top: 1px solid var(--border); 
+      z-index: 99999; /* Ensure it stays on top of everything */
+      padding-bottom: env(safe-area-inset-bottom, 0px); 
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 2px; width: 100%; height: 100%; justify-content: center; }
     .nav-btn.active { color: var(--primary); font-weight: bold; }
+    .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
     
     /* Shop Profile & Modals */
     .section-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
@@ -83,7 +98,7 @@
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
     
-    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
+    .modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
     .modal-content { background-color: var(--card-bg); margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 12px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .close-modal { color: #aaa; position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-modal:hover { color: #333; }
@@ -248,10 +263,25 @@
     </div>
   </div>
 
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <div class="nav-bar">
+    <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)">
+      <span class="nav-icon">🏠</span><span>Home</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('sell', this)">
+      <span class="nav-icon">➕</span><span>Sell</span>
+    </button>
+    <button class="nav-btn" id="navProfile" onclick="switchTab('profile', this)">
+      <span class="nav-icon">🏪</span><span>My Shop</span>
+    </button>
+  </div>
+
   <script>
-    const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
+    const tg = window.Telegram.WebApp; 
+    tg.ready(); 
+    tg.expand();
     
-    // ቦት ቶከን በትክክል ገብቷል
+    // ቦት ቶከን
     const BOT_TOKEN = "8848336833:AAHfsAdWgblfweZUkJHlgwAxuGhVOdaIW3w"; 
     const CHANNEL_USERNAME = "@wolkiteshop";
     
@@ -294,7 +324,6 @@
         orders = dataO || {};
         
         myShop = shops[currentUser.id] || null;
-        
       } catch(e) {}
       
       document.getElementById('loadingIndicator').style.display = 'none';
@@ -357,14 +386,17 @@
       reader.readAsDataURL(file);
     }
 
-    // Modal
     function openModal(id) {
       const p = products.find(x => x.id === id); if(!p) return;
       document.getElementById('modalImg').src = p.img || 'https://via.placeholder.com/400';
       document.getElementById('modalTitle').innerText = p.title;
       document.getElementById('modalCondition').innerText = p.condition;
-      document.getElementById('modalPrice').innerText = p.price + " ETB";
+      
+      // Undefined Price Fix for Phase 1 Data
+      const displayPrice = p.price || p.finalPrice || 0;
+      document.getElementById('modalPrice').innerText = displayPrice + " ETB";
       document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
+      
       let buttonsHtml = p.isSold ? `<div class="sold-text">❌ ይህ እቃ ተሽጧል</div>` : `
           <button class="btn-action btn-order" onclick="placeOrder('${p.id}'); closeModal();">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
@@ -385,12 +417,16 @@
         return (b.likes || 0) - (a.likes || 0);
       });
       const isAdmin = (Number(currentUser.id) === ADMIN_ID);
+      
       items.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
         const sellerShop = shops[p.sellerId];
         const isPro = sellerShop && sellerShop.isPro;
         const proHtml = isPro ? `<span class="pro-badge">PRO</span>` : '';
         const likeCount = p.likes || 0;
+        
+        // Undefined Price Fix
+        const displayPrice = p.price || p.finalPrice || 0;
         
         let actionHtml = p.isSold ? `<div class="sold-text">❌ ተሽጧል</div>` : `
           <button class="btn-action btn-order" onclick="placeOrder('${p.id}')">🛒 አሁን አዝዝ (Order)</button>
@@ -415,8 +451,8 @@
             <img src="${p.img || 'https://via.placeholder.com/150'}" class="product-img" onclick="openModal('${p.id}')">
             <div class="product-info">
               <div class="product-title" onclick="openModal('${p.id}')">${p.title}</div>
-              <div class="product-shop">🏪 ${p.sellerName} ${proHtml}</div>
-              <div class="product-price">${p.price} ETB</div>
+              <div class="product-shop">🏪 ${p.sellerName || 'ተማሪ'} ${proHtml}</div>
+              <div class="product-price">${displayPrice} ETB</div>
               <div class="action-buttons">${actionHtml}${adminActions}</div>
             </div>
           </div>`;
@@ -425,10 +461,11 @@
 
     async function placeOrder(productId) {
       const p = products.find(x => x.id === productId); if(!p) return;
+      const displayPrice = p.price || p.finalPrice || 0;
       const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
       if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ የትዕዛዝ ማሳወቂያ ይደርሰዋል።`)) {
         const orderId = `ORD-${Date.now().toString().slice(-6)}`;
-        const orderData = { productId: p.id, productTitle: p.title, price: p.price, sellerId: p.sellerId, buyerId: currentUser.id, buyerName: buyerName, buyerTg: currentUser.username || "የለውም", status: "Pending", date: new Date().toISOString() };
+        const orderData = { productId: p.id, productTitle: p.title, price: displayPrice, sellerId: p.sellerId, buyerId: currentUser.id, buyerName: buyerName, buyerTg: currentUser.username || "የለውም", status: "Pending", date: new Date().toISOString() };
         try {
           await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PUT', body: JSON.stringify(orderData) });
           if(tg.showAlert) tg.showAlert("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል! አሁን በቀጥታ ሻጩን በቴሌግራም አናግረው ይረከቡ።");
@@ -475,12 +512,13 @@
       }
       const container = document.getElementById('myListingsContainer'); container.innerHTML = '';
       myList.forEach(p => {
+        const displayPrice = p.price || p.finalPrice || 0;
         let statusBadge = p.status === 'pending' ? '<span style="color:var(--warning);">⏳ Pending</span>' : p.status === 'rejected' ? '<span style="color:var(--danger);">❌ Rejected</span>' : p.isSold ? '<span style="color:var(--danger);">🏷️ Sold</span>' : '<span style="color:var(--secondary);">✅ Active</span>';
         container.innerHTML += `
           <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; gap:8px; align-items:center;">
               <img src="${p.img || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
-              <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${p.price} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
+              <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${displayPrice} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
             </div>
             <div>
               <button class="btn-action btn-toggle-sold" style="padding:4px 8px; margin-bottom:4px;" onclick="toggleSold('${p.id}', ${p.isSold})">${p.isSold ? 'Active' : 'Sold'}</button>
@@ -505,11 +543,12 @@
       pendingList.innerHTML = '';
       if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
       pendProducts.forEach(p => {
+        const displayPrice = p.price || p.finalPrice || 0;
         pendingList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
             <img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
             <div style="flex:1;">
-              <strong>${p.title}</strong> (${p.price} ETB)<br><small>ሻጭ: ${p.sellerName}</small>
+              <strong>${p.title}</strong> (${displayPrice} ETB)<br><small>ሻጭ: ${p.sellerName}</small>
               <div style="display:flex; gap:4px; margin-top:6px;">
                 <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'approved')">አጽድቅ</button>
                 <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'rejected')">ውድቅ</button>
@@ -544,7 +583,23 @@
       try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); alert("ሱቅዎ ተፈጥሯል!"); await loadAllData(); } catch(err) {}
     }
 
-    async function likeProduct(id) { const p = products.find(x => x.id === id); if(!p) return; await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: (p.likes || 0) + 1 }) }); await loadAllData(); }
+    async function likeProduct(id) {
+      if(currentUser.id !== ADMIN_ID) {
+        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
+        if(likedItems.includes(id)) {
+          if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️");
+          else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️");
+          return;
+        }
+        likedItems.push(id);
+        localStorage.setItem('user_likes', JSON.stringify(likedItems));
+      }
+      
+      const p = products.find(x => x.id === id); if(!p) return;
+      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: (p.likes || 0) + 1 }) });
+      await loadAllData();
+    }
+    
     async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
     async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
 
@@ -575,9 +630,9 @@
     
     async function postToChannel(id) {
       const p = products.find(x => x.id === id); if(!p) return;
-      if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || BOT_TOKEN === "") { alert("የቦት ቶከን አላስገቡም!"); return; }
+      const displayPrice = p.price || p.finalPrice || 0;
       if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
-      const caption = `🛒 አዲስ እቃ <b>${p.sellerName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${p.price} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
+      const caption = `🛒 አዲስ እቃ <b>${p.sellerName || 'ተማሪ'}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
       try {
         const res = await fetch(p.img); const blob = await res.blob();
         const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
