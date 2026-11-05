@@ -659,7 +659,7 @@
 
     function renderMyOrders() {
       if(!myShop) return;
-      const myOrderKeys = Object.keys(orders).filter(k => orders[k].sellerId === String(currentUser.id));
+      const myOrderKeys = Object.keys(orders).filter(k => String(orders[k].sellerId) === String(currentUser.id));
       document.getElementById('myTotalOrders').innerText = myShop.totalOrdersReceived || 0;
       const container = document.getElementById('myOrdersContainer');
       if(myOrderKeys.length === 0) { container.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">ምንም አዲስ ትዕዛዝ የለም።</p>'; return; }
@@ -726,7 +726,6 @@
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
       document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
-      document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
       document.getElementById('st-active-sellers').innerText = tSellers; 
       document.getElementById('st-gold-sellers').innerText = gSellers;
       document.getElementById('st-silver-sellers').innerText = silSellers;
@@ -836,6 +835,26 @@
       const q = document.getElementById('homeSearch').value.toLowerCase();
       const filtered = products.filter(p => (currentCategory === 'All' || p.category === currentCategory) && p.title.toLowerCase().includes(q) && p.status === 'approved');
       renderProducts(filtered);
+    }
+
+    /* ✅ FIX 1: Category buttons + Refresh button */
+    function selectCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      filterProducts();
+    }
+    function fetchFromCloud() { loadAllData(); }
+
+    /* ✅ Like button (was missing, so ❤️ did nothing) */
+    async function likeProduct(id) {
+      const p = products.find(x => x.id === id); if(!p) return;
+      const newLikes = (p.likes || 0) + 1;
+      try {
+        await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) });
+        p.likes = newLikes;
+        filterProducts();
+      } catch(e) {}
     }
     
     initApp();
