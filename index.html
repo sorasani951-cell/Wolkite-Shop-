@@ -128,7 +128,8 @@
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
         <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
-        <button onclick="fetchFromCloud()" style="background:none; border:none; color:var(--secondary); font-weight:bold;">🔄 እደስ</button>
+        <!-- እዚህ ጋር loadAllData() ተብሎ ተስተካክሏል -->
+        <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
       </div>
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       <div class="product-grid" id="productGrid"></div>
@@ -340,7 +341,6 @@
     tg.ready(); 
     tg.expand();
     
-    // የቦት ቶከን አድራሻ - ጊትሀብ ላይ አይቀመጥም (ሴኪዩሪቲ)
     const CHANNEL_USERNAME = "@wolkiteshop";
     
     const DB_BASE = "https://wolkite-shop-default-rtdb.firebaseio.com";
@@ -522,7 +522,7 @@
       const p = products.find(x => x.id === productId); if(!p) return;
       const sShop = shops[p.sellerId] || {}; const sTier = sShop.tier || 'Free'; const sOrders = sShop.totalOrdersReceived || 0;
       const allowedOrders = sTier === 'Gold' ? Infinity : (sTier === 'Silver' ? 150 : 30);
-      if(sOrders >= allowedOrders) { if(tg.showAlert) tg.showAlert("ይቅርታ! ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል።"); else alert("ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል።"); return; }
+      if(sOrders >= allowedOrders) { if(tg.showAlert) tg.showAlert("ይቅርታ! ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል። ማዘዝ አይችሉም።"); else alert("ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል።"); return; }
       const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
       if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ ማሳወቂያ ይደርሰዋል።`)) {
         const orderId = `ORD-${Date.now().toString().slice(-6)}`;
@@ -597,7 +597,11 @@
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
       document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
-      document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
+      document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
+      document.getElementById('st-active-sellers').innerText = tSellers; 
+      document.getElementById('st-gold-sellers').innerText = gSellers;
+      document.getElementById('st-silver-sellers').innerText = silSellers;
+      document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
 
       const pendingList = document.getElementById('adminPendingList'); const pendProducts = products.filter(p => p.status === 'pending');
       pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
@@ -651,17 +655,6 @@
       }; reader.readAsDataURL(file);
     }
 
-    async function likeProduct(id) {
-      if(currentUser.id !== ADMIN_ID) {
-        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
-        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
-      }
-      const p = products.find(x => x.id === id); if(!p) return;
-      await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: (p.likes || 0) + 1 }) });
-      await loadAllData();
-    }
-    
     async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
     async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ? (ማሳሰቢያ: እቃው ቢጠፋም በጠቅላላ የጫኑት ብዛት ላይ ተቆጥሯል)")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
 
@@ -674,6 +667,20 @@
     function switchTab(viewName, btn) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); btn.classList.add('active'); }
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
+
+    // ✅ የ Category ማጣሪያ ፈንክሽን በትክክል ተመልሷል!
+    function selectCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      filterProducts();
+    }
+
+    function filterProducts() {
+      const q = document.getElementById('homeSearch').value.toLowerCase();
+      const filtered = products.filter(p => (currentCategory === 'All' || p.category === currentCategory) && p.title.toLowerCase().includes(q) && p.status === 'approved');
+      renderProducts(filtered);
+    }
 
     async function handleProductSubmit(e) {
       e.preventDefault(); if(!myShop) return;
@@ -698,10 +705,9 @@
       const displayPrice = p.price || p.finalPrice || 0;
       const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
       
-      // ⚠️ የተስተካከለው የቦት ቶከን አሰራር
       let savedToken = localStorage.getItem('admin_bot_token');
       if (!savedToken) {
-        savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ (ይህ ቶከን ጊትሀብ ላይ አይጻፍም፤ ስልክዎ ላይ ብቻ ነው የሚቀመጠው):");
+        savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ (በስልክዎ ብቻ ነው ሴቭ የሚሆነው):");
         if (!savedToken) return;
         localStorage.setItem('admin_bot_token', savedToken);
       }
@@ -716,18 +722,10 @@
         if(tgData.ok) {
           alert("ቻናል ላይ ተለጥፏል! 🎉");
         } else {
-          alert("ስህተት: ቦቱ የቻናሉ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description);
-          if (tgData.error_code === 401 || tgData.error_code === 404) {
-             localStorage.removeItem('admin_bot_token'); // ቶከኑ ከተሳሳተ ዳግም እንዲጠይቅ ያጠፋዋል
-          }
+          alert("ስህተት: ቦቱ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description);
+          if (tgData.error_code === 401 || tgData.error_code === 404) { localStorage.removeItem('admin_bot_token'); }
         }
-      } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
-    }
-    
-    function filterProducts() {
-      const q = document.getElementById('homeSearch').value.toLowerCase();
-      const filtered = products.filter(p => (currentCategory === 'All' || p.category === currentCategory) && p.title.toLowerCase().includes(q) && p.status === 'approved');
-      renderProducts(filtered);
+      } catch(e) { alert("መፖሰት አልተቻለም!"); }
     }
     
     initApp();
