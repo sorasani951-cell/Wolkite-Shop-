@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>W&S AI MINI SHOP (Pro Marketplace)</title>
+  <title>Wolkite Shop (Pro Marketplace)</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -109,7 +109,7 @@
 <body>
 
   <header>
-    <h1>W&S AI MINI SHOP</h1>
+    <h1>Wolkite Shop</h1>
     <p>Wolkite University Student Marketplace</p>
   </header>
 
@@ -127,10 +127,9 @@
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
       
-      <!-- 🌟 አዲስ: የተመረጠ ሱቅ ማሳያ -->
       <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
          <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
-         <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">❌ ተመለስ</button>
+         <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">❌ አጥፋ</button>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
@@ -239,6 +238,12 @@
         <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Admin Control Center</h3>
         
         <div class="analytics-grid">
+          <!-- 🌟 አዲስ: Total Bot Users -->
+          <div class="stat-box" style="grid-column: span 2; background:#E0F2FE; border-color:#BAE6FD;">
+            <div class="stat-num" id="st-total-users" style="color:#0284C7;">0</div>
+            <div class="stat-title" style="color:#0369A1;">Total Bot Users</div>
+          </div>
+          
           <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
           <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
           <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
@@ -355,6 +360,7 @@
     const FIREBASE_PRODUCTS = `${DB_BASE}/products`;
     const FIREBASE_SHOPS = `${DB_BASE}/shops`;
     const FIREBASE_ORDERS = `${DB_BASE}/orders`;
+    const FIREBASE_USERS = `${DB_BASE}/users`; // 🌟 የጠቅላላ ቦት ተጠቃሚዎች ማከማቻ
     
     const ADMIN_ID = 8356035160;
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
@@ -362,6 +368,7 @@
     let products = [];
     let shops = {};
     let orders = {};
+    let totalBotUsers = 0;
     let myShop = null; 
     let uploadedImageBase64 = "";
     let uploadedAvatarBase64 = "";
@@ -369,29 +376,49 @@
     let editingProductImageBase64 = "";
     let currentOpenedProductId = null;
     let currentCategory = 'All';
-    let currentSellerFilter = null; // 🌟 የሱቅ ማጣሪያ
+    let currentSellerFilter = null; 
 
     async function initApp() {
       if(currentUser.id === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
+      
+      // 🌟 1. ማንኛውም የገባ ሰው ዳታቤዝ ላይ ይመዘገባል (Bot User Tracking)
+      trackUser();
+      
+      // 🌟 2. ኔትወርክ ጠብቆ ሙሉ ዳታ ያወርዳል
       await loadAllData();
       
-      // 🌟 ቴሌግራም ላይ የተላከን ሊንክ (Deep Link) ለማንበብ
+      // 🌟 3. ዳታ ወርዶ ካለቀ በኋላ፣ Share የተደረገ ሊንክ ካለ ቀጥታ እቃውን ይከፍታል (Deep Link Fix!)
       const startParam = tg.initDataUnsafe?.start_param;
       if(startParam && startParam.startsWith('p_')) {
          const pId = startParam.substring(2);
-         setTimeout(() => { openModal(pId); }, 800); // አፑ እስኪከፈት ጠብቆ እቃውን ያመጣል
+         if(products.some(p => p.id === pId)) {
+            openModal(pId);
+         }
       }
+    }
+    
+    async function trackUser() {
+       try {
+         await fetch(`${FIREBASE_USERS}/${currentUser.id}.json`, {
+           method: 'PATCH',
+           body: JSON.stringify({ id: currentUser.id, name: currentUser.first_name || currentUser.username || "User", lastActive: new Date().toISOString() })
+         });
+       } catch(e) {}
     }
 
     async function loadAllData() {
       document.getElementById('loadingIndicator').style.display = 'block';
       try {
-        const [resP, resS, resO] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`) ]);
-        const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json();
+        const [resP, resS, resO, resU] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`) ]);
+        const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json();
         
         products = [];
         if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
         shops = dataS || {}; orders = dataO || {};
+        
+        const usersData = dataU || {};
+        totalBotUsers = Object.keys(usersData).length;
+        
         myShop = shops[currentUser.id] || null;
       } catch(e) {}
       document.getElementById('loadingIndicator').style.display = 'none';
@@ -476,19 +503,15 @@
     }
     function closeModal() { document.getElementById('productModal').style.display = "none"; currentOpenedProductId = null; }
     
-    // 🌟 አዲስ: የእቃ ማጋሪያ (Share)
     function shareProduct(id, title) {
-      // ማሳሰቢያ: "shop" የሚለው የ Web App Short Name ዎ ነው። ከተቀየረ እዚህ ጋር ያስተካክሉት።
       const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`;
       const text = `🛍️ የወልቂጤ ዩኒቨርሲቲ ገበያ ላይ ይሄንን አይተሃል?\n\n📌 ${title}\n\nአሁኑኑ ለማየት ሊንኩን ይጫኑ 👇`;
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(appLink)}&text=${encodeURIComponent(text)}`;
       if(tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
-    // 🌟 አዲስ: የሻጭን ሱቅ ለይቶ መመልከቻ (View Shop)
     function viewShop(sellerId) {
-      currentSellerFilter = sellerId;
-      currentCategory = 'All';
+      currentSellerFilter = sellerId; currentCategory = 'All';
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
       document.querySelector('#categoryBar .cat-pill').classList.add('active');
       document.getElementById('homeSearch').value = '';
@@ -518,7 +541,6 @@
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
-    // 🌟 የተስተካከለው Category እና Search
     function selectCategory(cat, btn) { 
       currentCategory = cat; 
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
@@ -531,18 +553,13 @@
       
       const filtered = products.filter(p => {
         if (p.status !== 'approved') return false;
-        
-        // በሻጭ ሱቅ ከተመረጠ ሌላውን ይደብቃል
         if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
         
-        // Category ማጣሪያ
-        let pCat = (p.category || "").trim();
-        let matchesCategory = false;
+        let pCat = (p.category || "").trim(); let matchesCategory = false;
         if (currentCategory === 'All') { matchesCategory = true; } 
-        else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } // የድሮ እቃዎችን fix ለማድረግ
+        else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } 
         else { matchesCategory = pCat === currentCategory; }
         
-        // Search ማጣሪያ
         let matchesSearch = true;
         if (q !== "") {
            const pTitle = (p.title || "").toLowerCase(); const pDesc = (p.desc || "").toLowerCase();
@@ -684,6 +701,9 @@
       let tSellers = sKeys.length; let gSellers = 0; let silSellers = 0;
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
+      // 🌟 አዲስ: Total Users 
+      document.getElementById('st-total-users').innerText = totalBotUsers;
+      
       document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
       document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
       document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
@@ -753,9 +773,9 @@
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
 
-    // 🌟 የተስተካከለው የ Like አዝራር
+    // 🌟 የ Like አዝራር 
     async function likeProduct(id, event) {
-      if(event) event.stopPropagation(); // እቃው እንዳይከፈት ያግዳል
+      if(event) event.stopPropagation();
       const p = products.find(x => x.id === id); if(!p) return;
       
       if(currentUser.id !== ADMIN_ID) {
@@ -764,13 +784,9 @@
         likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
       }
       
-      const newLikes = (p.likes || 0) + 1;
-      p.likes = newLikes;
-      
-      const countSpan = document.getElementById(`like-count-${id}`);
-      if(countSpan) countSpan.innerText = newLikes;
-      const btn = document.getElementById(`like-btn-${id}`);
-      if(btn) btn.classList.add('liked');
+      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
+      const countSpan = document.getElementById(`like-count-${id}`); if(countSpan) countSpan.innerText = newLikes;
+      const btn = document.getElementById(`like-btn-${id}`); if(btn) btn.classList.add('liked');
 
       try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
     }
