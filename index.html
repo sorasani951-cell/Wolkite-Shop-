@@ -27,10 +27,7 @@
     /* Horizontal Slider Layout */
     .category-section { margin-bottom: 24px; }
     .category-title { font-size: 1.05rem; font-weight: bold; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; padding-left: 4px;}
-    .horizontal-scroll { 
-      display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; 
-      scrollbar-width: none; scroll-snap-type: x mandatory;
-    }
+    .horizontal-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory; }
     .horizontal-scroll::-webkit-scrollbar { display: none; }
     
     /* Product Cards */
@@ -144,7 +141,7 @@
       <!-- Loading Indicator -->
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
 
-      <!-- Main Home Content (Sliders will be generated here) -->
+      <!-- Main Home Content -->
       <div id="homeContent"></div>
     </div>
 
@@ -232,14 +229,12 @@
         <div id="p-upgrade" class="p-content section-card" style="text-align:center;">
           <h3 style="color:var(--primary); margin-bottom:10px;">🚀 አካውንትዎን ያሳድጉ (Upgrade)</h3>
           <p style="font-size:0.85rem; color:#444; margin-bottom:15px;">የነጻ ገደብዎን ሲጨርሱ ከሚከተሉት አንዱን ይምረጡ፦</p>
-          
           <div style="background:var(--silver-bg); padding:10px; border-radius:8px; border:1px solid #D1D5DB; margin-bottom:10px; font-size:0.8rem; text-align:left;">
             <b style="color:#4B5563;">🥈 SILVER (150 ETB ለ 3 ወር)</b><br>
             - እስከ 15 እቃዎች መጫን<br>
             - እስከ 150 ትዕዛዞች መቀበል<br>
             - የ Silver ሻጭ ባጅ
           </div>
-          
           <div style="background:var(--gold-bg); padding:10px; border-radius:8px; border:1px solid var(--gold); margin-bottom:15px; font-size:0.8rem; text-align:left;">
             <b style="color:var(--gold);">👑 GOLD (200 ETB ለ 3 ወር)</b><br>
             - ያልተገደበ (Unlimited) እቃ መጫን<br>
@@ -253,7 +248,6 @@
       <!-- ADMIN DASHBOARD -->
       <div id="adminPanel" style="display:none;" class="section-card">
         <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Admin Control Center</h3>
-        
         <div class="analytics-grid">
           <div class="stat-box" style="grid-column: span 2; background:#E0F2FE; border-color:#BAE6FD;">
             <div class="stat-num" id="st-total-users" style="color:#0284C7;">0</div>
@@ -277,7 +271,7 @@
           <div class="stat-box"><div class="stat-num" id="st-free-sellers">0</div><div class="stat-title">Free Sellers</div></div>
         </div>
 
-        <div class="profile-tabs" style="margin-top:15px; font-size:0.8rem;">
+        <div class="profile-tabs" style="margin-top:15px; font-size:0.75rem;">
           <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
           <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
           <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
@@ -319,17 +313,7 @@
           <img id="editProdImagePreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
           <input type="file" accept="image/*" onchange="handleEditProductImageUpload(event)" style="font-size:0.75rem;">
         </div>
-        <div class="form-group">
-          <label>ዘርፍ</label>
-          <select id="editProdCategory">
-             <option value="Electronics">Electronics</option>
-             <option value="Clothes & Shoes">Clothes & Shoes</option>
-             <option value="Books & Study Materials">Books & Study Materials</option>
-             <option value="Dorm & Household Items">Dorm & Household Items</option>
-             <option value="Food">ምግብ (Food)</option>
-             <option value="Other Products">Other Products</option>
-          </select>
-        </div>
+        <div class="form-group"><label>ዘርፍ</label><select id="editProdCategory"><option value="Electronics">Electronics</option><option value="Clothes & Shoes">Clothes & Shoes</option><option value="Books & Study Materials">Books & Study Materials</option><option value="Dorm & Household Items">Dorm & Household Items</option><option value="Food">ምግብ (Food)</option><option value="Other Products">Other Products</option></select></div>
         <div class="form-group"><label>የእቃው ስም</label><input type="text" id="editProdTitle" required></div>
         <div class="form-group"><label>የእቃው ሁኔታ</label><select id="editProdCondition" required><option value="Brand New">አዲስ</option><option value="Slightly Used">ትንሽ የተጠቀመ</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ</option></select></div>
         <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="editProdPrice" required></div>
@@ -352,7 +336,6 @@
       <p id="modalDesc" style="font-size:0.85rem; color:#444; line-height:1.5; margin-bottom:10px; background:#f9f9f9; padding:10px; border-radius:8px; white-space: pre-wrap;"></p>
       <div id="modalButtons" class="action-buttons"></div>
       
-      <!-- Public Comments Section -->
       <div class="comment-box">
         <h4 style="font-size:0.85rem; color:var(--primary);">💬 አስተያየቶች (Reviews)</h4>
         <div id="modalCommentsList" style="max-height:120px; overflow-y:auto; background:#f9f9f9; border-radius:6px; padding:6px;"></div>
@@ -376,7 +359,6 @@
     tg.expand();
     
     const CHANNEL_USERNAME = "@wolkiteshop";
-    
     const DB_BASE = "https://wolkite-shop-default-rtdb.firebaseio.com";
     const FIREBASE_PRODUCTS = `${DB_BASE}/products`;
     const FIREBASE_SHOPS = `${DB_BASE}/shops`;
@@ -386,17 +368,10 @@
     const ADMIN_ID = 8356035160;
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    let products = [];
-    let shops = {};
-    let orders = {};
-    let totalBotUsers = 0;
-    let myShop = null; 
-    let uploadedImageBase64 = "";
-    let uploadedAvatarBase64 = "";
-    let editingProductId = null;
-    let editingProductImageBase64 = "";
-    let currentOpenedProductId = null;
-    let currentSellerFilter = null; 
+    let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
+    let myShop = null; let uploadedImageBase64 = ""; let uploadedAvatarBase64 = "";
+    let editingProductId = null; let editingProductImageBase64 = "";
+    let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
 
     async function initApp() {
       if(currentUser.id === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
@@ -420,8 +395,7 @@
         const [resP, resS, resO, resU] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`) ]);
         const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json();
         
-        products = [];
-        if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
+        products = []; if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
         shops = dataS || {}; orders = dataO || {};
         const usersData = dataU || {}; totalBotUsers = Object.keys(usersData).length;
         myShop = shops[currentUser.id] || null;
@@ -432,8 +406,7 @@
     }
 
     async function syncOldSellers() {
-      const btn = document.getElementById('syncBtn');
-      if(btn) { btn.innerText = "በመፈለግ ላይ..."; btn.disabled = true; }
+      const btn = document.getElementById('syncBtn'); if(btn) { btn.innerText = "በመፈለግ ላይ..."; btn.disabled = true; }
       let foundCount = 0;
       for (let p of products) {
         if (p.sellerId && !shops[p.sellerId]) {
@@ -493,7 +466,7 @@
     function openModal(id) {
       const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id; document.getElementById('modalImg').src = p.img || 'https://via.placeholder.com/400'; document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
       const sShop = shops[p.sellerId]; const sPhone = sShop ? sShop.phone : p.sellerPhone; const sTg = sShop ? sShop.tg : p.sellerTg;
-      let buttonsHtml = p.isSold ? `<div class="sold-text">❌ ይህ እቃ ተሽጧል</div>` : `
+      let buttonsHtml = p.isSold ? `<div class="sold-text" style="font-size:0.85rem; font-weight:bold; color:var(--danger); text-align:center; padding:10px;">❌ ይህ እቃ ተሽጧል</div>` : `
           <button class="btn-action btn-order" onclick="placeOrder('${p.id}'); closeModal();">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
             <a class="btn-action btn-call" style="flex:1;" href="tel:${sPhone}">📞 ደውል</a>
@@ -515,8 +488,7 @@
 
     function viewShop(sellerId) {
       currentSellerFilter = sellerId; document.getElementById('homeSearch').value = '';
-      const shop = shops[sellerId];
-      document.getElementById('shopFilterBanner').style.display = 'flex';
+      const shop = shops[sellerId]; document.getElementById('shopFilterBanner').style.display = 'flex';
       document.getElementById('shopFilterName').innerText = `🏪 የ ${shop ? shop.name : 'ሻጭ'} ሱቅ እቃዎች`;
       closeModal(); switchTab('home', document.getElementById('navHome')); filterProducts();
     }
@@ -539,32 +511,19 @@
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
-    // 🌟 LIKE BUTTON FIX 🌟
-    async function likeProduct(id, event) {
-      if(event) { event.preventDefault(); event.stopPropagation(); }
-      const p = products.find(x => x.id === id); if(!p) return;
-      
-      if(currentUser.id !== ADMIN_ID) {
-        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
-        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
-      }
-      
-      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
-      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
-      document.querySelectorAll(`.like-btn-${id}`).forEach(el => el.classList.add('liked'));
-
-      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
+    // 🌟 CATEGORIES & SLIDER UI
+    function selectCategory(cat, btn) { 
+      currentCategory = cat; 
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
+      btn.classList.add('active'); 
+      filterProducts(); 
     }
 
-    // 🌟 SLIDER UI LOGIC 🌟
     function filterProducts() {
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
       let approvedProducts = products.filter(p => p.status === 'approved');
       
-      if (currentSellerFilter) {
-          approvedProducts = approvedProducts.filter(p => String(p.sellerId) === String(currentSellerFilter));
-      }
+      if (currentSellerFilter) { approvedProducts = approvedProducts.filter(p => String(p.sellerId) === String(currentSellerFilter)); }
 
       if (q !== "") {
          const searched = approvedProducts.filter(p => {
@@ -572,13 +531,11 @@
              return pTitle.includes(q) || pDesc.includes(q);
          });
          document.getElementById('homeContent').innerHTML = `<div class="product-grid">${searched.map(p => generateCardHTML(p)).join('')}</div>`;
-         if(searched.length === 0) document.getElementById('homeContent').innerHTML = '<p style="text-align:center; color:var(--gray); padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>';
+         if(searched.length === 0) document.getElementById('homeContent').innerHTML = '<p style="text-align:center; color:var(--gray); padding:20px;">በዚህ ፍለጋ የተገኘ እቃ የለም።</p>';
          return;
       }
       
-      // Calculate orders for TOP ADS
-      let orderCounts = {};
-      Object.keys(orders).forEach(k => { const o = orders[k]; orderCounts[o.productId] = (orderCounts[o.productId] || 0) + 1; });
+      let orderCounts = {}; Object.keys(orders).forEach(k => { const o = orders[k]; orderCounts[o.productId] = (orderCounts[o.productId] || 0) + 1; });
       approvedProducts.forEach(p => p.orderCount = orderCounts[p.id] || 0);
 
       renderCategorizedLayout(approvedProducts);
@@ -587,7 +544,7 @@
     function renderCategorizedLayout(approvedProducts) {
       let html = '';
       
-      // 1. TOP ADS (Featured - Top 3 Ordered)
+      // Top Selling Ads
       let featured = [...approvedProducts].sort((a,b) => b.orderCount - a.orderCount).slice(0, 3);
       if(featured.length > 0 && featured[0].orderCount > 0) {
          html += `<div class="category-section">
@@ -598,7 +555,6 @@
                   </div>`;
       }
       
-      // 2. Sliders for each Category
       const categories = ["Electronics", "Clothes & Shoes", "Books & Study Materials", "Dorm & Household Items", "Food", "Other Products"];
       const catNamesAm = {"Electronics":"💻 ኤሌክትሮኒክስ", "Clothes & Shoes":"👕 ልብሶችና ጫማዎች", "Books & Study Materials":"📚 መጽሐፍት", "Dorm & Household Items":"🛏️ የዶርም እቃዎች", "Food":"🍔 ምግብ", "Other Products":"📦 ሌሎች"};
       
@@ -606,6 +562,7 @@
          let catItems = approvedProducts.filter(p => {
              let pCat = (p.category || "").trim();
              if(cat === 'Other Products' && pCat === 'Other') return true;
+             if(currentCategory !== 'All' && cat !== currentCategory) return false; // Hide others if specific category is selected
              return pCat === cat;
          });
          
@@ -672,6 +629,21 @@
           </div>`;
     }
 
+    // 🌟 ALL RESTORED FUNCTIONS 🌟
+    async function likeProduct(id, event) {
+      if(event) { event.preventDefault(); event.stopPropagation(); }
+      const p = products.find(x => x.id === id); if(!p) return;
+      if(currentUser.id !== ADMIN_ID) {
+        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
+        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
+        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
+      }
+      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
+      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
+      document.querySelectorAll(`.like-btn-${id}`).forEach(el => el.classList.add('liked'));
+      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
+    }
+
     async function handleProductSubmit(e) {
       e.preventDefault(); if(!myShop) return;
       const tUploads = myShop.totalUploads || 0; const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
@@ -689,11 +661,40 @@
         await loadAllData(); switchTab('home', document.getElementById('navHome'));
       } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
     }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image(); img.onload = function() {
+          const canvas = document.createElement('canvas'); const maxDim = 400; let width = img.width; let height = img.height;
+          if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+          canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('imagePreview').src = uploadedImageBase64; document.getElementById('imagePreview').style.display = 'block';
+        }; img.src = event.target.result;
+      }; reader.readAsDataURL(file);
+    }
     
     function switchTab(viewName, btn) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); btn.classList.add('active'); }
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     
+    async function placeOrder(productId) {
+      const p = products.find(x => x.id === productId); if(!p) return;
+      const sShop = shops[p.sellerId] || {}; const sTier = sShop.tier || 'Free'; const sOrders = sShop.totalOrdersReceived || 0;
+      const allowedOrders = sTier === 'Gold' ? Infinity : (sTier === 'Silver' ? 150 : 30);
+      if(sOrders >= allowedOrders) { if(tg.showAlert) tg.showAlert("ይቅርታ! ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል። ማዘዝ አይችሉም።"); else alert("ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል።"); return; }
+      const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
+      if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ ማሳወቂያ ይደርሰዋል።`)) {
+        const orderId = `ORD-${Date.now().toString().slice(-6)}`;
+        const orderData = { productId: p.id, productTitle: p.title, price: (p.price || p.finalPrice || 0), sellerId: p.sellerId, buyerId: currentUser.id, buyerName: buyerName, buyerTg: currentUser.username || "የለውም", status: "Pending", date: new Date().toISOString() };
+        try {
+          await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PUT', body: JSON.stringify(orderData) });
+          if(p.sellerId && !shops[p.sellerId]) { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PUT', body: JSON.stringify({ name: p.sellerName||"ሻጭ", tier: "Free", totalUploads: 1, totalOrdersReceived: 1 }) }); } else if(p.sellerId) { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ totalOrdersReceived: sOrders + 1 }) }); }
+          if(tg.showAlert) tg.showAlert("ትዕዛዝዎ ተልኳል! አሁን በቀጥታ ሻጩን አናግረው ይረከቡ።"); else alert("ትዕዛዝዎ ተልኳል!");
+          contactDirect(sShop.tg || p.sellerTg, p.title); await loadAllData();
+        } catch(e) { alert("ትዕዛዝ መላክ አልተቻለም።"); }
+      }
+    }
+
     function renderMyOrders() {
       if(!myShop) return;
       const myOrderKeys = Object.keys(orders).filter(k => String(orders[k].sellerId) === String(currentUser.id));
@@ -747,6 +748,7 @@
       });
     }
 
+    // 🌟 ADMIN FUNCTIONS 🌟
     function renderAdminDashboard() {
       const pKeys = products.map(p => p.id); const sKeys = Object.keys(shops); const oKeys = Object.keys(orders);
       let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
@@ -784,12 +786,14 @@
         else if(cTier === 'Silver') { badge = '<span class="pro-badge badge-silver">🥈 SILVER</span>'; avatarStyle += "border: 2px solid var(--silver); box-shadow: 0 0 5px rgba(156,163,175,0.5);"; } 
         else { badge = '<span style="font-size:0.6rem; color:var(--gray); border:1px solid var(--gray); padding:1px 4px; border-radius:4px;">FREE</span>'; avatarStyle += "border: 1px solid var(--border);"; }
         
+        // 🌟 MISSING BUTTONS RESTORED HERE 🌟
         const actionBtn = `
           <div style="display:flex; gap:4px; margin-top:6px;">
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${k}', 'Free')">Free</button>
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${k}', 'Silver')">Silver</button>
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${k}', 'Gold')">Gold</button>
           </div>`;
+          
         sellersList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -826,15 +830,38 @@
           });
       }
     }
+
+    async function adminUpdateProd(id, status) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) }); await loadAllData(); }
+    async function adminSetTier(sellerId, newTier) { 
+      if (tg.showConfirm) {
+          tg.showConfirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`, async function(confirmed) {
+              if(confirmed) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); }
+          });
+      } else {
+          if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`)) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); }
+      }
+    }
+    async function togglePin(id, isPinned) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) }); await loadAllData(); }
+    async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
+    async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
+
+    function contactDirect(username, itemTitle) {
+      const msg = `ሰላም፣ "${itemTitle}" አጋጥሞኝ ነበር።`;
+      const link = `https://t.me/${username}?text=${encodeURIComponent(msg)}`;
+      if (tg.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
+    }
     
     async function postToChannel(id) {
       const p = products.find(x => x.id === id); if(!p) return;
       const displayPrice = p.price || p.finalPrice || 0;
       const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
+      
       let savedToken = localStorage.getItem('admin_bot_token');
-      if (!savedToken) { savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ (በስልክዎ ብቻ ነው ሴቭ የሚሆነው):"); if (!savedToken) return; localStorage.setItem('admin_bot_token', savedToken); }
+      if (!savedToken) { savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ:"); if (!savedToken) return; localStorage.setItem('admin_bot_token', savedToken); }
       if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
-      const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ለመግዛት @wolkite_shopbot ይጠቀሙ።`;
+      
+      const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`; // 🌟 እቃውን በቀጥታ የሚከፍት ሊንክ
+      const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ሙሉ መረጃውን ለማየት እና ለመግዛት እዚህ ይጫኑ: ${appLink}`;
       try {
         const res = await fetch(p.img); const blob = await res.blob();
         const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
