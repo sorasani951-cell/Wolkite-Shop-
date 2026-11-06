@@ -45,7 +45,7 @@
     .product-img { width: 100%; height: 120px; object-fit: cover; background: #eee; cursor: pointer; }
     .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; }
     .product-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
-    .product-shop { font-size: 0.7rem; color: var(--primary); font-weight:bold; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;}
+    .product-shop { font-size: 0.7rem; color: var(--primary); font-weight:bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;}
     
     .pro-badge { color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; }
     .badge-gold { background: var(--gold); }
@@ -73,8 +73,8 @@
     .section-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
     .shop-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; }
     .shop-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; }
-    .shop-avatar.avatar-gold { border-color: var(--gold); box-shadow: 0 0 12px rgba(217,119,6,0.6); }
-    .shop-avatar.avatar-silver { border-color: var(--silver); box-shadow: 0 0 8px rgba(156,163,175,0.5); }
+    .shop-avatar.avatar-gold { border-color: var(--gold); box-shadow: 0 0 10px rgba(217,119,6,0.5); }
+    .shop-avatar.avatar-silver { border-color: var(--silver); box-shadow: 0 0 10px rgba(156,163,175,0.5); }
     .btn-edit-shop { position: absolute; right: 0; top: 0; background: #F3F4F6; color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
     
     .profile-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
@@ -260,10 +260,10 @@
           <div class="stat-box"><div class="stat-num" id="st-free-sellers">0</div><div class="stat-title">Free Sellers</div></div>
         </div>
 
-        <div class="profile-tabs" style="margin-top:15px; font-size:0.75rem;">
+        <!-- 🌟 አዲስ: ትዕዛዝ ማያ Tab ተስተካክሎ ገባ -->
+        <div class="profile-tabs" style="margin-top:15px; font-size:0.8rem;">
           <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
           <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
-          <!-- 🌟 አዲስ: የትዕዛዝ መቆጣጠሪያ Tab -->
           <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
         </div>
         
@@ -273,7 +273,7 @@
         <div id="a-sellers" class="p-content">
           <div id="adminSellersList"></div>
         </div>
-        <!-- 🌟 አዲስ: የትዕዛዝ ዝርዝር Content -->
+        <!-- 🌟 አዲስ: ትዕዛዝ ማያ Content -->
         <div id="a-orders" class="p-content">
           <div id="adminOrdersList"></div>
         </div>
@@ -403,7 +403,8 @@
         const [resP, resS, resO, resU] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`) ]);
         const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json();
         
-        products = []; if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
+        products = [];
+        if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
         shops = dataS || {}; orders = dataO || {};
         const usersData = dataU || {}; totalBotUsers = Object.keys(usersData).length;
         myShop = shops[currentUser.id] || null;
@@ -414,7 +415,8 @@
     }
 
     async function syncOldSellers() {
-      const btn = document.getElementById('syncBtn'); if(btn) { btn.innerText = "በመፈለግ ላይ..."; btn.disabled = true; }
+      const btn = document.getElementById('syncBtn');
+      if(btn) { btn.innerText = "በመፈለግ ላይ..."; btn.disabled = true; }
       let foundCount = 0;
       for (let p of products) {
         if (p.sellerId && !shops[p.sellerId]) {
@@ -422,7 +424,8 @@
           try { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); shops[p.sellerId] = shopData; foundCount++; } catch(e) {}
         }
       }
-      if(foundCount > 0) { if(tg.showAlert) tg.showAlert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); else alert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); } else { alert("ሁሉም ሻጮች አስቀድመው ተመዝግበዋል (አዲስ የለም)።"); }
+      if(foundCount > 0) { if(tg.showAlert) tg.showAlert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); else alert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); } 
+      else { alert("ሁሉም ሻጮች አስቀድመው ተመዝግበዋል (አዲስ የለም)።"); }
       if(btn) { btn.innerText = "🔄 የድሮ ሻጮችን ፈልግ"; btn.disabled = false; }
       await loadAllData();
     }
@@ -558,7 +561,6 @@
         
         let proHtml = ''; 
         let avatarStyle = "width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:4px;";
-        // 🌟 የፕሮፋይል ክብ (Avatar Stroke)
         if(sTier === 'Gold') {
            proHtml = `<span class="pro-badge badge-gold">👑</span>`;
            avatarStyle += "border: 2px solid var(--gold); box-shadow: 0 0 8px rgba(217,119,6,0.5);";
@@ -712,7 +714,6 @@
       sKeys.forEach(k => {
         const s = shops[k]; const cTier = s.tier || 'Free';
         let badge = '', avatarStyle = "width:30px; height:30px; border-radius:50%; object-fit:cover;";
-        // 🌟 Admin Sellers List Avatar Strokes
         if(cTier === 'Gold') {
            badge = '<span class="pro-badge badge-gold">👑 GOLD</span>';
            avatarStyle += "border: 2px solid var(--gold); box-shadow: 0 0 5px rgba(217,119,6,0.5);";
@@ -745,14 +746,14 @@
           </div>`;
       });
       
-      // 🌟 አዲስ: All Orders Tab (የአድሚን የትዕዛዝ መቆጣጠሪያ)
+      // 🌟 All Orders Tab (የአድሚን የትዕዛዝ መቆጣጠሪያ)
       const adminOrdersList = document.getElementById('adminOrdersList'); adminOrdersList.innerHTML = '';
-      const allOrderKeys = oKeys.reverse(); // Newest first
+      const allOrderKeys = [...oKeys].reverse(); 
       if (allOrderKeys.length === 0) { adminOrdersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ትዕዛዝ የለም።</p>'; } 
       else {
           allOrderKeys.forEach(k => {
               const o = orders[k];
-              const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '', tg: '' };
+              const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '-', tg: '-' };
               let statusColor = o.status === 'Pending' ? 'var(--danger)' : o.status === 'Completed' ? 'var(--secondary)' : 'var(--gray)';
               adminOrdersList.innerHTML += `
                 <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
@@ -765,7 +766,8 @@
                     <span style="color:var(--gray);">ሻጭ:</span> <b>${sellerInfo.name}</b> (📞 ${sellerInfo.phone})
                   </div>
                   <div style="display:flex; gap:4px; margin-top:6px;">
-                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${sellerInfo.tg}', 'ስለ ትዕዛዝ (Order)')">💬 ሻጩን አናግር</button>
+                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${sellerInfo.tg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ሻጩን አናግር</button>
+                    <button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${o.buyerTg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ገዢውን አናግር</button>
                   </div>
                 </div>`;
           });
@@ -791,7 +793,7 @@
     async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ? (ማሳሰቢያ: እቃው ቢጠፋም በጠቅላላ የጫኑት ብዛት ላይ ተቆጥሯል)")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
 
     function contactDirect(username, itemTitle) {
-      const msg = `ሰላም፣ ሱቅህ/ሽ ላይ "${itemTitle}" አይቼ መግዛት ፈልጌ ነበር።`;
+      const msg = `ሰላም፣ ሱቅህ/ሽ ላይ "${itemTitle}" አይቼ ነበር።`;
       const link = `https://t.me/${username}?text=${encodeURIComponent(msg)}`;
       if (tg.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
     }
