@@ -27,7 +27,7 @@
     .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
     .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
     
-    /* 🌟 Product Grid Design (2x2) */
+    /* Product Grid */
     .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .product-card { 
       background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
@@ -43,11 +43,9 @@
 
     .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; cursor: pointer; }
     
-    /* 🌟 Product Info Layout */
     .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 5px; }
     .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text);}
     
-    /* 🌟 Shop/Seller Profile Row */
     .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; margin-top:2px; margin-bottom:2px;}
     .product-shop img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
     
@@ -55,10 +53,8 @@
     .badge-gold { background: var(--gold); }
     .badge-silver { background: #6B7280; } 
     
-    /* Price */
     .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); }
     
-    /* Like Button */
     .like-btn-front { 
         display: flex; align-items: center; gap: 4px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px;
         font-size: 0.75rem; color: var(--gray); cursor: pointer; padding: 4px 8px; width: fit-content; transition: 0.2s;
@@ -112,11 +108,9 @@
     .close-modal { color: #aaa; position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-modal:hover { color: #333; }
     
-    /* 🌟 Popup Multi-image scroll */
     .modal-image-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory;}
     .modal-img { width: 100%; min-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; scroll-snap-align: start; background: #eee;}
     
-    /* Upload Multi-image Box */
     .upload-img-row { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
     .upload-img-box { position: relative; width: 80px; height: 80px; border: 1px dashed var(--gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--gray); cursor: pointer; background: #fafafa; flex-shrink: 0;}
     .upload-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top:0; left:0; display: none;}
@@ -154,7 +148,6 @@
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
       
-      <!-- 🌟 Shop Filter Banner (Fixed Text) -->
       <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
          <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
          <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">🔙 ወደ ዋናው ተመለስ</button>
@@ -166,7 +159,6 @@
       </div>
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       
-      <!-- Main Home Content (Grid) -->
       <div id="productGrid" class="product-grid"></div>
     </div>
 
@@ -185,26 +177,21 @@
         </div>
         <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
         <form id="sellForm" onsubmit="handleProductSubmit(event)">
-          
-          <!-- Multi-image Upload -->
           <div class="form-group">
             <label>የእቃው ፎቶዎች (እስከ 3 ፎቶ)</label>
             <div class="upload-img-row">
-                <!-- ፎቶ 1 -->
                 <div class="upload-img-box">
                     <span id="plus-0">+</span>
                     <input type="file" id="img-in-0" accept="image/*" onchange="handleMultiImageUpload(event, 0)" required>
                     <img id="img-preview-0">
                     <button type="button" class="remove-img-btn" id="rm-btn-0" onclick="removeImage(0)">X</button>
                 </div>
-                <!-- ፎቶ 2 -->
                 <div class="upload-img-box">
                     <span id="plus-1">+</span>
                     <input type="file" id="img-in-1" accept="image/*" onchange="handleMultiImageUpload(event, 1)">
                     <img id="img-preview-1">
                     <button type="button" class="remove-img-btn" id="rm-btn-1" onclick="removeImage(1)">X</button>
                 </div>
-                <!-- ፎቶ 3 -->
                 <div class="upload-img-box">
                     <span id="plus-2">+</span>
                     <input type="file" id="img-in-2" accept="image/*" onchange="handleMultiImageUpload(event, 2)">
@@ -407,7 +394,6 @@
     </div>
   </div>
 
-  <!-- 🌟 Fixed Bottom Navigation Tabs -->
   <div class="nav-bar">
     <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
     <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
@@ -431,10 +417,18 @@
 
     let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
     let myShop = null; 
-    let uploadedImages = ["", "", ""]; // For multiple images
+    let uploadedImages = ["", "", ""];
     let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
     let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
+
+    // 🌟 1. FIX: Switch Tab Logic (This was missing from the slider update)
+    function switchTab(viewName, btn) { 
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
+      document.getElementById(`view-${viewName}`).classList.add('active'); 
+      if(btn) btn.classList.add('active'); 
+    }
 
     async function initApp() {
       if(currentUser.id === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
@@ -558,7 +552,6 @@
       if(tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
-    // 🌟 SHOP FILTER (FIXED BACK BUTTON TEXT)
     function viewShop(sellerId) {
       currentSellerFilter = sellerId; currentCategory = 'All';
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
@@ -587,7 +580,6 @@
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
-    // 🌟 CATEGORY & SEARCH 
     function selectCategory(cat, btn) { 
       currentCategory = cat; 
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
@@ -599,7 +591,7 @@
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
       const filtered = products.filter(p => {
         if (p.status !== 'approved') return false;
-        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false; // Filter strictly by seller if active
+        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
         
         let pCat = (p.category || "").trim(); let matchesCategory = false;
         if (currentCategory === 'All') { matchesCategory = true; } else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } else { matchesCategory = pCat === currentCategory; }
@@ -612,7 +604,7 @@
       renderProducts(filtered);
     }
 
-    // 🌟 ORIGINAL GRID DESIGN (NO BUTTONS ON FRONT, SHORT HEIGHT, AVATARS RESTORED) 🌟
+    // 🌟 REVERTED GRID DESIGN (AS REQUESTED) 🌟
     function renderProducts(items) {
       const grid = document.getElementById('productGrid'); grid.innerHTML = '';
       if(items.length === 0) { grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>'; return; }
@@ -625,15 +617,23 @@
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
         const sellerShop = shops[p.sellerId]; 
         const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ'); 
-        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; // 🌟 ፎቶ ተመልሷል!
+        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50';
         const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
         const isLiked = userLikes.includes(p.id) ? 'liked' : '';
         
         let proHtml = ''; 
-        if(sTier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; } 
-        else if(sTier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; } 
+        let avatarStyle = "width:22px; height:22px; border-radius:50%; object-fit:cover;";
+        if(sTier === 'Gold') { 
+           proHtml = `<span class="pro-badge badge-gold">👑</span>`; 
+           avatarStyle += "border: 2px solid var(--gold);";
+        } 
+        else if(sTier === 'Silver') { 
+           proHtml = `<span class="pro-badge badge-silver">🥈</span>`; 
+           avatarStyle += "border: 1px solid var(--silver);";
+        } else {
+           avatarStyle += "border: 1px solid var(--border);";
+        }
         
-        // 🌟 Admin Actions Only on Front
         let adminActions = '';
         if(isAdmin) {
           adminActions = `
@@ -641,13 +641,13 @@
                 <button style="flex:1; background:#4F46E5; color:white; border:none; padding:4px; border-radius:4px;" onclick="togglePin('${p.id}', ${p.isPinned}); event.stopPropagation();">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
                 <button style="flex:1; background:var(--blue); color:white; border:none; padding:4px; border-radius:4px;" onclick="openEditProductModal('${p.id}'); event.stopPropagation();">⚙️ Edit</button>
             </div>
-            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል</button>`;
+            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል ላክ</button>`;
         }
         
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
 
         grid.innerHTML += `
-          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')">
+          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')" style="cursor:pointer;">
             ${isPinnedHtml}
             ${p.isSold ? `<span class="status-badge badge-sold">❌ ተሽጧል</span>` : ''}
             
@@ -657,15 +657,15 @@
               <div class="product-title">${p.title}</div>
               
               <div class="product-shop" onclick="viewShop('${p.sellerId}'); event.stopPropagation();">
-                <img src="${sAvatar}" alt="Shop Avatar">
+                <img src="${sAvatar}" style="${avatarStyle}" alt="Avatar">
                 ${sName} ${proHtml}
               </div>
-              
-              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
               
               <button class="like-btn-front like-btn-front-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">
                  <span class="like-icon">❤️</span> <span class="like-count-${p.id}">${p.likes || 0}</span>
               </button>
+              
+              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
               
               ${adminActions}
             </div>
@@ -673,199 +673,23 @@
       });
     }
 
-    async function placeOrder(productId) {
-      const p = products.find(x => x.id === productId); if(!p) return;
-      const sShop = shops[p.sellerId] || {}; const sTier = sShop.tier || 'Free'; const sOrders = sShop.totalOrdersReceived || 0;
-      const allowedOrders = sTier === 'Gold' ? Infinity : (sTier === 'Silver' ? 150 : 30);
-      if(sOrders >= allowedOrders) { if(tg.showAlert) tg.showAlert("ይቅርታ! ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል። ማዘዝ አይችሉም።"); else alert("ይህ ሻጭ የትዕዛዝ መቀበያ ገደቡን ጨርሷል።"); return; }
-      const buyerName = currentUser.first_name || currentUser.username || "ገዢ";
-      if(confirm(`"${p.title}" ን ለማዘዝ እርግጠኛ ነዎት? ሻጩ ማሳወቂያ ይደርሰዋል።`)) {
-        const orderId = `ORD-${Date.now().toString().slice(-6)}`;
-        const orderData = { productId: p.id, productTitle: p.title, price: (p.price || p.finalPrice || 0), sellerId: p.sellerId, buyerId: currentUser.id, buyerName: buyerName, buyerTg: currentUser.username || "የለውም", status: "Pending", date: new Date().toISOString() };
-        try {
-          await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PUT', body: JSON.stringify(orderData) });
-          if(p.sellerId && !shops[p.sellerId]) { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PUT', body: JSON.stringify({ name: p.sellerName||"ሻጭ", tier: "Free", totalUploads: 1, totalOrdersReceived: 1 }) }); } else if(p.sellerId) { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ totalOrdersReceived: sOrders + 1 }) }); }
-          if(tg.showAlert) tg.showAlert("ትዕዛዝዎ ተልኳል! አሁን በቀጥታ ሻጩን አናግረው ይረከቡ።"); else alert("ትዕዛዝዎ ተልኳል!");
-          contactDirect(sShop.tg || p.sellerTg, p.title); await loadAllData();
-        } catch(e) { alert("ትዕዛዝ መላክ አልተቻለም።"); }
-      }
-    }
-
-    function renderMyOrders() {
-      if(!myShop) return;
-      const myOrderKeys = Object.keys(orders).filter(k => String(orders[k].sellerId) === String(currentUser.id));
-      document.getElementById('myTotalOrders').innerText = myShop.totalOrdersReceived || 0;
-      const container = document.getElementById('myOrdersContainer');
-      if(myOrderKeys.length === 0) { container.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">ምንም አዲስ ትዕዛዝ የለም።</p>'; return; }
-      container.innerHTML = '';
-      myOrderKeys.reverse().forEach(key => {
-        const o = orders[key]; let statusColor = o.status === 'Pending' ? 'var(--danger)' : o.status === 'Completed' ? 'var(--secondary)' : 'var(--gray)';
-        container.innerHTML += `
-          <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 8px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-              <strong style="font-size:0.85rem;">🛒 ${o.productTitle}</strong>
-              <span style="font-size:0.75rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px; font-weight:bold;">${o.status}</span>
-            </div>
-            <div style="font-size:0.8rem; margin-bottom:8px;">ገዢ: <b>${o.buyerName}</b> (@${o.buyerTg})<br>ዋጋ: ${o.price} ETB</div>
-            <div style="display:flex; gap:6px;">
-              <button class="btn-action" style="background:var(--secondary); color:white; flex:1;" onclick="updateOrderStatus('${key}', 'Completed')">✅ Completed</button>
-              <button class="btn-action" style="background:var(--gray); color:white; flex:1;" onclick="updateOrderStatus('${key}', 'Cancelled')">❌ Cancelled</button>
-            </div>
-          </div>`;
-      });
-    }
-
-    async function updateOrderStatus(orderId, newStatus) { await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) }); await loadAllData(); }
-
-    function renderMyListings() {
-      if(!myShop) return;
-      const myList = products.filter(p => String(p.sellerId) === String(currentUser.id));
-      const tUploads = myShop.totalUploads || 0; document.getElementById('myTotalUploads').innerText = tUploads;
-      const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
-      
-      if(tUploads >= allowed) { document.getElementById('submitBtn').disabled = true; document.getElementById('submitBtn').innerText = `የ ${tier} ጭነት ገደብ ሞልቷል`; document.getElementById('submitBtn').style.background = "var(--gray)"; } else { document.getElementById('submitBtn').disabled = false; document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').style.background = "var(--secondary)"; }
-      
-      const container = document.getElementById('myListingsContainer'); container.innerHTML = '';
-      myList.forEach(p => {
-        const displayPrice = p.price || p.finalPrice || 0;
-        let statusBadge = p.status === 'pending' ? '<span style="color:var(--warning);">⏳ Pending</span>' : p.status === 'rejected' ? '<span style="color:var(--danger);">❌ Rejected</span>' : p.isSold ? '<span style="color:var(--danger);">🏷️ Sold</span>' : '<span style="color:var(--secondary);">✅ Active</span>';
-        
-        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
-        
-        container.innerHTML += `
-          <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; gap:8px; align-items:center;">
-              <img src="${displayImg}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
-              <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${displayPrice} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
-            </div>
-            <div>
-              <button class="btn-action" style="background:var(--blue); color:white; padding:4px 8px; margin-bottom:4px;" onclick="openEditProductModal('${p.id}')">⚙️ Edit</button>
-              <button class="btn-action btn-toggle-sold" style="padding:4px 8px; margin-bottom:4px;" onclick="toggleSold('${p.id}', ${p.isSold})">${p.isSold ? 'Active' : 'Sold'}</button>
-              <button class="btn-action btn-delete" style="padding:4px 8px;" onclick="deleteProduct('${p.id}')">Delete</button>
-            </div>
-          </div>`;
-      });
-    }
-
-    // 🌟 ADMIN DASHBOARD FUNCTIONS 🌟
-    function renderAdminDashboard() {
-      const pKeys = products.map(p => p.id); const sKeys = Object.keys(shops); const oKeys = Object.keys(orders);
-      let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
-      oKeys.forEach(k => { if(orders[k].status === 'Pending') newO++; else if(orders[k].status === 'Completed') compO++; else if(orders[k].status === 'Cancelled') cancO++; });
-      let tSellers = sKeys.length; let gSellers = 0; let silSellers = 0;
-      sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
-      
-      document.getElementById('st-total-users').innerText = totalBotUsers;
-      document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO;
-      document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO;
-      document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
-
-      const pendingList = document.getElementById('adminPendingList'); const pendProducts = products.filter(p => p.status === 'pending');
-      pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
-      pendProducts.forEach(p => {
-        const displayPrice = p.price || p.finalPrice || 0; const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : p.sellerName;
-        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
-        pendingList.innerHTML += `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
-            <img src="${displayImg}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
-            <div style="flex:1;">
-              <strong>${p.title}</strong> (${displayPrice} ETB)<br><small>ሻጭ: ${sName}</small>
-              <div style="display:flex; gap:4px; margin-top:6px;">
-                <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'approved')">አጽድቅ</button>
-                <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'rejected')">ውድቅ</button>
-              </div>
-            </div>
-          </div>`;
-      });
-
-      const sellersList = document.getElementById('adminSellersList'); sellersList.innerHTML = '';
-      sKeys.forEach(k => {
-        const s = shops[k]; const cTier = s.tier || 'Free';
-        let badge = '', avatarStyle = "width:30px; height:30px; border-radius:50%; object-fit:cover;";
-        if(cTier === 'Gold') { badge = '<span class="pro-badge badge-gold">👑 GOLD</span>'; avatarStyle += "border: 2px solid var(--gold); box-shadow: 0 0 5px rgba(217,119,6,0.5);"; } 
-        else if(cTier === 'Silver') { badge = '<span class="pro-badge badge-silver">🥈 SILVER</span>'; avatarStyle += "border: 2px solid var(--silver); box-shadow: 0 0 5px rgba(156,163,175,0.5);"; } 
-        else { badge = '<span style="font-size:0.6rem; color:var(--gray); border:1px solid var(--gray); padding:1px 4px; border-radius:4px;">FREE</span>'; avatarStyle += "border: 1px solid var(--border);"; }
-        
-        const actionBtn = `
-          <div style="display:flex; gap:4px; margin-top:6px;">
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${k}', 'Free')">Free</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${k}', 'Silver')">Silver</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${k}', 'Gold')">Gold</button>
-          </div>`;
-        sellersList.innerHTML += `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <div style="display:flex; align-items:center; gap:6px;"><img src="${s.avatar || 'https://via.placeholder.com/50'}" style="${avatarStyle}"><strong>${s.name}</strong></div>${badge}
-            </div>
-            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:2px;">📞 ${s.phone} | 💬 @${s.tg}</div>
-            <div style="font-size:0.7rem; color:var(--text); margin-bottom:6px;">Uploads: <b>${s.totalUploads||0}</b> | Orders: <b>${s.totalOrdersReceived||0}</b></div>
-            ${actionBtn}
-          </div>`;
-      });
-      
-      const adminOrdersList = document.getElementById('adminOrdersList'); adminOrdersList.innerHTML = '';
-      const allOrderKeys = [...oKeys].reverse(); 
-      if (allOrderKeys.length === 0) { adminOrdersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ትዕዛዝ የለም።</p>'; } 
-      else {
-          allOrderKeys.forEach(k => {
-              const o = orders[k]; const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '-', tg: '-' };
-              let statusColor = o.status === 'Pending' ? 'var(--danger)' : o.status === 'Completed' ? 'var(--secondary)' : 'var(--gray)';
-              adminOrdersList.innerHTML += `
-                <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
-                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                    <strong style="font-size:0.85rem;">🛒 ${o.productTitle}</strong>
-                    <span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${o.status}</span>
-                  </div>
-                  <div style="font-size:0.75rem; margin-bottom:4px; line-height:1.5;">
-                    <span style="color:var(--gray);">ገዢ:</span> <b>${o.buyerName}</b> (@${o.buyerTg}) <br>
-                    <span style="color:var(--gray);">ሻጭ:</span> <b>${sellerInfo.name}</b> (📞 ${sellerInfo.phone})
-                  </div>
-                  <div style="display:flex; gap:4px; margin-top:6px;">
-                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${sellerInfo.tg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ሻጩን አናግር</button>
-                    <button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${o.buyerTg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ገዢውን አናግር</button>
-                  </div>
-                </div>`;
-          });
-      }
-    }
-
-    async function adminUpdateProd(id, status) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) }); await loadAllData(); }
-    async function adminSetTier(sellerId, newTier) { 
-      if (tg.showConfirm) { tg.showConfirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`, async function(c) { if(c) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }); } 
-      else { if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`)) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }
-    }
-    async function togglePin(id, isPinned) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) }); await loadAllData(); }
-    async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
-    async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
-
-    function contactDirect(username, itemTitle) {
-      const msg = `ሰላም፣ "${itemTitle}" አጋጥሞኝ ነበር።`;
-      const link = `https://t.me/${username}?text=${encodeURIComponent(msg)}`;
-      if (tg.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
-    }
+    function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
+    function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     
-    async function postToChannel(id) {
+    async function likeProduct(id, event) {
+      if(event) { event.preventDefault(); event.stopPropagation(); }
       const p = products.find(x => x.id === id); if(!p) return;
-      const displayPrice = p.price || p.finalPrice || 0;
-      const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
-      
-      let savedToken = localStorage.getItem('admin_bot_token');
-      if (!savedToken) { savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ:"); if (!savedToken) return; localStorage.setItem('admin_bot_token', savedToken); }
-      if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
-      
-      const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`;
-      const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ሙሉ መረጃውን ለማየት እና ለመግዛት እዚህ ይጫኑ: ${appLink}`;
-      try {
-        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
-        const res = await fetch(displayImg); const blob = await res.blob();
-        const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
-        const tgRes = await fetch(`https://api.telegram.org/bot${savedToken}/sendPhoto`, { method: 'POST', body: formData });
-        const tgData = await tgRes.json();
-        if(tgData.ok) { alert("ቻናል ላይ ተለጥፏል! 🎉"); } else { alert("ስህተት: ቦቱ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description); if (tgData.error_code === 401 || tgData.error_code === 404) { localStorage.removeItem('admin_bot_token'); } }
-      } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
+      if(currentUser.id !== ADMIN_ID) {
+        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
+        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
+        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
+      }
+      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
+      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
+      document.querySelectorAll(`.like-btn-front-${id}`).forEach(el => el.classList.add('liked'));
+      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
     }
 
-    // 🌟 MULTI-IMAGE UPLOAD 🌟
     function handleMultiImageUpload(e, index) {
       const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
       reader.onload = function(event) {
@@ -875,7 +699,6 @@
           canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); 
           const base64 = canvas.toDataURL('image/jpeg', 0.6);
           uploadedImages[index] = base64;
-          
           document.getElementById(`img-preview-${index}`).src = base64;
           document.getElementById(`img-preview-${index}`).style.display = 'block';
           document.getElementById(`plus-${index}`).style.display = 'none';
@@ -897,36 +720,41 @@
       e.preventDefault(); if(!myShop) return;
       const tUploads = myShop.totalUploads || 0; const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
       if(tUploads >= allowed) { alert(`የ ${tier} እቅድ ገደብ (${allowed} ጭነቶች) አልቋል! ወደሚቀጥለው ያሳድጉ።`); return; }
-      
       const validImages = uploadedImages.filter(img => img !== "");
       if(validImages.length === 0) { alert("እባክዎ ቢያንስ 1 የእቃ ፎቶ ያስገቡ"); return; }
       
       document.getElementById('submitBtn').innerText = "በመላክ ላይ..."; document.getElementById('submitBtn').disabled = true;
       const newId = `WS-${Date.now().toString().slice(-6)}`;
-      const newProduct = { 
-          title: document.getElementById('prodTitle').value, 
-          price: document.getElementById('sellerPrice').value, 
-          category: document.getElementById('prodCategory').value, 
-          condition: document.getElementById('prodCondition').value, 
-          desc: document.getElementById('prodDesc').value, 
-          status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', 
-          isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, 
-          sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, 
-          img: validImages[0],
-          images: validImages 
-      };
+      const newProduct = { title: document.getElementById('prodTitle').value, price: document.getElementById('sellerPrice').value, category: document.getElementById('prodCategory').value, condition: document.getElementById('prodCondition').value, desc: document.getElementById('prodDesc').value, status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, img: validImages[0], images: validImages };
       
       try {
         await fetch(`${FIREBASE_PRODUCTS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
         await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ totalUploads: tUploads + 1 }) });
-        alert('እቃው ተልኳል!'); 
-        document.getElementById('sellForm').reset(); 
-        for(let i=0; i<3; i++) removeImage(i);
+        alert('እቃው ተልኳል!'); document.getElementById('sellForm').reset(); for(let i=0; i<3; i++) removeImage(i);
         await loadAllData(); switchTab('home', document.getElementById('navHome'));
       } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
     }
+    
+    async function postToChannel(id) {
+      const p = products.find(x => x.id === id); if(!p) return;
+      const displayPrice = p.price || p.finalPrice || 0;
+      const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ');
+      let savedToken = localStorage.getItem('admin_bot_token');
+      if (!savedToken) { savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ:"); if (!savedToken) return; localStorage.setItem('admin_bot_token', savedToken); }
+      if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
+      
+      const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`;
+      const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ሙሉ መረጃውን ለማየት እና ለመግዛት እዚህ ይጫኑ: ${appLink}`;
+      try {
+        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
+        const res = await fetch(displayImg); const blob = await res.blob();
+        const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
+        const tgRes = await fetch(`https://api.telegram.org/bot${savedToken}/sendPhoto`, { method: 'POST', body: formData });
+        const tgData = await tgRes.json();
+        if(tgData.ok) { alert("ቻናል ላይ ተለጥፏል! 🎉"); } else { alert("ስህተት: ቦቱ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description); if (tgData.error_code === 401 || tgData.error_code === 404) { localStorage.removeItem('admin_bot_token'); } }
+      } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
+    }
 
-    initApp();
   </script>
 </body>
 </html>
