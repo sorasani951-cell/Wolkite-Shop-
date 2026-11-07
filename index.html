@@ -20,14 +20,14 @@
     .view { display: none; }
     .view.active { display: block; }
     
-    /* Search & Categories */
+    /* Search Box & Categories */
     .search-box { display: flex; gap: 8px; margin-bottom: 14px; }
     .search-box input { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 25px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size:0.9rem;}
     .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; scrollbar-width: none; }
     .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
     .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
     
-    /* 🌟 መጀመሪያው Grid Design */
+    /* 🌟 Product Grid Design (2x2) */
     .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .product-card { 
       background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
@@ -43,26 +43,30 @@
 
     .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; cursor: pointer; }
     
-    /* 🌟 አዲሱ የእቃ ካርድ አቀማመጥ (አዝራር የሌለው) */
-    .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 4px; }
-    .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;}
-    .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;}
+    /* 🌟 Product Info Layout */
+    .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 5px; }
+    .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text);}
     
-    .like-btn-front { 
-        display: flex; align-items: center; gap: 4px; background: none; border: none; 
-        font-size: 0.8rem; color: var(--gray); cursor: pointer; padding: 0; width: fit-content;
-    }
-    .like-btn-front.liked { color: var(--danger); font-weight: bold; }
-    .like-icon { font-size: 1.1rem; }
-
+    /* 🌟 Shop/Seller Profile Row */
+    .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; margin-top:2px; margin-bottom:2px;}
+    .product-shop img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+    
     .pro-badge { color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; }
     .badge-gold { background: var(--gold); }
     .badge-silver { background: #6B7280; } 
     
-    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); margin-top: auto; }
+    /* Price */
+    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); }
+    
+    /* Like Button */
+    .like-btn-front { 
+        display: flex; align-items: center; gap: 4px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px;
+        font-size: 0.75rem; color: var(--gray); cursor: pointer; padding: 4px 8px; width: fit-content; transition: 0.2s;
+    }
+    .like-btn-front.liked { background: #FEE2E2; color: var(--danger); border-color: #FECACA; font-weight: bold; }
     
     /* Popup Action Buttons */
-    .action-buttons { display: flex; flex-direction: column; gap: 6px; }
+    .action-buttons { display: flex; flex-direction: column; gap: 6px; margin-top:10px; }
     .btn-action { border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; }
     .btn-tg { background: var(--secondary); color: white; }
     .btn-call { background: #2563EB; color: white; }
@@ -150,9 +154,10 @@
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
       
+      <!-- 🌟 Shop Filter Banner (Fixed Text) -->
       <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
          <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
-         <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">❌ አጥፋ</button>
+         <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">🔙 ወደ ዋናው ተመለስ</button>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
@@ -181,25 +186,25 @@
         <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
         <form id="sellForm" onsubmit="handleProductSubmit(event)">
           
-          <!-- 🌟 Multi-image Upload -->
+          <!-- Multi-image Upload -->
           <div class="form-group">
             <label>የእቃው ፎቶዎች (እስከ 3 ፎቶ)</label>
             <div class="upload-img-row">
-                <!-- ፎቶ 1 (ግዴታ) -->
+                <!-- ፎቶ 1 -->
                 <div class="upload-img-box">
                     <span id="plus-0">+</span>
                     <input type="file" id="img-in-0" accept="image/*" onchange="handleMultiImageUpload(event, 0)" required>
                     <img id="img-preview-0">
                     <button type="button" class="remove-img-btn" id="rm-btn-0" onclick="removeImage(0)">X</button>
                 </div>
-                <!-- ፎቶ 2 (አማራጭ) -->
+                <!-- ፎቶ 2 -->
                 <div class="upload-img-box">
                     <span id="plus-1">+</span>
                     <input type="file" id="img-in-1" accept="image/*" onchange="handleMultiImageUpload(event, 1)">
                     <img id="img-preview-1">
                     <button type="button" class="remove-img-btn" id="rm-btn-1" onclick="removeImage(1)">X</button>
                 </div>
-                <!-- ፎቶ 3 (አማራጭ) -->
+                <!-- ፎቶ 3 -->
                 <div class="upload-img-box">
                     <span id="plus-2">+</span>
                     <input type="file" id="img-in-2" accept="image/*" onchange="handleMultiImageUpload(event, 2)">
@@ -358,7 +363,6 @@
       <span class="close-modal" onclick="closeEditProductModal()">&times;</span>
       <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">⚙️ እቃውን ማስተካከያ</h3>
       <form id="editProductForm" onsubmit="saveProductChanges(event)">
-        <!-- Multi-image placeholder for edit -->
         <div class="form-group">
           <label>የእቃው ፎቶ (የመጀመሪያው ብቻ ነው ሚስተካከለው)</label>
           <img id="editProdImagePreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
@@ -379,7 +383,7 @@
     <div class="modal-content">
       <span class="close-modal" onclick="closeModal()">&times;</span>
       
-      <!-- 🌟 አዲስ: Multi-image Slider Container -->
+      <!-- Multi-image Slider Container -->
       <div id="modalImageContainer" class="modal-image-container"></div>
       
       <h2 id="modalTitle" style="font-size:1.1rem; margin-bottom:5px; color:var(--primary);"></h2>
@@ -403,6 +407,7 @@
     </div>
   </div>
 
+  <!-- 🌟 Fixed Bottom Navigation Tabs -->
   <div class="nav-bar">
     <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
     <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
@@ -426,8 +431,7 @@
 
     let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
     let myShop = null; 
-    // Multi Image arrays
-    let uploadedImages = ["", "", ""]; 
+    let uploadedImages = ["", "", ""]; // For multiple images
     let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
     let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
@@ -525,20 +529,15 @@
     function openModal(id) {
       const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id; 
       
-      // Multi-image renderer
-      const imgContainer = document.getElementById('modalImageContainer');
-      imgContainer.innerHTML = '';
+      const imgContainer = document.getElementById('modalImageContainer'); imgContainer.innerHTML = '';
       if(p.images && p.images.length > 0) {
-          p.images.forEach(imgData => {
-              if(imgData) imgContainer.innerHTML += `<img class="modal-img" src="${imgData}">`;
-          });
+          p.images.forEach(imgData => { if(imgData) imgContainer.innerHTML += `<img class="modal-img" src="${imgData}">`; });
       } else {
           imgContainer.innerHTML = `<img class="modal-img" src="${p.img || 'https://via.placeholder.com/400'}">`;
       }
       
       document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
       const sShop = shops[p.sellerId]; const sPhone = sShop ? sShop.phone : p.sellerPhone; const sTg = sShop ? sShop.tg : p.sellerTg;
-      
       let buttonsHtml = p.isSold ? `<div class="sold-text" style="font-size:0.85rem; font-weight:bold; color:var(--danger); text-align:center; padding:10px;">❌ ይህ እቃ ተሽጧል</div>` : `
           <button class="btn-action btn-order" onclick="placeOrder('${p.id}'); closeModal();">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
@@ -559,6 +558,7 @@
       if(tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
+    // 🌟 SHOP FILTER (FIXED BACK BUTTON TEXT)
     function viewShop(sellerId) {
       currentSellerFilter = sellerId; currentCategory = 'All';
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
@@ -599,17 +599,20 @@
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
       const filtered = products.filter(p => {
         if (p.status !== 'approved') return false;
-        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
+        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false; // Filter strictly by seller if active
+        
         let pCat = (p.category || "").trim(); let matchesCategory = false;
         if (currentCategory === 'All') { matchesCategory = true; } else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } else { matchesCategory = pCat === currentCategory; }
+        
         let matchesSearch = true;
         if (q !== "") { const pTitle = (p.title || "").toLowerCase(); const pDesc = (p.desc || "").toLowerCase(); matchesSearch = pTitle.includes(q) || pDesc.includes(q); }
+        
         return matchesCategory && matchesSearch;
       });
       renderProducts(filtered);
     }
 
-    // 🌟 ORIGINAL GRID DESIGN (NO BUTTONS ON FRONT) 🌟
+    // 🌟 ORIGINAL GRID DESIGN (NO BUTTONS ON FRONT, SHORT HEIGHT, AVATARS RESTORED) 🌟
     function renderProducts(items) {
       const grid = document.getElementById('productGrid'); grid.innerHTML = '';
       if(items.length === 0) { grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>'; return; }
@@ -620,14 +623,17 @@
       
       items.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
-        const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ'); const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
+        const sellerShop = shops[p.sellerId]; 
+        const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ'); 
+        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; // 🌟 ፎቶ ተመልሷል!
+        const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
         const isLiked = userLikes.includes(p.id) ? 'liked' : '';
         
         let proHtml = ''; 
         if(sTier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; } 
         else if(sTier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; } 
         
-        // 🌟 Admin Actions (Pin, Edit, Post) Only
+        // 🌟 Admin Actions Only on Front
         let adminActions = '';
         if(isAdmin) {
           adminActions = `
@@ -638,11 +644,10 @@
             <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል</button>`;
         }
         
-        // Use first image if multiple exist
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
 
         grid.innerHTML += `
-          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')" style="cursor:pointer;">
+          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')">
             ${isPinnedHtml}
             ${p.isSold ? `<span class="status-badge badge-sold">❌ ተሽጧል</span>` : ''}
             
@@ -651,15 +656,16 @@
             <div class="product-info">
               <div class="product-title">${p.title}</div>
               
-              <div class="product-shop">
-                👤 ${sName} ${proHtml}
+              <div class="product-shop" onclick="viewShop('${p.sellerId}'); event.stopPropagation();">
+                <img src="${sAvatar}" alt="Shop Avatar">
+                ${sName} ${proHtml}
               </div>
+              
+              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
               
               <button class="like-btn-front like-btn-front-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">
                  <span class="like-icon">❤️</span> <span class="like-count-${p.id}">${p.likes || 0}</span>
               </button>
-              
-              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
               
               ${adminActions}
             </div>
@@ -741,6 +747,7 @@
       });
     }
 
+    // 🌟 ADMIN DASHBOARD FUNCTIONS 🌟
     function renderAdminDashboard() {
       const pKeys = products.map(p => p.id); const sKeys = Object.keys(shops); const oKeys = Object.keys(orders);
       let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
@@ -858,25 +865,7 @@
       } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
     }
 
-    // 🌟 LIKE BUTTON FIX 🌟
-    async function likeProduct(id, event) {
-      if(event) { event.preventDefault(); event.stopPropagation(); }
-      const p = products.find(x => x.id === id); if(!p) return;
-      
-      if(currentUser.id !== ADMIN_ID) {
-        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
-        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
-      }
-      
-      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
-      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
-      document.querySelectorAll(`.like-btn-front-${id}`).forEach(el => el.classList.add('liked'));
-
-      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
-    }
-
-    // 🌟 MULTI-IMAGE UPLOAD LOGIC 🌟
+    // 🌟 MULTI-IMAGE UPLOAD 🌟
     function handleMultiImageUpload(e, index) {
       const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
       reader.onload = function(event) {
@@ -923,8 +912,8 @@
           status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', 
           isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, 
           sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, 
-          img: validImages[0], // For backward compatibility
-          images: validImages // Array of 1 to 3 images
+          img: validImages[0],
+          images: validImages 
       };
       
       try {
