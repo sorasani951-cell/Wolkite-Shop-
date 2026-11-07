@@ -749,35 +749,52 @@
       } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
     }
     
-    // Admin Functions
+    // 🔧 ረዳት ፋንክሽኖች (አዲስ): በስም ውስጥ ' " < > ሲኖር ገጹ እንዳይበላሽ
+    function escHtml(s) {
+      return String(s === undefined || s === null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    // onclick="fn('...')" ውስጥ ለሚገባ ጽሑፍ
+    function escAttr(s) {
+      return escHtml(String(s === undefined || s === null ? '' : s)
+        .replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' '));
+    }
+
+    // 🌟 ADMIN DASHBOARD FUNCTIONS (FIXED) 🌟
     function renderAdminDashboard() {
-      const pKeys = products.map(p => p.id); const sKeys = Object.keys(shops); const oKeys = Object.keys(orders);
+      const sKeys = Object.keys(shops || {}); const oKeys = Object.keys(orders || {});
+      const stOf = (o) => String((o && o.status) || '').toLowerCase();
+
       let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
-      oKeys.forEach(k => { if(orders[k].status === 'Pending') newO++; else if(orders[k].status === 'Completed') compO++; else if(orders[k].status === 'Cancelled') cancO++; });
+      oKeys.forEach(k => { const st = stOf(orders[k]); if(st === 'pending') newO++; else if(st === 'completed') compO++; else if(st === 'cancelled') cancO++; });
       let tSellers = sKeys.length; let gSellers = 0; let silSellers = 0;
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
       
       document.getElementById('st-total-users').innerText = totalBotUsers; document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO; document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO; document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
 
+      // ⏳ Pending products
       const pendingList = document.getElementById('adminPendingList'); const pendProducts = products.filter(p => p.status === 'pending');
       pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
       pendProducts.forEach(p => {
-        const displayPrice = p.price || p.finalPrice || 0; const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : p.sellerName;
+        const displayPrice = p.price || p.finalPrice || 0; const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ያልታወቀ ሻጭ');
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
         pendingList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
             <img src="${displayImg}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
             <div style="flex:1;">
-              <strong>${p.title}</strong> (${displayPrice} ETB)<br><small>ሻጭ: ${sName}</small>
+              <strong>${escHtml(p.title)}</strong> (${escHtml(displayPrice)} ETB)<br><small>ሻጭ: ${escHtml(sName)}</small>
               <div style="display:flex; gap:4px; margin-top:6px;">
-                <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'approved')">አጽድቅ</button>
-                <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${p.id}', 'rejected')">ውድቅ</button>
+                <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'approved')">አጽድቅ</button>
+                <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'rejected')">ውድቅ</button>
               </div>
             </div>
           </div>`;
       });
 
+      // 👥 Sellers
       const sellersList = document.getElementById('adminSellersList'); sellersList.innerHTML = '';
+      if (sKeys.length === 0) sellersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ሻጭ የለም።</p>';
       sKeys.forEach(k => {
         const s = shops[k]; const cTier = s.tier || 'Free';
         let badge = '', avatarStyle = "width:30px; height:30px; border-radius:50%; object-fit:cover;";
@@ -787,55 +804,155 @@
         
         const actionBtn = `
           <div style="display:flex; gap:4px; margin-top:6px;">
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${k}', 'Free')">Free</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${k}', 'Silver')">Silver</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${k}', 'Gold')">Gold</button>
+            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${escAttr(k)}', 'Free')">Free</button>
+            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Silver')">Silver</button>
+            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Gold')">Gold</button>
           </div>`;
         sellersList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <div style="display:flex; align-items:center; gap:6px;"><img src="${s.avatar || 'https://via.placeholder.com/50'}" style="${avatarStyle}"><strong>${s.name}</strong></div>${badge}
+              <div style="display:flex; align-items:center; gap:6px;"><img src="${s.avatar || 'https://via.placeholder.com/50'}" style="${avatarStyle}"><strong>${escHtml(s.name || 'ያልታወቀ ሻጭ')}</strong></div>${badge}
             </div>
-            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:2px;">📞 ${s.phone} | 💬 @${s.tg}</div>
+            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:2px;">📞 ${escHtml(s.phone || '-')} | 💬 @${escHtml(s.tg || '-')}</div>
             <div style="font-size:0.7rem; color:var(--text); margin-bottom:6px;">Uploads: <b>${s.totalUploads||0}</b> | Orders: <b>${s.totalOrdersReceived||0}</b></div>
             ${actionBtn}
           </div>`;
       });
       
+      // 🛍️ Orders
       const adminOrdersList = document.getElementById('adminOrdersList'); adminOrdersList.innerHTML = '';
       const allOrderKeys = [...oKeys].reverse(); 
       if (allOrderKeys.length === 0) { adminOrdersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ትዕዛዝ የለም።</p>'; } 
       else {
           allOrderKeys.forEach(k => {
               const o = orders[k]; const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '-', tg: '-' };
-              let statusColor = o.status === 'Pending' ? 'var(--danger)' : o.status === 'Completed' ? 'var(--secondary)' : 'var(--gray)';
+              const st = stOf(o);
+              let statusColor = st === 'pending' ? 'var(--danger)' : st === 'completed' ? 'var(--secondary)' : 'var(--gray)';
+              const orderNote = 'ስለ ትዕዛዝ (Order) - ' + (o.productTitle || '');
               adminOrdersList.innerHTML += `
                 <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
                   <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                    <strong style="font-size:0.85rem;">🛒 ${o.productTitle}</strong>
-                    <span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${o.status}</span>
+                    <strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || 'ያልታወቀ እቃ')}</strong>
+                    <span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${escHtml(o.status || '-')}</span>
                   </div>
                   <div style="font-size:0.75rem; margin-bottom:4px; line-height:1.5;">
-                    <span style="color:var(--gray);">ገዢ:</span> <b>${o.buyerName}</b> (@${o.buyerTg}) <br>
-                    <span style="color:var(--gray);">ሻጭ:</span> <b>${sellerInfo.name}</b> (📞 ${sellerInfo.phone})
+                    <span style="color:var(--gray);">ገዢ:</span> <b>${escHtml(o.buyerName || 'ያልታወቀ ገዢ')}</b> (@${escHtml(o.buyerTg || '-')}) <br>
+                    <span style="color:var(--gray);">ሻጭ:</span> <b>${escHtml(sellerInfo.name || 'ያልታወቀ ሻጭ')}</b> (📞 ${escHtml(sellerInfo.phone || '-')})
                   </div>
                   <div style="display:flex; gap:4px; margin-top:6px;">
-                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${sellerInfo.tg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ሻጩን አናግር</button>
-                    <button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${o.buyerTg}', 'ስለ ትዕዛዝ (Order) - ${o.productTitle}')">💬 ገዢውን አናግር</button>
+                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(sellerInfo.tg)}', '${escAttr(orderNote)}')">💬 ሻጩን አናግር</button>
+                    <button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr(orderNote)}')">💬 ገዢውን አናግር</button>
                   </div>
                 </div>`;
           });
       }
     }
 
-    async function adminUpdateProd(id, status) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) }); await loadAllData(); }
+    async function adminUpdateProd(id, status) {
+      try {
+        const res = await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) });
+        if (!res.ok) throw new Error('save failed');
+      } catch(e) {
+        if(tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
+      }
+      await loadAllData();
+    }
+
     async function adminSetTier(sellerId, newTier) { 
-      if (tg.showConfirm) { tg.showConfirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`, async function(c) { if(c) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }); } 
-      else { if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`)) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }
+      const applyTier = async function() {
+        try {
+          const res = await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) });
+          if (!res.ok) throw new Error('save failed');
+        } catch(e) {
+          if(tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
+        }
+        await loadAllData();
+      };
+      const msg = `የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`;
+      if (tg.showConfirm) { tg.showConfirm(msg, async function(c) { if(c) await applyTier(); }); } 
+      else { if(confirm(msg)) await applyTier(); }
     }
     async function togglePin(id, isPinned) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) }); await loadAllData(); }
     async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
     async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
+
+    // =====================================================================
+    // 🆕 በላክኸው ኮድ ውስጥ ያልነበሩ (ግን ሌሎች ፋንክሽኖች የሚጠሯቸው) ፋንክሽኖች
+    // በእውነተኛው ፋይልህ ውስጥ አስቀድመው ካሉ ይህንን ክፍል ሙሉ በሙሉ ሰርዘው
+    // =====================================================================
+    function contactDirect(tgUser, text) {
+      const user = String(tgUser || '').replace(/^@/, '').trim();
+      if (!user || user === '-' || user === 'undefined') { alert('ቴሌግራም ዩዘርኔም አልተገኘም'); return; }
+      const url = `https://t.me/${user}?text=${encodeURIComponent(text || '')}`;
+      if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
+    }
+
+    async function placeOrder(id) {
+      const p = products.find(x => x.id === id); if (!p) return;
+      const order = {
+        productId: id, productTitle: p.title, price: p.price || p.finalPrice || 0,
+        sellerId: p.sellerId, buyerId: currentUser.id,
+        buyerName: currentUser.first_name || currentUser.username || 'ገዢ',
+        buyerTg: currentUser.username || '', status: 'Pending', date: new Date().toISOString()
+      };
+      try {
+        await fetch(`${FIREBASE_ORDERS}/OR-${Date.now()}.json`, { method: 'PUT', body: JSON.stringify(order) });
+        const sh = shops[p.sellerId];
+        if (sh) await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ totalOrdersReceived: (sh.totalOrdersReceived || 0) + 1 }) });
+        if (tg.showAlert) tg.showAlert("ትዕዛዝዎ ተልኳል! ሻጩ ያናግርዎታል ✅"); else alert("ትዕዛዝዎ ተልኳል! ሻጩ ያናግርዎታል ✅");
+        await loadAllData();
+      } catch(e) {
+        if (tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
+      }
+    }
+
+    function renderMyListings() {
+      const box = document.getElementById('myListingsContainer'); if (!box) return;
+      const mine = products.filter(p => String(p.sellerId) === String(currentUser.id));
+      document.getElementById('myTotalUploads').innerText = myShop ? (myShop.totalUploads || 0) : mine.length;
+      if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; text-align:center; color:var(--gray);">እስካሁን ምንም እቃ አልጫኑም።</p>'; return; }
+      const stText = { approved: '✅ ጸድቋል', pending: '⏳ በመጠባበቅ ላይ', rejected: '❌ ውድቅ ሆኗል' };
+      box.innerHTML = mine.map(p => {
+        const img = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
+        return `
+          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
+            <img src="${img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+            <div style="flex:1;">
+              <strong>${escHtml(p.title)}</strong> (${escHtml(p.price || p.finalPrice || 0)} ETB)<br>
+              <small>${stText[p.status] || escHtml(p.status || '-')}${p.isSold ? ' | ❌ ተሽጧል' : ''}</small>
+              <div style="display:flex; gap:4px; margin-top:6px;">
+                <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#10B981; color:white;" onclick="toggleSold('${escAttr(p.id)}', ${!!p.isSold})">${p.isSold ? 'አልተሸጠም' : 'ተሽጧል'}</button>
+                <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--danger); color:white;" onclick="deleteProduct('${escAttr(p.id)}')">🗑️ አጥፋ</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderMyOrders() {
+      const box = document.getElementById('myOrdersContainer'); if (!box) return;
+      const mine = Object.keys(orders || {}).filter(k => String(orders[k].sellerId) === String(currentUser.id)).reverse();
+      document.getElementById('myTotalOrders').innerText = mine.length;
+      if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; text-align:center; color:var(--gray);">ምንም ትዕዛዝ የለም።</p>'; return; }
+      box.innerHTML = mine.map(k => {
+        const o = orders[k];
+        return `
+          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
+            <strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || '-')}</strong>
+            <div style="font-size:0.75rem; line-height:1.5; margin:4px 0;">ገዢ: <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | ${escHtml(o.status || '-')}</div>
+            <button class="btn-action btn-tg" style="padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr('ስለ ትዕዛዝ (Order) - ' + (o.productTitle || ''))}')">💬 ገዢውን አናግር</button>
+          </div>`;
+      }).join('');
+    }
+
+    // ቻናል ላክ: ለመለጠፍ የ Bot Token ስለሚያስፈልግ አሁን የ Telegram share መስኮት ይከፍታል
+    function postToChannel(id) {
+      const p = products.find(x => x.id === id); if (!p) return;
+      shareProduct(id, p.title);
+    }
+
+    // 🚀 መተግበሪያውን ጀምር (በኮዱ ውስጥ ይህ ጥሪ አልነበረም)
+    initApp();
 
   </script>
 </body>
