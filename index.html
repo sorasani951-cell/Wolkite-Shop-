@@ -20,53 +20,50 @@
     .view { display: none; }
     .view.active { display: block; }
     
-    /* Search Box */
+    /* Search & Categories */
     .search-box { display: flex; gap: 8px; margin-bottom: 14px; }
     .search-box input { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 25px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size:0.9rem;}
+    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; scrollbar-width: none; }
+    .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
+    .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
     
-    /* Horizontal Slider Layout */
-    .category-section { margin-bottom: 24px; }
-    .category-title { font-size: 1.05rem; font-weight: bold; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; padding-left: 4px;}
-    .horizontal-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory; }
-    .horizontal-scroll::-webkit-scrollbar { display: none; }
-    
-    /* Product Cards */
+    /* 🌟 መጀመሪያው Grid Design */
+    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .product-card { 
       background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
-      display: flex; flex-direction: column; position: relative; 
-      min-width: 165px; max-width: 165px; flex-shrink: 0; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex; flex-direction: column; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .featured-scroll .product-card { min-width: 260px; max-width: 260px; }
-    .featured-scroll .product-img { height: 160px; }
     
     .product-card.sold-out { opacity: 0.7; border: 1px dashed var(--danger); }
     .product-card.pinned { border: 2px solid var(--gold); box-shadow: 0 0 8px rgba(217, 119, 6, 0.3); }
     
-    /* Grid (For Search Results Only) */
-    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .product-grid .product-card { min-width: 100%; max-width: 100%; }
-    
     .status-badge { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; color: white; z-index: 2; }
     .badge-sold { background-color: var(--danger); }
     .badge-pinned { background-color: var(--gold); left: 8px; right: auto; top: 8px; }
-    
-    .like-btn { position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 14px; z-index: 2; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: 0.2s; }
-    .like-btn.liked { color: var(--danger); font-weight:bold; }
-    .pinned .like-btn { top: 38px; }
 
     .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; cursor: pointer; }
-    .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; }
-    .product-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-    .product-shop { font-size: 0.7rem; color: var(--primary); font-weight:bold; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
     
+    /* 🌟 አዲሱ የእቃ ካርድ አቀማመጥ (አዝራር የሌለው) */
+    .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 4px; }
+    .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;}
+    .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;}
+    
+    .like-btn-front { 
+        display: flex; align-items: center; gap: 4px; background: none; border: none; 
+        font-size: 0.8rem; color: var(--gray); cursor: pointer; padding: 0; width: fit-content;
+    }
+    .like-btn-front.liked { color: var(--danger); font-weight: bold; }
+    .like-icon { font-size: 1.1rem; }
+
     .pro-badge { color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; }
     .badge-gold { background: var(--gold); }
     .badge-silver { background: #6B7280; } 
     
-    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--text); margin-top: auto; margin-bottom: 8px; }
+    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); margin-top: auto; }
     
-    .action-buttons { display: flex; flex-direction: column; gap: 4px; }
-    .btn-action { border: none; padding: 7px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; }
+    /* Popup Action Buttons */
+    .action-buttons { display: flex; flex-direction: column; gap: 6px; }
+    .btn-action { border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; }
     .btn-tg { background: var(--secondary); color: white; }
     .btn-call { background: #2563EB; color: white; }
     .btn-order { background: #10B981; color: white; }
@@ -110,7 +107,17 @@
     .modal-content { background-color: var(--card-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 92%; max-width: 450px; border-radius: 12px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
     .close-modal { color: #aaa; position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-modal:hover { color: #333; }
-    .modal-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #eee;}
+    
+    /* 🌟 Popup Multi-image scroll */
+    .modal-image-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory;}
+    .modal-img { width: 100%; min-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; scroll-snap-align: start; background: #eee;}
+    
+    /* Upload Multi-image Box */
+    .upload-img-row { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
+    .upload-img-box { position: relative; width: 80px; height: 80px; border: 1px dashed var(--gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--gray); cursor: pointer; background: #fafafa; flex-shrink: 0;}
+    .upload-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top:0; left:0; display: none;}
+    .upload-img-box input { opacity: 0; position: absolute; top:0; left:0; width:100%; height:100%; cursor: pointer;}
+    .remove-img-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: none; cursor: pointer; z-index: 10;}
     
     .comment-box { display:flex; flex-direction:column; gap:8px; margin-top:10px; border-top:1px solid #E5E7EB; padding-top:10px; }
     .comment-item { background: #F3F4F6; padding: 8px; border-radius: 8px; font-size: 0.8rem; margin-bottom:6px; }
@@ -133,16 +140,29 @@
         <input type="text" id="homeSearch" placeholder="እቃዎችን ፈልግ (Search)..." oninput="filterProducts()">
       </div>
       
+      <div class="categories-bar" id="categoryBar">
+        <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
+        <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
+        <div class="cat-pill" onclick="selectCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Books & Study Materials', this)">መጽሐፍት</div>
+        <div class="cat-pill" onclick="selectCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
+        <div class="cat-pill" onclick="selectCategory('Food', this)">ምግብ</div>
+        <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
+      </div>
+      
       <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
          <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
          <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">❌ አጥፋ</button>
       </div>
-      
-      <!-- Loading Indicator -->
-      <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
 
-      <!-- Main Home Content -->
-      <div id="homeContent"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
+        <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+      </div>
+      <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
+      
+      <!-- Main Home Content (Grid) -->
+      <div id="productGrid" class="product-grid"></div>
     </div>
 
     <!-- SELL VIEW -->
@@ -160,11 +180,35 @@
         </div>
         <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
         <form id="sellForm" onsubmit="handleProductSubmit(event)">
+          
+          <!-- 🌟 Multi-image Upload -->
           <div class="form-group">
-            <label>የእቃው ፎቶ</label>
-            <input type="file" id="prodPhotoInput" accept="image/*" onchange="handleImageUpload(event)" required>
-            <img id="imagePreview" style="display:none; width:100%; height:140px; object-fit:cover; border-radius:8px; margin-top:8px;">
+            <label>የእቃው ፎቶዎች (እስከ 3 ፎቶ)</label>
+            <div class="upload-img-row">
+                <!-- ፎቶ 1 (ግዴታ) -->
+                <div class="upload-img-box">
+                    <span id="plus-0">+</span>
+                    <input type="file" id="img-in-0" accept="image/*" onchange="handleMultiImageUpload(event, 0)" required>
+                    <img id="img-preview-0">
+                    <button type="button" class="remove-img-btn" id="rm-btn-0" onclick="removeImage(0)">X</button>
+                </div>
+                <!-- ፎቶ 2 (አማራጭ) -->
+                <div class="upload-img-box">
+                    <span id="plus-1">+</span>
+                    <input type="file" id="img-in-1" accept="image/*" onchange="handleMultiImageUpload(event, 1)">
+                    <img id="img-preview-1">
+                    <button type="button" class="remove-img-btn" id="rm-btn-1" onclick="removeImage(1)">X</button>
+                </div>
+                <!-- ፎቶ 3 (አማራጭ) -->
+                <div class="upload-img-box">
+                    <span id="plus-2">+</span>
+                    <input type="file" id="img-in-2" accept="image/*" onchange="handleMultiImageUpload(event, 2)">
+                    <img id="img-preview-2">
+                    <button type="button" class="remove-img-btn" id="rm-btn-2" onclick="removeImage(2)">X</button>
+                </div>
+            </div>
           </div>
+          
           <div class="form-group">
              <label>የእቃው ዘርፍ</label>
              <select id="prodCategory">
@@ -187,6 +231,7 @@
 
     <!-- SELLER PROFILE / SHOP VIEW -->
     <div id="view-profile" class="view">
+      
       <div id="shopSetupBox" class="section-card">
         <h3 style="color:var(--primary); margin-bottom:10px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
         <form onsubmit="handleShopSetup(event)">
@@ -229,12 +274,14 @@
         <div id="p-upgrade" class="p-content section-card" style="text-align:center;">
           <h3 style="color:var(--primary); margin-bottom:10px;">🚀 አካውንትዎን ያሳድጉ (Upgrade)</h3>
           <p style="font-size:0.85rem; color:#444; margin-bottom:15px;">የነጻ ገደብዎን ሲጨርሱ ከሚከተሉት አንዱን ይምረጡ፦</p>
+          
           <div style="background:var(--silver-bg); padding:10px; border-radius:8px; border:1px solid #D1D5DB; margin-bottom:10px; font-size:0.8rem; text-align:left;">
             <b style="color:#4B5563;">🥈 SILVER (150 ETB ለ 3 ወር)</b><br>
             - እስከ 15 እቃዎች መጫን<br>
             - እስከ 150 ትዕዛዞች መቀበል<br>
             - የ Silver ሻጭ ባጅ
           </div>
+          
           <div style="background:var(--gold-bg); padding:10px; border-radius:8px; border:1px solid var(--gold); margin-bottom:15px; font-size:0.8rem; text-align:left;">
             <b style="color:var(--gold);">👑 GOLD (200 ETB ለ 3 ወር)</b><br>
             - ያልተገደበ (Unlimited) እቃ መጫን<br>
@@ -248,6 +295,7 @@
       <!-- ADMIN DASHBOARD -->
       <div id="adminPanel" style="display:none;" class="section-card">
         <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Admin Control Center</h3>
+        
         <div class="analytics-grid">
           <div class="stat-box" style="grid-column: span 2; background:#E0F2FE; border-color:#BAE6FD;">
             <div class="stat-num" id="st-total-users" style="color:#0284C7;">0</div>
@@ -271,7 +319,7 @@
           <div class="stat-box"><div class="stat-num" id="st-free-sellers">0</div><div class="stat-title">Free Sellers</div></div>
         </div>
 
-        <div class="profile-tabs" style="margin-top:15px; font-size:0.75rem;">
+        <div class="profile-tabs" style="margin-top:15px; font-size:0.8rem;">
           <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
           <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
           <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
@@ -281,6 +329,7 @@
         <div id="a-sellers" class="p-content"><div id="adminSellersList"></div></div>
         <div id="a-orders" class="p-content"><div id="adminOrdersList"></div></div>
       </div>
+      
     </div>
   </div>
 
@@ -309,7 +358,9 @@
       <span class="close-modal" onclick="closeEditProductModal()">&times;</span>
       <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">⚙️ እቃውን ማስተካከያ</h3>
       <form id="editProductForm" onsubmit="saveProductChanges(event)">
+        <!-- Multi-image placeholder for edit -->
         <div class="form-group">
+          <label>የእቃው ፎቶ (የመጀመሪያው ብቻ ነው ሚስተካከለው)</label>
           <img id="editProdImagePreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
           <input type="file" accept="image/*" onchange="handleEditProductImageUpload(event)" style="font-size:0.75rem;">
         </div>
@@ -323,19 +374,24 @@
     </div>
   </div>
 
-  <!-- PRODUCT DETAILS MODAL -->
+  <!-- PRODUCT DETAILS MODAL (POPUP) -->
   <div id="productModal" class="modal">
     <div class="modal-content">
       <span class="close-modal" onclick="closeModal()">&times;</span>
-      <img id="modalImg" class="modal-img" src="" alt="Product">
+      
+      <!-- 🌟 አዲስ: Multi-image Slider Container -->
+      <div id="modalImageContainer" class="modal-image-container"></div>
+      
       <h2 id="modalTitle" style="font-size:1.1rem; margin-bottom:5px; color:var(--primary);"></h2>
       <div style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">
         <span>ሁኔታ: <b id="modalCondition"></b></span> | <span>ዋጋ: <b id="modalPrice" style="color:var(--primary); font-size:1rem;"></b></span>
       </div>
       <p style="font-size:0.85rem; font-weight:bold; margin-bottom:5px;">የእቃው መግለጫ:</p>
       <p id="modalDesc" style="font-size:0.85rem; color:#444; line-height:1.5; margin-bottom:10px; background:#f9f9f9; padding:10px; border-radius:8px; white-space: pre-wrap;"></p>
+      
       <div id="modalButtons" class="action-buttons"></div>
       
+      <!-- Public Comments Section -->
       <div class="comment-box">
         <h4 style="font-size:0.85rem; color:var(--primary);">💬 አስተያየቶች (Reviews)</h4>
         <div id="modalCommentsList" style="max-height:120px; overflow-y:auto; background:#f9f9f9; border-radius:6px; padding:6px;"></div>
@@ -369,7 +425,10 @@
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
     let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
-    let myShop = null; let uploadedImageBase64 = ""; let uploadedAvatarBase64 = "";
+    let myShop = null; 
+    // Multi Image arrays
+    let uploadedImages = ["", "", ""]; 
+    let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
     let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
 
@@ -464,8 +523,22 @@
     async function saveProductChanges(e) { e.preventDefault(); if(!editingProductId) return; document.getElementById('saveProdBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveProdBtn').disabled = true; const updatedProd = { title: document.getElementById('editProdTitle').value, price: document.getElementById('editProdPrice').value, category: document.getElementById('editProdCategory').value, condition: document.getElementById('editProdCondition').value, desc: document.getElementById('editProdDesc').value, img: editingProductImageBase64 }; try { await fetch(`${FIREBASE_PRODUCTS}/${editingProductId}.json`, { method: 'PATCH', body: JSON.stringify(updatedProd) }); if(tg.showAlert) tg.showAlert("እቃው ተስተካክሏል! ✅"); else alert("እቃው ተስተካክሏል! ✅"); closeEditProductModal(); await loadAllData(); } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveProdBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveProdBtn').disabled = false; } }
 
     function openModal(id) {
-      const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id; document.getElementById('modalImg').src = p.img || 'https://via.placeholder.com/400'; document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
+      const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id; 
+      
+      // Multi-image renderer
+      const imgContainer = document.getElementById('modalImageContainer');
+      imgContainer.innerHTML = '';
+      if(p.images && p.images.length > 0) {
+          p.images.forEach(imgData => {
+              if(imgData) imgContainer.innerHTML += `<img class="modal-img" src="${imgData}">`;
+          });
+      } else {
+          imgContainer.innerHTML = `<img class="modal-img" src="${p.img || 'https://via.placeholder.com/400'}">`;
+      }
+      
+      document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
       const sShop = shops[p.sellerId]; const sPhone = sShop ? sShop.phone : p.sellerPhone; const sTg = sShop ? sShop.tg : p.sellerTg;
+      
       let buttonsHtml = p.isSold ? `<div class="sold-text" style="font-size:0.85rem; font-weight:bold; color:var(--danger); text-align:center; padding:10px;">❌ ይህ እቃ ተሽጧል</div>` : `
           <button class="btn-action btn-order" onclick="placeOrder('${p.id}'); closeModal();">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
@@ -487,7 +560,10 @@
     }
 
     function viewShop(sellerId) {
-      currentSellerFilter = sellerId; document.getElementById('homeSearch').value = '';
+      currentSellerFilter = sellerId; currentCategory = 'All';
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
+      document.querySelector('#categoryBar .cat-pill').classList.add('active');
+      document.getElementById('homeSearch').value = '';
       const shop = shops[sellerId]; document.getElementById('shopFilterBanner').style.display = 'flex';
       document.getElementById('shopFilterName').innerText = `🏪 የ ${shop ? shop.name : 'ሻጭ'} ሱቅ እቃዎች`;
       closeModal(); switchTab('home', document.getElementById('navHome')); filterProducts();
@@ -511,7 +587,7 @@
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
     }
 
-    // 🌟 CATEGORIES & SLIDER UI
+    // 🌟 CATEGORY & SEARCH 
     function selectCategory(cat, btn) { 
       currentCategory = cat; 
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
@@ -521,162 +597,76 @@
 
     function filterProducts() {
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
-      let approvedProducts = products.filter(p => p.status === 'approved');
-      
-      if (currentSellerFilter) { approvedProducts = approvedProducts.filter(p => String(p.sellerId) === String(currentSellerFilter)); }
-
-      if (q !== "") {
-         const searched = approvedProducts.filter(p => {
-             const pTitle = (p.title || "").toLowerCase(); const pDesc = (p.desc || "").toLowerCase();
-             return pTitle.includes(q) || pDesc.includes(q);
-         });
-         document.getElementById('homeContent').innerHTML = `<div class="product-grid">${searched.map(p => generateCardHTML(p)).join('')}</div>`;
-         if(searched.length === 0) document.getElementById('homeContent').innerHTML = '<p style="text-align:center; color:var(--gray); padding:20px;">በዚህ ፍለጋ የተገኘ እቃ የለም።</p>';
-         return;
-      }
-      
-      let orderCounts = {}; Object.keys(orders).forEach(k => { const o = orders[k]; orderCounts[o.productId] = (orderCounts[o.productId] || 0) + 1; });
-      approvedProducts.forEach(p => p.orderCount = orderCounts[p.id] || 0);
-
-      renderCategorizedLayout(approvedProducts);
-    }
-
-    function renderCategorizedLayout(approvedProducts) {
-      let html = '';
-      
-      // Top Selling Ads
-      let featured = [...approvedProducts].sort((a,b) => b.orderCount - a.orderCount).slice(0, 3);
-      if(featured.length > 0 && featured[0].orderCount > 0) {
-         html += `<div class="category-section">
-                    <div class="category-title">🔥 ተወዳጅ (Top Selling)</div>
-                    <div class="horizontal-scroll featured-scroll">
-                      ${featured.map(p => generateCardHTML(p)).join('')}
-                    </div>
-                  </div>`;
-      }
-      
-      const categories = ["Electronics", "Clothes & Shoes", "Books & Study Materials", "Dorm & Household Items", "Food", "Other Products"];
-      const catNamesAm = {"Electronics":"💻 ኤሌክትሮኒክስ", "Clothes & Shoes":"👕 ልብሶችና ጫማዎች", "Books & Study Materials":"📚 መጽሐፍት", "Dorm & Household Items":"🛏️ የዶርም እቃዎች", "Food":"🍔 ምግብ", "Other Products":"📦 ሌሎች"};
-      
-      categories.forEach(cat => {
-         let catItems = approvedProducts.filter(p => {
-             let pCat = (p.category || "").trim();
-             if(cat === 'Other Products' && pCat === 'Other') return true;
-             if(currentCategory !== 'All' && cat !== currentCategory) return false; // Hide others if specific category is selected
-             return pCat === cat;
-         });
-         
-         if(catItems.length > 0) {
-             catItems.sort((a, b) => { if(a.isPinned && !b.isPinned) return -1; if(!a.isPinned && b.isPinned) return 1; return (b.likes || 0) - (a.likes || 0); });
-             html += `<div class="category-section">
-                        <div class="category-title">${catNamesAm[cat]}</div>
-                        <div class="horizontal-scroll">
-                          ${catItems.map(p => generateCardHTML(p)).join('')}
-                        </div>
-                      </div>`;
-         }
+      const filtered = products.filter(p => {
+        if (p.status !== 'approved') return false;
+        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
+        let pCat = (p.category || "").trim(); let matchesCategory = false;
+        if (currentCategory === 'All') { matchesCategory = true; } else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } else { matchesCategory = pCat === currentCategory; }
+        let matchesSearch = true;
+        if (q !== "") { const pTitle = (p.title || "").toLowerCase(); const pDesc = (p.desc || "").toLowerCase(); matchesSearch = pTitle.includes(q) || pDesc.includes(q); }
+        return matchesCategory && matchesSearch;
       });
-      
-      if(html === '') html = '<p style="text-align:center; color:var(--gray); padding:20px;">ምንም እቃ አልተገኘም!</p>';
-      document.getElementById('homeContent').innerHTML = html;
+      renderProducts(filtered);
     }
 
-    function generateCardHTML(p) {
-        const isAdmin = (Number(currentUser.id) === ADMIN_ID);
-        const userLikes = JSON.parse(localStorage.getItem('user_likes') || '[]');
+    // 🌟 ORIGINAL GRID DESIGN (NO BUTTONS ON FRONT) 🌟
+    function renderProducts(items) {
+      const grid = document.getElementById('productGrid'); grid.innerHTML = '';
+      if(items.length === 0) { grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>'; return; }
+      
+      items.sort((a, b) => { if(a.isPinned && !b.isPinned) return -1; if(!a.isPinned && b.isPinned) return 1; return (b.likes || 0) - (a.likes || 0); });
+      const isAdmin = (Number(currentUser.id) === ADMIN_ID);
+      const userLikes = JSON.parse(localStorage.getItem('user_likes') || '[]');
+      
+      items.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
-        const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ'); const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free'; const sPhone = sellerShop ? sellerShop.phone : p.sellerPhone; const sTg = sellerShop ? sellerShop.tg : p.sellerTg;
+        const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ'); const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
         const isLiked = userLikes.includes(p.id) ? 'liked' : '';
         
-        let proHtml = ''; let avatarStyle = "width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right:4px;";
-        if(sTier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; avatarStyle += "border: 2px solid var(--gold); box-shadow: 0 0 8px rgba(217,119,6,0.5);"; } 
-        else if(sTier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; avatarStyle += "border: 2px solid var(--silver); box-shadow: 0 0 5px rgba(156,163,175,0.3);"; } 
-        else { avatarStyle += "border: 1px solid var(--border);"; }
+        let proHtml = ''; 
+        if(sTier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; } 
+        else if(sTier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; } 
         
-        let actionHtml = p.isSold ? `<div class="sold-text" style="font-size:0.75rem; text-align:center; color:var(--danger); font-weight:bold;">❌ ተሽጧል</div>` : `
-          <button class="btn-action btn-order" onclick="placeOrder('${p.id}')">🛒 አሁን አዝዝ</button>
-          <div style="display:flex; gap:4px; margin-top:4px;">
-            <a class="btn-action btn-call" style="flex:1;" href="tel:${sPhone}">📞 ደውል</a>
-            <button class="btn-action btn-tg" style="flex:1;" onclick="contactDirect('${sTg}', '${p.title}')">💬 ቻት</button>
-          </div>`;
-
+        // 🌟 Admin Actions (Pin, Edit, Post) Only
         let adminActions = '';
         if(isAdmin) {
           adminActions = `
-            <div style="margin-top:6px; padding:6px; background:#f9f9f9; border-radius:6px; font-size:0.7rem;">
-              <div style="display:flex; gap:4px; margin-bottom:4px;">
-                <button class="btn-action" style="background:#4F46E5; color:white; flex:1;" onclick="togglePin('${p.id}', ${p.isPinned})">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
-                <button class="btn-action" style="background:var(--blue); color:white; flex:1;" onclick="openEditProductModal('${p.id}')">⚙️ Edit</button>
-              </div>
-              <button class="btn-action btn-channel" onclick="postToChannel('${p.id}')">📢 ቻናል ላክ</button>
-            </div>`;
+            <div style="margin-top:4px; display:flex; gap:4px; font-size:0.7rem;">
+                <button style="flex:1; background:#4F46E5; color:white; border:none; padding:4px; border-radius:4px;" onclick="togglePin('${p.id}', ${p.isPinned}); event.stopPropagation();">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
+                <button style="flex:1; background:var(--blue); color:white; border:none; padding:4px; border-radius:4px;" onclick="openEditProductModal('${p.id}'); event.stopPropagation();">⚙️ Edit</button>
+            </div>
+            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል</button>`;
         }
+        
+        // Use first image if multiple exist
+        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
 
-        return `
-          <div class="product-card ${p.isPinned ? 'pinned' : ''}">
+        grid.innerHTML += `
+          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')" style="cursor:pointer;">
             ${isPinnedHtml}
-            <button class="like-btn like-btn-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">❤️ <span class="like-count-${p.id}">${p.likes || 0}</span></button>
-            <img src="${p.img || 'https://via.placeholder.com/150'}" class="product-img" onclick="openModal('${p.id}')">
+            ${p.isSold ? `<span class="status-badge badge-sold">❌ ተሽጧል</span>` : ''}
+            
+            <img src="${displayImg}" class="product-img">
+            
             <div class="product-info">
-              <div class="product-title" onclick="openModal('${p.id}')">${p.title}</div>
-              <div class="product-shop" onclick="viewShop('${p.sellerId}')" style="cursor:pointer;">
-                <img src="${sAvatar}" style="${avatarStyle}">
-                ${sName} ${proHtml}
+              <div class="product-title">${p.title}</div>
+              
+              <div class="product-shop">
+                👤 ${sName} ${proHtml}
               </div>
+              
+              <button class="like-btn-front like-btn-front-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">
+                 <span class="like-icon">❤️</span> <span class="like-count-${p.id}">${p.likes || 0}</span>
+              </button>
+              
               <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
-              <div class="action-buttons">${actionHtml}${adminActions}</div>
+              
+              ${adminActions}
             </div>
           </div>`;
+      });
     }
 
-    // 🌟 ALL RESTORED FUNCTIONS 🌟
-    async function likeProduct(id, event) {
-      if(event) { event.preventDefault(); event.stopPropagation(); }
-      const p = products.find(x => x.id === id); if(!p) return;
-      if(currentUser.id !== ADMIN_ID) {
-        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
-        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
-      }
-      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
-      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
-      document.querySelectorAll(`.like-btn-${id}`).forEach(el => el.classList.add('liked'));
-      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
-    }
-
-    async function handleProductSubmit(e) {
-      e.preventDefault(); if(!myShop) return;
-      const tUploads = myShop.totalUploads || 0; const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
-      if(tUploads >= allowed) { alert(`የ ${tier} እቅድ ገደብ (${allowed} ጭነቶች) አልቋል! ወደሚቀጥለው ያሳድጉ።`); return; }
-      if(!uploadedImageBase64) { alert("እባክዎ ፎቶ ያስገቡ"); return; }
-      
-      document.getElementById('submitBtn').innerText = "በመላክ ላይ..."; document.getElementById('submitBtn').disabled = true;
-      const newId = `WS-${Date.now().toString().slice(-6)}`;
-      const newProduct = { title: document.getElementById('prodTitle').value, price: document.getElementById('sellerPrice').value, category: document.getElementById('prodCategory').value, condition: document.getElementById('prodCondition').value, desc: document.getElementById('prodDesc').value, status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, img: uploadedImageBase64 };
-      
-      try {
-        await fetch(`${FIREBASE_PRODUCTS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
-        await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ totalUploads: tUploads + 1 }) });
-        alert('እቃው ተልኳል!'); document.getElementById('sellForm').reset(); document.getElementById('imagePreview').style.display='none'; uploadedImageBase64="";
-        await loadAllData(); switchTab('home', document.getElementById('navHome'));
-      } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
-    }
-
-    function handleImageUpload(e) {
-      const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = new Image(); img.onload = function() {
-          const canvas = document.createElement('canvas'); const maxDim = 400; let width = img.width; let height = img.height;
-          if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
-          canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('imagePreview').src = uploadedImageBase64; document.getElementById('imagePreview').style.display = 'block';
-        }; img.src = event.target.result;
-      }; reader.readAsDataURL(file);
-    }
-    
-    function switchTab(viewName, btn) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewName}`).classList.add('active'); btn.classList.add('active'); }
-    function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
-    function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
-    
     async function placeOrder(productId) {
       const p = products.find(x => x.id === productId); if(!p) return;
       const sShop = shops[p.sellerId] || {}; const sTier = sShop.tier || 'Free'; const sOrders = sShop.totalOrdersReceived || 0;
@@ -733,10 +723,13 @@
       myList.forEach(p => {
         const displayPrice = p.price || p.finalPrice || 0;
         let statusBadge = p.status === 'pending' ? '<span style="color:var(--warning);">⏳ Pending</span>' : p.status === 'rejected' ? '<span style="color:var(--danger);">❌ Rejected</span>' : p.isSold ? '<span style="color:var(--danger);">🏷️ Sold</span>' : '<span style="color:var(--secondary);">✅ Active</span>';
+        
+        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
+        
         container.innerHTML += `
           <div style="border-bottom: 1px solid var(--border); padding: 8px 0; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; gap:8px; align-items:center;">
-              <img src="${p.img || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+              <img src="${displayImg}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
               <div><strong>${p.title}</strong><br><span style="font-size:0.75rem;">${displayPrice} ETB | ❤️ ${p.likes || 0} | ${statusBadge}</span></div>
             </div>
             <div>
@@ -748,7 +741,6 @@
       });
     }
 
-    // 🌟 ADMIN FUNCTIONS 🌟
     function renderAdminDashboard() {
       const pKeys = products.map(p => p.id); const sKeys = Object.keys(shops); const oKeys = Object.keys(orders);
       let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
@@ -765,9 +757,10 @@
       pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
       pendProducts.forEach(p => {
         const displayPrice = p.price || p.finalPrice || 0; const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : p.sellerName;
+        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
         pendingList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
-            <img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+            <img src="${displayImg}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
             <div style="flex:1;">
               <strong>${p.title}</strong> (${displayPrice} ETB)<br><small>ሻጭ: ${sName}</small>
               <div style="display:flex; gap:4px; margin-top:6px;">
@@ -786,14 +779,12 @@
         else if(cTier === 'Silver') { badge = '<span class="pro-badge badge-silver">🥈 SILVER</span>'; avatarStyle += "border: 2px solid var(--silver); box-shadow: 0 0 5px rgba(156,163,175,0.5);"; } 
         else { badge = '<span style="font-size:0.6rem; color:var(--gray); border:1px solid var(--gray); padding:1px 4px; border-radius:4px;">FREE</span>'; avatarStyle += "border: 1px solid var(--border);"; }
         
-        // 🌟 MISSING BUTTONS RESTORED HERE 🌟
         const actionBtn = `
           <div style="display:flex; gap:4px; margin-top:6px;">
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${k}', 'Free')">Free</button>
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${k}', 'Silver')">Silver</button>
             <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${k}', 'Gold')">Gold</button>
           </div>`;
-          
         sellersList.innerHTML += `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -833,13 +824,8 @@
 
     async function adminUpdateProd(id, status) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) }); await loadAllData(); }
     async function adminSetTier(sellerId, newTier) { 
-      if (tg.showConfirm) {
-          tg.showConfirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`, async function(confirmed) {
-              if(confirmed) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); }
-          });
-      } else {
-          if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`)) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); }
-      }
+      if (tg.showConfirm) { tg.showConfirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`, async function(c) { if(c) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }); } 
+      else { if(confirm(`የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`)) { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); await loadAllData(); } }
     }
     async function togglePin(id, isPinned) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) }); await loadAllData(); }
     async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
@@ -860,15 +846,95 @@
       if (!savedToken) { savedToken = prompt("እባክዎ የቦት ቶከንዎን ያስገቡ:"); if (!savedToken) return; localStorage.setItem('admin_bot_token', savedToken); }
       if(!confirm(`ወደ ${CHANNEL_USERNAME} ቻናል መላክ ይፈልጋሉ?`)) return;
       
-      const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`; // 🌟 እቃውን በቀጥታ የሚከፍት ሊንክ
+      const appLink = `https://t.me/wolkite_shopbot/shop?startapp=p_${id}`;
       const caption = `🛒 አዲስ እቃ <b>${sName}</b> ገበያ ላይ አውጥቷል!\n\n📌 <b>${p.title}</b>\n💰 ዋጋ: <b>${displayPrice} ETB</b>\n✨ ሁኔታ: <b>${p.condition}</b>\n\n📝 መግለጫ: ${p.desc}\n\n👉 ሙሉ መረጃውን ለማየት እና ለመግዛት እዚህ ይጫኑ: ${appLink}`;
       try {
-        const res = await fetch(p.img); const blob = await res.blob();
+        const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
+        const res = await fetch(displayImg); const blob = await res.blob();
         const formData = new FormData(); formData.append('chat_id', CHANNEL_USERNAME); formData.append('photo', blob, 'product.jpg'); formData.append('caption', caption); formData.append('parse_mode', 'HTML');
         const tgRes = await fetch(`https://api.telegram.org/bot${savedToken}/sendPhoto`, { method: 'POST', body: formData });
         const tgData = await tgRes.json();
         if(tgData.ok) { alert("ቻናል ላይ ተለጥፏል! 🎉"); } else { alert("ስህተት: ቦቱ አድሚን ላይሆን ይችላል ወይንም ቶከኑ የተሳሳተ ነው።\n" + tgData.description); if (tgData.error_code === 401 || tgData.error_code === 404) { localStorage.removeItem('admin_bot_token'); } }
       } catch(e) { alert("መፖሰት አልተቻለም! ኢንተርኔት ያረጋግጡ።"); }
+    }
+
+    // 🌟 LIKE BUTTON FIX 🌟
+    async function likeProduct(id, event) {
+      if(event) { event.preventDefault(); event.stopPropagation(); }
+      const p = products.find(x => x.id === id); if(!p) return;
+      
+      if(currentUser.id !== ADMIN_ID) {
+        let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
+        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
+        likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
+      }
+      
+      const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
+      document.querySelectorAll(`.like-count-${id}`).forEach(el => el.innerText = newLikes);
+      document.querySelectorAll(`.like-btn-front-${id}`).forEach(el => el.classList.add('liked'));
+
+      try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ likes: newLikes }) }); } catch(e) {}
+    }
+
+    // 🌟 MULTI-IMAGE UPLOAD LOGIC 🌟
+    function handleMultiImageUpload(e, index) {
+      const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image(); img.onload = function() {
+          const canvas = document.createElement('canvas'); const maxDim = 400; let width = img.width; let height = img.height;
+          if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+          canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); 
+          const base64 = canvas.toDataURL('image/jpeg', 0.6);
+          uploadedImages[index] = base64;
+          
+          document.getElementById(`img-preview-${index}`).src = base64;
+          document.getElementById(`img-preview-${index}`).style.display = 'block';
+          document.getElementById(`plus-${index}`).style.display = 'none';
+          document.getElementById(`rm-btn-${index}`).style.display = 'block';
+        }; img.src = event.target.result;
+      }; reader.readAsDataURL(file);
+    }
+    
+    function removeImage(index) {
+       uploadedImages[index] = "";
+       document.getElementById(`img-preview-${index}`).src = "";
+       document.getElementById(`img-preview-${index}`).style.display = 'none';
+       document.getElementById(`plus-${index}`).style.display = 'block';
+       document.getElementById(`rm-btn-${index}`).style.display = 'none';
+       document.getElementById(`img-in-${index}`).value = "";
+    }
+
+    async function handleProductSubmit(e) {
+      e.preventDefault(); if(!myShop) return;
+      const tUploads = myShop.totalUploads || 0; const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
+      if(tUploads >= allowed) { alert(`የ ${tier} እቅድ ገደብ (${allowed} ጭነቶች) አልቋል! ወደሚቀጥለው ያሳድጉ።`); return; }
+      
+      const validImages = uploadedImages.filter(img => img !== "");
+      if(validImages.length === 0) { alert("እባክዎ ቢያንስ 1 የእቃ ፎቶ ያስገቡ"); return; }
+      
+      document.getElementById('submitBtn').innerText = "በመላክ ላይ..."; document.getElementById('submitBtn').disabled = true;
+      const newId = `WS-${Date.now().toString().slice(-6)}`;
+      const newProduct = { 
+          title: document.getElementById('prodTitle').value, 
+          price: document.getElementById('sellerPrice').value, 
+          category: document.getElementById('prodCategory').value, 
+          condition: document.getElementById('prodCondition').value, 
+          desc: document.getElementById('prodDesc').value, 
+          status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', 
+          isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, 
+          sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, 
+          img: validImages[0], // For backward compatibility
+          images: validImages // Array of 1 to 3 images
+      };
+      
+      try {
+        await fetch(`${FIREBASE_PRODUCTS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
+        await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ totalUploads: tUploads + 1 }) });
+        alert('እቃው ተልኳል!'); 
+        document.getElementById('sellForm').reset(); 
+        for(let i=0; i<3; i++) removeImage(i);
+        await loadAllData(); switchTab('home', document.getElementById('navHome'));
+      } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
     }
 
     initApp();
