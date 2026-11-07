@@ -27,7 +27,7 @@
     .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
     .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
     
-    /* Product Grid Design */
+    /* 🌟 Product Grid Design (2x2) */
     .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .product-card { 
       background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
@@ -43,20 +43,19 @@
 
     .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; cursor: pointer; }
     
-    /* Product Info Layout */
+    /* 🌟 Product Info Layout */
     .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 5px; }
     .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text);}
     
-    /* Shop/Seller Profile Row */
+    /* 🌟 Shop/Seller Profile Row */
     .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; margin-top:2px; margin-bottom:2px;}
-    .product-shop img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
     
     .pro-badge { color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; }
     .badge-gold { background: var(--gold); }
     .badge-silver { background: #6B7280; } 
     
     /* Price */
-    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); margin-top: auto;}
+    .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); }
     
     /* Like Button */
     .like-btn-front { 
@@ -90,7 +89,6 @@
     .shop-avatar.avatar-silver { border-color: var(--silver); box-shadow: 0 0 10px rgba(156,163,175,0.5); }
     .btn-edit-shop { position: absolute; right: 0; top: 0; background: #F3F4F6; color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
     
-    /* 🌟 TAB CSS (RESTORED) 🌟 */
     .profile-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; justify-content: center;}
     .p-tab { padding: 8px 16px; background: transparent; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap; color: var(--gray); }
     .p-tab.active { background: var(--primary); color: white; }
@@ -165,6 +163,8 @@
         <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
         <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
       </div>
+      
+      <!-- Loading Indicator -->
       <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
       
       <!-- Main Home Content (Grid) -->
@@ -405,6 +405,7 @@
     </div>
   </div>
 
+  <!-- 🌟 Fixed Bottom Navigation Tabs -->
   <div class="nav-bar">
     <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
     <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
@@ -428,12 +429,12 @@
 
     let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
     let myShop = null; 
-    let uploadedImages = ["", "", ""]; 
+    let uploadedImages = ["", "", ""];
     let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
     let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
 
-    // 🌟 GLOBAL TAB NAVIGATION
+    // 🌟 1. FIX: Switch Tab Logic (This was missing from the slider update)
     function switchTab(viewName, btn) { 
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
@@ -563,6 +564,7 @@
       if(tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
+    // 🌟 SHOP FILTER (FIXED BACK BUTTON TEXT)
     function viewShop(sellerId) {
       currentSellerFilter = sellerId; currentCategory = 'All';
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
@@ -603,7 +605,7 @@
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
       const filtered = products.filter(p => {
         if (p.status !== 'approved') return false;
-        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
+        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false; 
         
         let pCat = (p.category || "").trim(); let matchesCategory = false;
         if (currentCategory === 'All') { matchesCategory = true; } else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } else { matchesCategory = pCat === currentCategory; }
@@ -629,7 +631,7 @@
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
         const sellerShop = shops[p.sellerId]; 
         const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ'); 
-        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; // 🌟 ፎቶ ተመልሷል!
+        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; 
         const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
         const isLiked = userLikes.includes(p.id) ? 'liked' : '';
         
@@ -653,7 +655,7 @@
                 <button style="flex:1; background:#4F46E5; color:white; border:none; padding:4px; border-radius:4px;" onclick="togglePin('${p.id}', ${p.isPinned}); event.stopPropagation();">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
                 <button style="flex:1; background:var(--blue); color:white; border:none; padding:4px; border-radius:4px;" onclick="openEditProductModal('${p.id}'); event.stopPropagation();">⚙️ Edit</button>
             </div>
-            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል</button>`;
+            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል ላክ</button>`;
         }
         
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
@@ -673,11 +675,11 @@
                 ${sName} ${proHtml}
               </div>
               
+              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
+              
               <button class="like-btn-front like-btn-front-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">
                  <span class="like-icon">❤️</span> <span class="like-count-${p.id}">${p.likes || 0}</span>
               </button>
-              
-              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
               
               ${adminActions}
             </div>
@@ -685,7 +687,6 @@
       });
     }
 
-    // 🌟 Profile and Admin Tab switchers (Restored to fix CSS issues)
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     
