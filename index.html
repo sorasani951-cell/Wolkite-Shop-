@@ -126,9 +126,71 @@
     .comment-item { background: #F3F4F6; padding: 8px; border-radius: 8px; font-size: 0.8rem; margin-bottom:6px; }
     .comment-item strong { color: var(--primary); }
     .comment-item small { color: var(--gray); font-size:0.65rem; margin-left:6px; }
+
+    /* 🌟 NEW: Onboarding / Welcome Screen */
+    .onboarding-screen {
+      position: fixed; inset: 0; z-index: 999999; background: var(--bg);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 28px 20px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    }
+    .onboarding-icons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+    .onboarding-icon-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+      aspect-ratio: 1 / 1; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .onboarding-text-block { text-align: center; margin: 22px 0 10px; }
+    .onboarding-text-block h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 8px; line-height:1.3; }
+    .onboarding-text-block p { font-size: 0.85rem; color: var(--gray); line-height: 1.5; }
+    .btn-onboarding-start {
+      background: var(--primary); color: white; border: none; width: 100%; padding: 14px;
+      border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(6,59,46,0.25);
+    }
+
+    /* 🌟 NEW: Special Offers Carousel (admin-managed, round, side-scroll) */
+    .offers-carousel { display: flex; gap: 14px; overflow-x: auto; padding: 6px 2px 12px; margin-bottom: 6px; scrollbar-width: none; }
+    .offers-carousel::-webkit-scrollbar { display: none; }
+    .offer-circle {
+      flex-shrink: 0; width: 92px; height: 92px; border-radius: 50%;
+      background: linear-gradient(145deg, var(--primary), var(--secondary));
+      color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+    .offer-circle .offer-discount { font-size: 1rem; font-weight: bold; line-height:1.1; }
+    .offer-circle .offer-title { font-size: 0.55rem; line-height:1.1; margin-top:2px; opacity:0.9; }
+    .offer-add-circle {
+      flex-shrink: 0; width: 92px; height: 92px; border-radius: 50%; background: var(--card-bg);
+      border: 2px dashed var(--gray); color: var(--gray); display:flex; align-items:center; justify-content:center;
+      font-size: 1.6rem; cursor: pointer;
+    }
+    .offer-admin-item { display:flex; align-items:center; gap:10px; background:white; border:1px solid #ddd; border-radius:8px; padding:8px; margin-bottom:8px; }
+    .offer-admin-circle-preview { width:40px; height:40px; border-radius:50%; background: linear-gradient(145deg, var(--primary), var(--secondary)); color:white; display:flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:bold; flex-shrink:0; text-align:center; }
+
+    /* 🌟 NEW: small modal variant (used by Add Offer / Order Phone popups) */
+    .modal-content.small-modal { max-width: 360px; }
   </style>
 </head>
 <body>
+
+  <!-- 🌟 NEW: ONBOARDING / WELCOME SCREEN (shown only on first visit) -->
+  <div id="onboardingScreen" class="onboarding-screen">
+    <div>
+      <div class="onboarding-icons-grid">
+        <div class="onboarding-icon-card">📱</div>
+        <div class="onboarding-icon-card">👕</div>
+        <div class="onboarding-icon-card">👟</div>
+        <div class="onboarding-icon-card">📚</div>
+        <div class="onboarding-icon-card">🛏️</div>
+        <div class="onboarding-icon-card">🍔</div>
+      </div>
+      <div class="onboarding-text-block">
+        <h2>ወደ Wolkite Shop<br>በደህና መጣችሁ</h2>
+        <p>የወልቂጤ ዩኒቨርሲቲ ተማሪዎች እርስ በርስ የሚሸጡበትና የሚገዙበት ቀላል የገበያ ቦታ። ልብስ፣ ጫማ፣ ኤሌክትሮኒክስና ሌሎችም እቃዎችን በቀላሉ ያግኙ!</p>
+      </div>
+    </div>
+    <button class="btn-onboarding-start" onclick="startApp()">Let's Get Started 🚀</button>
+  </div>
 
   <header>
     <h1>Wolkite Shop</h1>
@@ -152,6 +214,9 @@
         <div class="cat-pill" onclick="selectCategory('Food', this)">ምግብ</div>
         <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
       </div>
+
+      <!-- 🌟 NEW: Special Offers Carousel (admin adds/removes, side-scroll, round shape) -->
+      <div id="offersCarousel" class="offers-carousel" style="display:none;"></div>
       
       <!-- Shop Filter Banner -->
       <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
@@ -326,11 +391,17 @@
           <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
           <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
           <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
+          <div class="p-tab" onclick="switchAdminTab('a-offers', this)">🎁 Offers</div>
         </div>
         
         <div id="a-pending" class="p-content active"><div id="adminPendingList"></div></div>
         <div id="a-sellers" class="p-content"><div id="adminSellersList"></div></div>
         <div id="a-orders" class="p-content"><div id="adminOrdersList"></div></div>
+        <!-- 🌟 NEW: Admin manages the special-offer circles here -->
+        <div id="a-offers" class="p-content">
+          <button class="btn-action btn-tg" style="margin-bottom:10px;" onclick="openAddOfferModal()">➕ አዲስ ቅናሽ ጨምር</button>
+          <div id="adminOffersList"></div>
+        </div>
       </div>
       
     </div>
@@ -372,6 +443,32 @@
         <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="editProdPrice" required></div>
         <div class="form-group"><label>መግለጫ</label><textarea id="editProdDesc" rows="3" required></textarea></div>
         <button type="submit" class="btn-action btn-tg" id="saveProdBtn" style="padding:10px;">ሴቭ አድርግ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🌟 NEW: ADD OFFER MODAL (Admin only) -->
+  <div id="addOfferModal" class="modal">
+    <div class="modal-content small-modal">
+      <span class="close-modal" onclick="closeAddOfferModal()">&times;</span>
+      <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">🎁 አዲስ ቅናሽ ጨምር</h3>
+      <form id="addOfferForm" onsubmit="saveNewOffer(event)">
+        <div class="form-group"><label>የቅናሽ መጠን (ለምሳሌ 40% ቅናሽ)</label><input type="text" id="offerDiscountText" placeholder="40% ቅናሽ" required></div>
+        <div class="form-group"><label>አጭር ርዕስ</label><input type="text" id="offerTitleText" placeholder="ልዩ ቅናሽ" required></div>
+        <button type="submit" class="btn-action btn-tg" id="saveOfferBtn" style="padding:10px;">ጨምር</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🌟 NEW: ORDER PHONE NUMBER MODAL (shown when buyer taps "🛒 አሁን አዝዝ") -->
+  <div id="orderPhoneModal" class="modal">
+    <div class="modal-content small-modal">
+      <span class="close-modal" onclick="closeOrderPhoneModal()">&times;</span>
+      <h3 style="margin-bottom:12px; color:var(--primary); font-size:1.1rem;">📞 ስልክ ቁጥርዎን ያስገቡ</h3>
+      <p style="font-size:0.8rem; color:var(--gray); margin-bottom:12px;">ሻጩ ሊያገኝዎት እንዲችል ትክክለኛ ስልክ ቁጥርዎን ያስገቡ።</p>
+      <form id="orderPhoneForm" onsubmit="submitOrderWithPhone(event)">
+        <div class="form-group"><input type="tel" id="orderPhoneInput" placeholder="09XXXXXXXX" required></div>
+        <button type="submit" class="btn-action btn-order" id="confirmOrderBtn" style="padding:10px;">🛒 ትዕዛዝ አረጋግጥ</button>
       </form>
     </div>
   </div>
@@ -423,16 +520,18 @@
     const FIREBASE_SHOPS = `${DB_BASE}/shops`;
     const FIREBASE_ORDERS = `${DB_BASE}/orders`;
     const FIREBASE_USERS = `${DB_BASE}/users`; 
+    const FIREBASE_OFFERS = `${DB_BASE}/offers`; // 🌟 NEW: special-offer circles
     
     const ADMIN_ID = 8356035160;
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0;
+    let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0; let offers = {}; // 🌟 NEW: offers
     let myShop = null; 
     let uploadedImages = ["", "", ""];
     let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
     let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
+    let pendingOrderProductId = null; // 🌟 NEW: holds the product id while the phone-number popup is open
 
     // 🌟 1. FIX: Switch Tab Logic (This was missing from the slider update)
     function switchTab(viewName, btn) { 
@@ -474,16 +573,16 @@
     async function loadAllData() {
       document.getElementById('loadingIndicator').style.display = 'block';
       try {
-        const [resP, resS, resO, resU] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`) ]);
-        const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json();
+        const [resP, resS, resO, resU, resOf] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`), fetch(`${FIREBASE_OFFERS}.json`) ]);
+        const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json(); const dataOf = await resOf.json();
         
         products = []; if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
-        shops = dataS || {}; orders = dataO || {};
+        shops = dataS || {}; orders = dataO || {}; offers = dataOf || {}; // 🌟 NEW
         const usersData = dataU || {}; totalBotUsers = Object.keys(usersData).length;
         myShop = shops[currentUser.id] || null;
       } catch(e) {}
       document.getElementById('loadingIndicator').style.display = 'none';
-      renderShopUI(); filterProducts(); renderMyListings(); renderMyOrders();
+      renderShopUI(); filterProducts(); renderMyListings(); renderMyOrders(); renderOffers(); // 🌟 NEW: renderOffers()
       if(currentUser.id === ADMIN_ID) renderAdminDashboard();
     }
 
@@ -558,7 +657,7 @@
       document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
       const sShop = shops[p.sellerId]; const sPhone = sShop ? sShop.phone : p.sellerPhone; const sTg = sShop ? sShop.tg : p.sellerTg;
       let buttonsHtml = p.isSold ? `<div class="sold-text" style="font-size:0.85rem; font-weight:bold; color:var(--danger); text-align:center; padding:10px;">❌ ይህ እቃ ተሽጧል</div>` : `
-          <button class="btn-action btn-order" onclick="placeOrder('${p.id}'); closeModal();">🛒 አሁን አዝዝ (Order)</button>
+          <button class="btn-action btn-order" onclick="openOrderPhoneModal('${p.id}')">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
             <a class="btn-action btn-call" style="flex:1;" href="tel:${sPhone}">📞 ደውል</a>
             <button class="btn-action btn-tg" style="flex:1;" onclick="contactDirect('${sTg}', '${p.title}')">💬 ቻት</button>
@@ -603,7 +702,9 @@
     
     window.onclick = function(event) { 
       const pModal = document.getElementById('productModal'); const sModal = document.getElementById('editShopModal'); const eProdModal = document.getElementById('editProductModal');
+      const offModal = document.getElementById('addOfferModal'); const phoneModal = document.getElementById('orderPhoneModal'); // 🌟 NEW
       if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
+      if (event.target === offModal) offModal.style.display = "none"; if (event.target === phoneModal) { phoneModal.style.display = "none"; pendingOrderProductId = null; } // 🌟 NEW
     }
 
     // 🌟 CATEGORY & SEARCH 
@@ -850,7 +951,7 @@
                     <span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${escHtml(o.status || '-')}</span>
                   </div>
                   <div style="font-size:0.75rem; margin-bottom:4px; line-height:1.5;">
-                    <span style="color:var(--gray);">ገዢ:</span> <b>${escHtml(o.buyerName || 'ያልታወቀ ገዢ')}</b> (@${escHtml(o.buyerTg || '-')}) <br>
+                    <span style="color:var(--gray);">ገዢ:</span> <b>${escHtml(o.buyerName || 'ያልታወቀ ገዢ')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} <br>
                     <span style="color:var(--gray);">ሻጭ:</span> <b>${escHtml(sellerInfo.name || 'ያልታወቀ ሻጭ')}</b> (📞 ${escHtml(sellerInfo.phone || '-')})
                   </div>
                   <div style="display:flex; gap:4px; margin-top:6px;">
@@ -864,6 +965,8 @@
                 </div>`;
           });
       }
+
+      renderAdminOffersList(); // 🌟 NEW: keep the admin Offers tab in sync
     }
 
     async function adminUpdateOrderStatus(orderId, newStatus) {
@@ -915,13 +1018,13 @@
       if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
-    async function placeOrder(id) {
+    async function placeOrder(id, buyerPhone) {
       const p = products.find(x => x.id === id); if (!p) return;
       const order = {
         productId: id, productTitle: p.title, price: p.price || p.finalPrice || 0,
         sellerId: p.sellerId, buyerId: currentUser.id,
         buyerName: currentUser.first_name || currentUser.username || 'ገዢ',
-        buyerTg: currentUser.username || '', status: 'Pending', date: new Date().toISOString()
+        buyerTg: currentUser.username || '', buyerPhone: buyerPhone || '', status: 'Pending', date: new Date().toISOString() // 🌟 NEW: buyerPhone
       };
       try {
         await fetch(`${FIREBASE_ORDERS}/OR-${Date.now()}.json`, { method: 'PUT', body: JSON.stringify(order) });
@@ -967,7 +1070,7 @@
         return `
           <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
             <strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || '-')}</strong>
-            <div style="font-size:0.75rem; line-height:1.5; margin:4px 0;">ገዢ: <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | ${escHtml(o.status || '-')}</div>
+            <div style="font-size:0.75rem; line-height:1.5; margin:4px 0;">ገዢ: <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} | ${escHtml(o.status || '-')}</div>
             <button class="btn-action btn-tg" style="padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr('ስለ ትዕዛዝ (Order) - ' + (o.productTitle || ''))}')">💬 ገዢውን አናግር</button>
           </div>`;
       }).join('');
@@ -979,7 +1082,95 @@
       shareProduct(id, p.title);
     }
 
+    // =====================================================================
+    // 🌟 NEW: Onboarding / Welcome Screen logic
+    // =====================================================================
+    function initOnboarding() {
+      let seen = false;
+      try { seen = localStorage.getItem('ws_onboarding_seen'); } catch(e) {}
+      if (seen) { document.getElementById('onboardingScreen').style.display = 'none'; }
+    }
+    function startApp() {
+      try { localStorage.setItem('ws_onboarding_seen', '1'); } catch(e) {}
+      document.getElementById('onboardingScreen').style.display = 'none';
+    }
+
+    // =====================================================================
+    // 🌟 NEW: Special Offers Carousel (admin adds/removes; round, side-scroll)
+    // =====================================================================
+    function renderOffers() {
+      const box = document.getElementById('offersCarousel'); if (!box) return;
+      const isAdmin = (Number(currentUser.id) === ADMIN_ID);
+      const keys = Object.keys(offers || {});
+      let html = '';
+      keys.forEach(k => {
+        const o = offers[k];
+        html += `<div class="offer-circle"><div class="offer-discount">${escHtml(o.discount)}</div><div class="offer-title">${escHtml(o.title)}</div></div>`;
+      });
+      if (isAdmin) { html += `<div class="offer-add-circle" onclick="openAddOfferModal()">➕</div>`; }
+      if (!html) { box.style.display = 'none'; box.innerHTML = ''; } else { box.style.display = 'flex'; box.innerHTML = html; }
+    }
+
+    function openAddOfferModal() { document.getElementById('addOfferForm').reset(); document.getElementById('addOfferModal').style.display = 'block'; }
+    function closeAddOfferModal() { document.getElementById('addOfferModal').style.display = 'none'; }
+
+    async function saveNewOffer(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveOfferBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
+      const newOffer = { discount: document.getElementById('offerDiscountText').value, title: document.getElementById('offerTitleText').value, createdAt: new Date().toISOString() };
+      const newId = `OF-${Date.now()}`;
+      try {
+        await fetch(`${FIREBASE_OFFERS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newOffer) });
+        closeAddOfferModal(); await loadAllData();
+      } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { btn.innerText = "ጨምር"; btn.disabled = false; }
+    }
+
+    async function deleteOffer(id) {
+      if (!confirm("ይህን ቅናሽ ማጥፋት ይፈልጋሉ?")) return;
+      try { await fetch(`${FIREBASE_OFFERS}/${id}.json`, { method: 'DELETE' }); } catch(e) {}
+      await loadAllData();
+    }
+
+    function renderAdminOffersList() {
+      const box = document.getElementById('adminOffersList'); if (!box) return;
+      const keys = Object.keys(offers || {});
+      if (keys.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; text-align:center; color:var(--gray);">እስካሁን ምንም ቅናሽ አልተጨመረም።</p>'; return; }
+      box.innerHTML = keys.map(k => {
+        const o = offers[k];
+        return `<div class="offer-admin-item">
+          <div class="offer-admin-circle-preview">${escHtml(o.discount)}</div>
+          <div style="flex:1;"><strong style="font-size:0.85rem;">${escHtml(o.title)}</strong></div>
+          <button class="btn-action" style="width:auto; padding:6px 10px; font-size:0.75rem; background:var(--danger); color:white;" onclick="deleteOffer('${escAttr(k)}')">🗑️</button>
+        </div>`;
+      }).join('');
+    }
+
+    // =====================================================================
+    // 🌟 NEW: Order phone-number popup (shown when tapping "🛒 አሁን አዝዝ")
+    // The product-details popup itself is unchanged; only this one extra step was added.
+    // =====================================================================
+    function openOrderPhoneModal(id) {
+      pendingOrderProductId = id;
+      document.getElementById('orderPhoneForm').reset();
+      document.getElementById('orderPhoneModal').style.display = 'block';
+    }
+    function closeOrderPhoneModal() { document.getElementById('orderPhoneModal').style.display = 'none'; pendingOrderProductId = null; }
+
+    async function submitOrderWithPhone(e) {
+      e.preventDefault();
+      if (!pendingOrderProductId) return;
+      const phone = document.getElementById('orderPhoneInput').value.trim();
+      if (!phone) return;
+      const btn = document.getElementById('confirmOrderBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
+      const idToOrder = pendingOrderProductId;
+      await placeOrder(idToOrder, phone);
+      btn.innerText = "🛒 ትዕዛዝ አረጋግጥ"; btn.disabled = false;
+      closeOrderPhoneModal();
+      closeModal();
+    }
+
     // 🚀 መተግበሪያውን ጀምር (በኮዱ ውስጥ ይህ ጥሪ አልነበረም)
+    initOnboarding(); // 🌟 NEW: decide whether to show the welcome screen
     initApp();
 
   </script>
