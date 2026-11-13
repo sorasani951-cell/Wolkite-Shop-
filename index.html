@@ -107,6 +107,8 @@
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
     
     .modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
+    /* 🌟 NEW: a modal opened on top of another modal (e.g. order phone popup over the product popup) must always stack above it, regardless of DOM order */
+    .modal.modal-stacked { z-index: 100010; }
     .modal-content { background-color: var(--card-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 92%; max-width: 450px; border-radius: 12px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
     .close-modal { color: #aaa; position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-modal:hover { color: #333; }
@@ -469,13 +471,17 @@
         </div>
         <div class="form-group"><label>የቅናሽ መጠን (ለምሳሌ 40% ቅናሽ)</label><input type="text" id="offerDiscountText" placeholder="40% ቅናሽ" required></div>
         <div class="form-group"><label>አጭር ርዕስ</label><input type="text" id="offerTitleText" placeholder="ልዩ ቅናሽ" required></div>
+        <div class="form-group">
+          <label>የእቃው ሊንክ (አማራጭ - ሲነካ ወደ እቃው ይወስዳል)</label>
+          <input type="text" id="offerLinkText" placeholder="የእቃውን 🔗 አጋራ ሊንክ ይለጥፉ ወይም የእቃውን ID ያስገቡ">
+        </div>
         <button type="submit" class="btn-action btn-tg" id="saveOfferBtn" style="padding:10px;">ጨምር</button>
       </form>
     </div>
   </div>
 
   <!-- 🌟 NEW: ORDER PHONE NUMBER MODAL (shown when buyer taps "🛒 አሁን አዝዝ") -->
-  <div id="orderPhoneModal" class="modal">
+  <div id="orderPhoneModal" class="modal modal-stacked">
     <div class="modal-content small-modal">
       <span class="close-modal" onclick="closeOrderPhoneModal()">&times;</span>
       <h3 style="margin-bottom:12px; color:var(--primary); font-size:1.1rem;">📞 ስልክ ቁጥርዎን ያስገቡ</h3>
@@ -1120,11 +1126,32 @@
       let html = '';
       keys.forEach(k => {
         const o = offers[k];
-        const bgStyle = o.img ? ` style="background-image:url('${escAttr(o.img)}')"` : '';
-        html += `<div class="offer-circle"${bgStyle}><div class="offer-discount">${escHtml(o.discount)}</div><div class="offer-title">${escHtml(o.title)}</div></div>`;
+        // 🌟 NEW: build the style (background image + pointer cursor) and the tap handler together
+        let styleParts = [];
+        if (o.img) styleParts.push(`background-image:url('${escAttr(o.img)}')`);
+        if (o.link) styleParts.push('cursor:pointer');
+        const styleAttr = styleParts.length ? ` style="${styleParts.join(';')}"` : '';
+        const onclickAttr = o.link ? ` onclick="openOfferLink('${escAttr(o.link)}')"` : '';
+        html += `<div class="offer-circle"${styleAttr}${onclickAttr}><div class="offer-discount">${escHtml(o.discount)}</div><div class="offer-title">${escHtml(o.title)}</div></div>`;
       });
       if (isAdmin) { html += `<div class="offer-add-circle" onclick="openAddOfferModal()">➕</div>`; }
       if (!html) { box.style.display = 'none'; box.innerHTML = ''; } else { box.style.display = 'flex'; box.innerHTML = html; }
+    }
+
+    // 🌟 NEW: tapping an offer card goes to the product it's linked to (or opens the raw link if it's not one of ours)
+    function extractProductIdFromOfferLink(link) {
+      if (!link) return null;
+      let m = link.match(/startapp=p_([^&]+)/) || link.match(/[?&]p_([^&]+)/) || link.match(/\/p_([^/?&]+)/);
+      if (m) return decodeURIComponent(m[1]);
+      return link.trim(); // fall back to treating the whole value as a product ID
+    }
+    function openOfferLink(link) {
+      if (!link) return;
+      const pid = extractProductIdFromOfferLink(link);
+      const prod = products.find(p => p.id === pid);
+      if (prod) { switchTab('home', document.getElementById('navHome')); openModal(prod.id); return; }
+      if (tg.openTelegramLink && /^https?:\/\/(t\.me|telegram\.me)\//.test(link)) tg.openTelegramLink(link);
+      else window.open(link, '_blank');
     }
 
     function openAddOfferModal() {
@@ -1155,7 +1182,7 @@
     async function saveNewOffer(e) {
       e.preventDefault();
       const btn = document.getElementById('saveOfferBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
-      const newOffer = { discount: document.getElementById('offerDiscountText').value, title: document.getElementById('offerTitleText').value, img: uploadedOfferImageBase64 || "", createdAt: new Date().toISOString() }; // 🌟 NEW: img
+      const newOffer = { discount: document.getElementById('offerDiscountText').value, title: document.getElementById('offerTitleText').value, img: uploadedOfferImageBase64 || "", link: document.getElementById('offerLinkText').value.trim(), createdAt: new Date().toISOString() }; // 🌟 NEW: img + link
       const newId = `OF-${Date.now()}`;
       try {
         await fetch(`${FIREBASE_OFFERS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newOffer) });
@@ -1178,7 +1205,7 @@
         const bgStyle = o.img ? ` style="background-image:url('${escAttr(o.img)}')"` : '';
         return `<div class="offer-admin-item">
           <div class="offer-admin-circle-preview"${bgStyle}>${o.img ? '' : escHtml(o.discount)}</div>
-          <div style="flex:1;"><strong style="font-size:0.85rem;">${escHtml(o.title)}</strong></div>
+          <div style="flex:1;"><strong style="font-size:0.85rem;">${escHtml(o.title)}</strong><br><small style="color:var(--gray);">${o.link ? '🔗 ወደ እቃ ተያይዟል' : 'ምንም ሊንክ የለውም'}</small></div>
           <button class="btn-action" style="width:auto; padding:6px 10px; font-size:0.75rem; background:var(--danger); color:white;" onclick="deleteOffer('${escAttr(k)}')">🗑️</button>
         </div>`;
       }).join('');
