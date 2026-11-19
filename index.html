@@ -569,14 +569,22 @@
       <div id="view-edu-quiz" class="view active">
         <div id="eduLoading" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px; display:none;">የBIKAT መረጃዎችን በመጫን ላይ...</div>
 
+        <!-- 🔔 In-App Notification / Announcement Banner -->
+        <div id="eduNotifBanner" class="section-card" style="display:none; background:#FEF3C7; border-color:var(--gold); position:relative; padding-right:34px;">
+          <button onclick="eduDismissNotif()" style="position:absolute; right:10px; top:8px; background:none; border:none; font-size:1.1rem; color:var(--gray); cursor:pointer;">&times;</button>
+          <div style="font-size:0.78rem; font-weight:bold; color:var(--gold); margin-bottom:4px;">🔔 አዲስ ማስታወቂያ (Notification)</div>
+          <div id="eduNotifText" style="font-size:0.82rem; color:var(--text); line-height:1.45; white-space:pre-wrap;"></div>
+          <div id="eduNotifDate" style="font-size:0.68rem; color:var(--gray); margin-top:4px;"></div>
+        </div>
+
         <!-- Student Summary Banner -->
         <div class="edu-hero" id="eduHeroBanner">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
               <h2 id="eduWelcomeName">👋 ሰላም ተማሪ!</h2>
               <div style="font-size:0.78rem; opacity:0.9;" id="eduLevelDisplay">📚 ክፍል: ገና አልተመረጠም</div>
             </div>
-            <button onclick="eduShowLevelPicker()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.72rem; font-weight:bold; cursor:pointer;">🔄 ክፍል ቀይር</button>
+            <button onclick="eduShowLevelPicker()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.72rem; font-weight:bold; cursor:pointer; white-space:nowrap;">🔄 ክፍል ቀይር</button>
           </div>
           <div class="edu-hero-meta">
             <span class="edu-chip" id="eduVipChip">👤 Free Tier</span>
@@ -584,6 +592,10 @@
             <span class="edu-chip" id="eduInviteChip">👥 0 / 5 ግብዣ</span>
           </div>
           <div id="eduBonusLine" style="font-size:0.72rem; margin-top:8px; color:#A7F3D0; display:none;"></div>
+          <div style="display:flex; gap:6px; margin-top:10px;">
+            <a class="btn-action" style="flex:1; padding:7px; font-size:0.74rem; background:rgba(255,255,255,0.18); color:white;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር</a>
+            <a class="btn-action" style="flex:1; padding:7px; font-size:0.74rem; background:rgba(255,255,255,0.18); color:white;" href="https://t.me/bikat_quiz" target="_blank">📢 ቻናላችን</a>
+          </div>
         </div>
 
         <!-- Resume Paused Quiz Banner -->
@@ -603,31 +615,48 @@
 
       <!-- EDU VIP & SHORT NOTES VIEW -->
       <div id="view-edu-vip" class="view">
-        <div class="section-card">
-          <h3 style="color:var(--edu-accent); margin-bottom:6px;">💎 VIP Membership (30 ብር / ወር)</h3>
+        <!-- Single Subject VIP (50 ETB / 2 Months) -->
+        <div class="section-card" style="border-color:var(--edu-accent);">
+          <h3 style="color:var(--edu-accent); margin-bottom:6px;">📘 የ1 ትምህርት VIP (50 ብር / ለ2 ወር)</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            🔓 ሁሉንም የተቆለፉ (Paid) ጥያቄዎችና ምዕራፎች ያለ ገደብ ይሰራሉ!<br>
-            🔓 የ 50 ጥያቄ (Free-tier) ገደብ ይነሳልዎታል!
+            🔓 በመረጡት 1 ስትሪም ውስጥ ለ <b>1 የትምህርት ዓይነት (Subject)</b> ብቻ ለ2 ወር ያለ ገደብ መዳረሻ!<br>
+            💡 <i>ወይም 50 ነጥብ በመሙላት / 5 ጓደኛ በመጋበዝ 1 ትምህርት ለ2 ወር በነፃ መክፈት ይችላሉ።</i>
           </p>
-          <div class="payment-box">
+          <div class="form-group" style="margin-top:8px;">
+            <label>የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology, Physics)</label>
+            <input type="text" id="eduVipSubjectInput" list="eaSubjectList" placeholder="ትምህርት ይምረጡ ወይም ይጻፉ...">
+          </div>
+          <button class="btn-action btn-edu" onclick="eduStartSingleSubjectVip()">📸 የ1 ትምህርት (50 ብር) ደረሰኝ ላክ</button>
+        </div>
+
+        <!-- Full VIP (100 ETB / All Subjects) -->
+        <div class="section-card" style="background:var(--gold-bg); border-color:var(--gold);">
+          <h3 style="color:var(--gold); margin-bottom:6px;">👑 FULL VIP — ሁሉም ትምህርቶች (100 ብር)</h3>
+          <p style="font-size:0.8rem; color:#444; line-height:1.5;">
+            🔓 <b>ሁሉንም የትምህርት ዓይነቶች</b> እና የተቆለፉ (Paid) ጥያቄዎች ያለ ገደብ ይሰራሉ!<br>
+            🔓 Grade 12፣ Remedial እና Freshman (Natural & Social) ሁሉም ይከፈታሉ!
+          </p>
+          <div class="payment-box" style="background:white;">
             🏦 <b>ንግድ ባንክ (CBE):</b> <code>1000649943188</code> (በሶራ ታጁ)<br>
             📱 <b>ቴሌብር (Telebirr):</b> <code>0948944979</code> (በሶራ ታጁ)
           </div>
-          <button class="btn-action btn-edu" onclick="eduOpenPaymentModal('vip', 'VIP Membership', 'All Levels', '30 ብር')">📸 የVIP (30 ብር) ደረሰኝ ላክ</button>
+          <button class="btn-action" style="background:var(--gold); color:white;" onclick="eduOpenPaymentModal('full_vip', 'Full VIP (All Subjects)', 'All Streams', '100 ብር', 'ALL')">📸 የFull VIP (100 ብር) ደረሰኝ ላክ</button>
         </div>
 
+        <!-- Short Notes (300 ETB) -->
         <div class="section-card">
           <h3 style="color:var(--primary); margin-bottom:6px;">📖 Short Notes (300 ብር)</h3>
           <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">የሚፈልጉትን የትምህርት ደረጃ መርጠው ክፍያ ሲፈጽሙ የፕራይቬት ቻናል መግቢያ ሊንክ ይላክልዎታል!</p>
-          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Grade 12', 'ሙሉ ዓመት', '300 ብር')">
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Grade 12', 'ሙሉ ዓመት', '300 ብር', '')">
             <span>📚 Grade 12 (ሙሉ ዓመት)</span><span style="color:var(--primary);">300 ብር ➔</span>
           </button>
-          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Remedial', 'ለሴሚስተር', '300 ብር')">
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Remedial', 'ለሴሚስተር', '300 ብር', '')">
             <span>📖 Remedial (ለሴሚስተር)</span><span style="color:var(--primary);">300 ብር ➔</span>
           </button>
-          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Freshman', 'ለሴሚስተር', '300 ብር')">
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Freshman', 'ለሴሚስተር', '300 ብር', '')">
             <span>🎓 Freshman (ለሴሚስተር)</span><span style="color:var(--primary);">300 ብር ➔</span>
           </button>
+          <a class="btn-action btn-tg" style="margin-top:8px;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
         </div>
 
         <div class="section-card">
@@ -641,7 +670,7 @@
         <div class="section-card">
           <h3 style="color:var(--edu-accent); margin-bottom:6px;">🎁 ጓደኞችን በመጋበዝ ነፃ መዳረሻ ያግኙ!</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
+            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ለ<b>2 ወር</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
           </p>
           <div class="copy-box">
             <input type="text" id="eduRefLinkInput" readonly>
@@ -675,46 +704,59 @@
           <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:6px; margin-bottom:12px;">🛠 BIKAT Admin Control</h3>
           <div class="analytics-grid">
             <div class="stat-box"><div class="stat-num" id="eduStStudents">0</div><div class="stat-title">Students</div></div>
-            <div class="stat-box gold"><div class="stat-num" id="eduStVip" style="color:var(--gold);">0</div><div class="stat-title">VIP Students</div></div>
+            <div class="stat-box gold"><div class="stat-num" id="eduStVip" style="color:var(--gold);">0</div><div class="stat-title">Full VIP</div></div>
             <div class="stat-box"><div class="stat-num" id="eduStQuestions">0</div><div class="stat-title">Questions</div></div>
             <div class="stat-box"><div class="stat-num" id="eduStPendingPay" style="color:var(--danger);">0</div><div class="stat-title">Pending Pay</div></div>
           </div>
 
           <div class="profile-tabs">
             <div class="p-tab active" onclick="eduSwitchAdminTab('ea-add', this)">➕ ጥያቄ አስገባ</div>
+            <div class="p-tab" onclick="eduSwitchAdminTab('ea-notify', this)">📢 ማስታወቂያ</div>
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-pay', this)">💳 ክፍያዎች</div>
-            <div class="p-tab" onclick="eduSwitchAdminTab('ea-manage', this)">🗑 አጥፋ/Stats</div>
+            <div class="p-tab" onclick="eduSwitchAdminTab('ea-manage', this)">🗑 አጥፋ</div>
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-students', this)">👥 ተማሪዎች</div>
           </div>
 
-          <!-- ADD QUESTIONS (SINGLE & BULK 8-LINE FORMAT) -->
+          <!-- ADD QUESTIONS (CONTINUOUS MODE + CONTINUE EXISTING CHAPTER + MULTI-QUESTION) -->
           <div id="ea-add" class="p-content active">
             <form id="eduAddQuizForm" onsubmit="eduAdminAddQuestions(event)">
-              <div class="form-group">
-                <label>የትምህርት ደረጃ (Level)</label>
-                <select id="eaLevel" onchange="eduAdminToggleStream()">
-                  <option value="Grade 12">Grade 12</option>
-                  <option value="Remedial">Remedial</option>
-                  <option value="Freshman">Freshman</option>
-                </select>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group">
+                  <label>ደረጃ (Level)</label>
+                  <select id="eaLevel" onchange="eduAdminRefreshSubjectSelect()">
+                    <option value="Grade 12">Grade 12</option>
+                    <option value="Remedial">Remedial</option>
+                    <option value="Freshman">Freshman</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>ስትሪም (Stream)</label>
+                  <select id="eaStream" onchange="eduAdminRefreshSubjectSelect()">
+                    <option value="Natural">Natural</option>
+                    <option value="Social">Social</option>
+                  </select>
+                </div>
               </div>
-              <div class="form-group" id="eaStreamGroup">
-                <label>ስትሪም (Stream)</label>
-                <select id="eaStream">
-                  <option value="Natural">Natural</option>
-                  <option value="Social">Social</option>
-                </select>
-              </div>
+
+              <!-- Existing or New Subject -->
               <div class="form-group">
-                <label>ትምህርት (Subject - ነባር ወይም አዲስ ይጻፉ)</label>
-                <input type="text" id="eaSubject" list="eaSubjectList" placeholder="ምሳሌ: Biology, Chemistry, Psychology" required>
+                <label>ትምህርት (ነባር ምረጥ ወይም አዲስ ፍጠር)</label>
+                <select id="eaSubjectSelect" onchange="eduAdminOnSubjectChange()" style="margin-bottom:6px;"></select>
+                <input type="text" id="eaSubjectNew" placeholder="አዲሱን የትምህርት ስም ይጻፉ (ምሳሌ: Biology)" style="display:none;">
                 <datalist id="eaSubjectList"></datalist>
               </div>
+
+              <!-- Existing or New Chapter (shows question count!) -->
               <div class="form-group">
-                <label>ምዕራፍ (Chapter - ነባር ወይም አዲስ ይጻፉ)</label>
-                <input type="text" id="eaChapter" list="eaChapterList" placeholder="ምሳሌ: Chapter 1, Unit 2" required>
-                <datalist id="eaChapterList"></datalist>
+                <label>ምዕራፍ (ነባር ምዕራፍ ላይ መቀጠል ወይም አዲስ)</label>
+                <select id="eaChapterSelect" onchange="eduAdminOnChapterChange()" style="margin-bottom:6px;"></select>
+                <input type="text" id="eaChapterNew" placeholder="አዲሱን ምዕራፍ ስም ይጻፉ (ምሳሌ: Chapter 1)" style="display:none;">
               </div>
+
+              <div id="eaChapterLiveCount" style="background:#EEF2FF; color:var(--edu-accent); padding:8px 10px; border-radius:8px; font-size:0.78rem; font-weight:bold; margin-bottom:10px;">
+                📊 በዚህ ምዕራፍ ያሉ ጥያቄዎች: 0
+              </div>
+
               <div class="form-group">
                 <label>የጥያቄው ዓይነት (Free / Paid)</label>
                 <select id="eaType">
@@ -722,12 +764,32 @@
                   <option value="paid">🔒 የክፍያ (Paid / VIP)</option>
                 </select>
               </div>
+
               <div class="form-group">
-                <label>ጥያቄዎችን ይለጥፉ (8 መስመር format — ብዙ ጥያቄ በባዶ መስመር ይለዩ)</label>
-                <textarea id="eaBulkText" rows="9" placeholder="ጥያቄው እዚህ...&#10;ምርጫ A&#10;ምርጫ B&#10;ምርጫ C&#10;ምርጫ D&#10;A&#10;ማብራሪያ (ከሌለ 0)&#10;ምንጭ (ምሳሌ: 2015 EUEE)" required></textarea>
+                <label>ጥያቄዎች (8 መስመር format — እስከ 5+ ጥያቄ በባዶ መስመር ለይተህ በአንዴ መላክ ትችላለህ)</label>
+                <textarea id="eaBulkText" rows="9" placeholder="ጥያቄ 1...&#10;ምርጫ A&#10;ምርጫ B&#10;ምርጫ C&#10;ምርጫ D&#10;A&#10;ማብራሪያ (ከሌለ 0)&#10;ምንጭ (2015 EUEE)&#10;&#10;ጥያቄ 2... (በባዶ መስመር ተለይቶ)" required></textarea>
               </div>
-              <button type="submit" id="eaSubmitBtn" class="btn-action btn-edu">➕ ጥያቄዎቹን አስገባ (Save)</button>
+              <button type="submit" id="eaSubmitBtn" class="btn-action btn-edu">➕ አስገባና እዚሁ ቀጥል (Save & Continue)</button>
             </form>
+
+            <!-- Live status & Quick Notify after adding -->
+            <div id="eaLastSavedBox" style="display:none; margin-top:12px; background:#DCFCE7; border:1px solid #16A34A; border-radius:10px; padding:10px; font-size:0.8rem;">
+              <div id="eaLastSavedMsg" style="color:#14532D; margin-bottom:8px;"></div>
+              <button type="button" class="btn-action btn-tg" style="padding:8px;" onclick="eduQuickNotifyNewQuestions()">🔔 አዲስ ጥያቄ መጫኑን Notification ላክ</button>
+            </div>
+          </div>
+
+          <!-- BROADCAST / NOTIFICATION TAB -->
+          <div id="ea-notify" class="p-content">
+            <form onsubmit="eduAdminSendAnnouncement(event)">
+              <div class="form-group">
+                <label>📢 ለሁሉም ተማሪዎች የሚታይ ማስታወቂያ (In-App Notification)</label>
+                <textarea id="eaNotifInput" rows="4" placeholder="ለምሳሌ: 🔥 የBiology Chapter 2 አዲስ 25 ጥያቄዎች ተጭነዋል! አሁኑኑ ገብተው ይስሩ!" required></textarea>
+              </div>
+              <button type="submit" id="eaNotifBtn" class="btn-action btn-edu">🔔 ማስታወቂያውን ለጥፍ (Publish)</button>
+            </form>
+            <button type="button" class="btn-action btn-tg" style="margin-top:8px;" onclick="eduShareAnnouncementToChannel()">📤 ወደ ቻናል (@bikat_quiz) ሼር አድርግ</button>
+            <div id="eaPastNotifs" style="margin-top:12px;"></div>
           </div>
 
           <!-- PAYMENT APPROVALS -->
@@ -1502,20 +1564,24 @@
     // =========================================================================
     // PART 2: BIKAT EDUCATION LOGIC (Firebase-powered)
     // =========================================================================
+    const BIKAT_ANNOUNCEMENTS = `${DB_BASE}/bikat/announcements`;
     const PRACTICE_SIZE = 25;
     const BONUS_POINTS_THRESHOLD = 50;
     const BONUS_INVITE_THRESHOLD = 5;
+    const TWO_MONTHS_MS = 60 * 24 * 60 * 60 * 1000; // 60 days
 
     let eduDataLoaded = false;
     let bikatStudents = {};
     let bikatQuestions = [];
     let bikatPayments = {};
+    let bikatAnnouncements = {};
     let myStudent = null;
 
     let eduNav = { level: null, stream: null, subject: null, chapter: null, practice: 1 };
-    let eduActiveQuiz = null; // { questions, index, score, earned, answeredCurrent, subject, chapter, practice }
+    let eduActiveQuiz = null;
     let eduPendingPayment = null;
     let eduReceiptBase64 = "";
+    let lastAddedBatch = null; // { level, stream, subject, chapter, count }
 
     function eduSwitchTab(viewId, btn) {
       document.querySelectorAll('#mode-edu .view').forEach(v => v.classList.remove('active'));
@@ -1538,17 +1604,18 @@
     async function eduLoadAllData(referrerId = null) {
       document.getElementById('eduLoading').style.display = 'block';
       try {
-        const [resS, resQ, resP] = await Promise.all([
+        const [resS, resQ, resP, resA] = await Promise.all([
           fetch(`${BIKAT_STUDENTS}.json`),
           fetch(`${BIKAT_QUESTIONS}.json`),
-          fetch(`${BIKAT_PAYMENTS}.json`)
+          fetch(`${BIKAT_PAYMENTS}.json`),
+          fetch(`${BIKAT_ANNOUNCEMENTS}.json`)
         ]);
         bikatStudents = (await resS.json()) || {};
         const rawQ = (await resQ.json()) || {};
         bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
         bikatPayments = (await resP.json()) || {};
+        bikatAnnouncements = (await resA.json()) || {};
 
-        // Register student if first time
         if (!bikatStudents[currentUser.id]) {
           myStudent = {
             user_id: currentUser.id,
@@ -1559,13 +1626,14 @@
             invited_count: 0,
             is_vip: 0,
             bonus_subject: null,
+            bonus_expires_at: 0,
+            subject_vips: {},
             answered_questions: {},
             joined_at: new Date().toISOString()
           };
           await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(myStudent) });
           bikatStudents[currentUser.id] = myStudent;
 
-          // Credit referrer if valid
           if (referrerId && String(referrerId) !== String(currentUser.id) && bikatStudents[referrerId]) {
             const refUser = bikatStudents[referrerId];
             await fetch(`${BIKAT_STUDENTS}/${referrerId}.json`, {
@@ -1588,6 +1656,7 @@
       }
 
       eduRenderHero();
+      eduRenderLatestNotification();
       eduCheckPausedQuiz();
       eduRenderInitialQuizView();
       eduRenderLeaderboard();
@@ -1596,25 +1665,57 @@
       if (Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
     }
 
+    function eduRenderLatestNotification() {
+      const banner = document.getElementById('eduNotifBanner');
+      const keys = Object.keys(bikatAnnouncements || {}).sort();
+      if (keys.length === 0) { banner.style.display = 'none'; return; }
+      const latestKey = keys[keys.length - 1];
+      const dismissed = localStorage.getItem('bikat_dismissed_notif');
+      if (dismissed === latestKey) { banner.style.display = 'none'; return; }
+      const item = bikatAnnouncements[latestKey];
+      document.getElementById('eduNotifText').innerText = item.text || '';
+      document.getElementById('eduNotifDate').innerText = item.date ? new Date(item.date).toLocaleString() : '';
+      banner.dataset.notifKey = latestKey;
+      banner.style.display = 'block';
+    }
+
+    function eduDismissNotif() {
+      const banner = document.getElementById('eduNotifBanner');
+      if (banner.dataset.notifKey) localStorage.setItem('bikat_dismissed_notif', banner.dataset.notifKey);
+      banner.style.display = 'none';
+    }
+
     function eduRenderHero() {
       if (!myStudent) return;
       document.getElementById('eduWelcomeName').innerText = `👋 ሰላም ${myStudent.full_name || 'ተማሪ'}!`;
       document.getElementById('eduLevelDisplay').innerText = `📚 ክፍል: ${myStudent.education_level === 'Not Set' ? 'ገና አልተመረጠም' : myStudent.education_level}`;
       const vipChip = document.getElementById('eduVipChip');
       if (myStudent.is_vip == 1) {
-        vipChip.innerText = '💎 VIP አባል'; vipChip.className = 'edu-chip vip';
+        vipChip.innerText = '👑 Full VIP'; vipChip.className = 'edu-chip vip';
       } else {
         vipChip.innerText = '👤 Free Tier'; vipChip.className = 'edu-chip';
       }
       document.getElementById('eduPointsChip').innerText = `🏆 ${myStudent.total_points || 0} / ${BONUS_POINTS_THRESHOLD} ነጥብ`;
       document.getElementById('eduInviteChip').innerText = `👥 ${myStudent.invited_count || 0} / ${BONUS_INVITE_THRESHOLD} ግብዣ`;
+
+      const now = Date.now();
+      const activeSubVips = [];
+      if (myStudent.subject_vips) {
+        Object.entries(myStudent.subject_vips).forEach(([sub, exp]) => {
+          if (exp > now) activeSubVips.push(sub);
+        });
+      }
+      if (myStudent.bonus_subject && (!myStudent.bonus_expires_at || myStudent.bonus_expires_at > now)) {
+        if (!activeSubVips.includes(myStudent.bonus_subject)) activeSubVips.push(myStudent.bonus_subject);
+      }
       const bLine = document.getElementById('eduBonusLine');
-      if (myStudent.bonus_subject) {
+      if (activeSubVips.length > 0 && myStudent.is_vip != 1) {
         bLine.style.display = 'block';
-        bLine.innerText = `🎁 ነፃ ያለገደብ ትምህርት: ${myStudent.bonus_subject}`;
+        bLine.innerText = `🔓 የተከፈቱ ትምህርቶች (ለ2 ወር): ${activeSubVips.join(', ')}`;
       } else {
         bLine.style.display = 'none';
       }
+
       const refInput = document.getElementById('eduRefLinkInput');
       if (refInput) refInput.value = `${BOT_APP_LINK}?startapp=ref_${currentUser.id}`;
     }
@@ -1622,18 +1723,31 @@
     function eduHasSubjectAccess(subject, allowClaim = false) {
       if (!myStudent) return false;
       if (Number(currentUser.id) === ADMIN_ID || myStudent.is_vip == 1) return true;
-      const hasApprovedNote = Object.values(bikatPayments).some(p => String(p.user_id) === String(currentUser.id) && p.status === 'approved');
-      if (hasApprovedNote) return true;
+      const now = Date.now();
 
+      // Check 50 ETB single-subject VIP (2 months)
+      if (myStudent.subject_vips && subject) {
+        const subKey = Object.keys(myStudent.subject_vips).find(k => k.toLowerCase() === subject.toLowerCase());
+        if (subKey && myStudent.subject_vips[subKey] > now) return true;
+      }
+
+      // Check 50 points / 5 invites bonus (1 subject for 2 months)
       const qualifies = (myStudent.total_points || 0) >= BONUS_POINTS_THRESHOLD || (myStudent.invited_count || 0) >= BONUS_INVITE_THRESHOLD;
       if (!qualifies) return false;
 
-      if (myStudent.bonus_subject === subject) return true;
+      if (myStudent.bonus_subject && myStudent.bonus_subject.toLowerCase() === (subject || '').toLowerCase()) {
+        if (!myStudent.bonus_expires_at || myStudent.bonus_expires_at > now) return true;
+      }
       if (!myStudent.bonus_subject && allowClaim && subject) {
+        const exp = now + TWO_MONTHS_MS;
         myStudent.bonus_subject = subject;
-        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ bonus_subject: subject }) }).catch(() => {});
+        myStudent.bonus_expires_at = exp;
+        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({ bonus_subject: subject, bonus_expires_at: exp })
+        }).catch(() => {});
         eduRenderHero();
-        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
+        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ለ2 ወር ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
         return true;
       }
       return false;
@@ -1641,10 +1755,11 @@
 
     function eduParseLevelStream(edStr) {
       if (!edStr || edStr === 'Not Set') return null;
-      if (edStr.includes('Natural')) return { level: 'Grade 12', stream: 'Natural' };
-      if (edStr.includes('Social')) return { level: 'Grade 12', stream: 'Social' };
-      if (edStr.includes('Freshman')) return { level: 'Freshman', stream: 'None' };
-      return { level: 'Remedial', stream: 'None' };
+      const stream = edStr.includes('Social') ? 'Social' : 'Natural';
+      if (edStr.includes('Grade 12')) return { level: 'Grade 12', stream };
+      if (edStr.includes('Freshman')) return { level: 'Freshman', stream };
+      if (edStr.includes('Remedial')) return { level: 'Remedial', stream };
+      return null;
     }
 
     function eduRenderInitialQuizView() {
@@ -1661,20 +1776,28 @@
     function eduShowLevelPicker() {
       const stage = document.getElementById('eduQuizStage');
       const cur = myStudent?.education_level || '';
+      const levels = [
+        { level: 'Grade 12', stream: 'Natural', icon: '🔬', label: 'Grade 12 Natural' },
+        { level: 'Grade 12', stream: 'Social', icon: '🌍', label: 'Grade 12 Social' },
+        { level: 'Remedial', stream: 'Natural', icon: '🧬', label: 'Remedial Natural' },
+        { level: 'Remedial', stream: 'Social', icon: '📖', label: 'Remedial Social' },
+        { level: 'Freshman', stream: 'Natural', icon: '🎓', label: 'Freshman Natural' },
+        { level: 'Freshman', stream: 'Social', icon: '🏛️', label: 'Freshman Social' }
+      ];
       stage.innerHTML = `
         <div class="section-card">
           <h3 style="font-size:0.95rem; margin-bottom:10px; color:var(--edu-accent);">📚 የትምህርት ደረጃ እና ስትሪም ይምረጡ</h3>
           <div class="edu-level-grid">
-            <div class="edu-level-card ${cur.includes('Natural') ? 'selected' : ''}" onclick="eduSetLevel('Grade 12', 'Natural')">🔬<br>Grade 12 Natural</div>
-            <div class="edu-level-card ${cur.includes('Social') ? 'selected' : ''}" onclick="eduSetLevel('Grade 12', 'Social')">🌍<br>Grade 12 Social</div>
-            <div class="edu-level-card ${cur === 'Remedial' ? 'selected' : ''}" onclick="eduSetLevel('Remedial', 'None')">📖<br>Remedial</div>
-            <div class="edu-level-card ${cur === 'Freshman' ? 'selected' : ''}" onclick="eduSetLevel('Freshman', 'None')">🎓<br>Freshman</div>
+            ${levels.map(l => {
+              const full = `${l.level} (${l.stream})`;
+              return `<div class="edu-level-card ${cur === full ? 'selected' : ''}" onclick="eduSetLevel('${l.level}', '${l.stream}')">${l.icon}<br>${l.label}</div>`;
+            }).join('')}
           </div>
         </div>`;
     }
 
     async function eduSetLevel(level, stream) {
-      const displayLevel = stream !== 'None' ? `${level} (${stream})` : level;
+      const displayLevel = `${level} (${stream})`;
       myStudent.education_level = displayLevel;
       eduNav = { level, stream, subject: null, chapter: null, practice: 1 };
       eduRenderHero();
@@ -1687,7 +1810,7 @@
     function eduGetFilteredQuestions(level, stream, subject = null, chapter = null) {
       return bikatQuestions.filter(q => {
         if (q.level !== level) return false;
-        if (stream !== 'None' && q.stream !== stream) return false;
+        if (stream && q.stream && q.stream !== 'None' && q.stream !== stream) return false;
         if (subject && q.subject !== subject) return false;
         if (chapter && q.chapter !== chapter) return false;
         return true;
@@ -1698,7 +1821,7 @@
       const stage = document.getElementById('eduQuizStage');
       const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream);
       const subjects = [...new Set(qs.map(q => q.subject))];
-      const title = eduNav.stream !== 'None' ? `${eduNav.level} - ${eduNav.stream}` : eduNav.level;
+      const title = `${eduNav.level} - ${eduNav.stream}`;
 
       if (subjects.length === 0) {
         stage.innerHTML = `
@@ -1753,12 +1876,14 @@
           <div class="section-card" style="text-align:center;">
             <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ምዕራፍ የተቆለፈ (VIP) ነው!</h3>
             <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
-              ይህንን ምዕራፍ ለመስራት የ VIP አባል (30 ብር) ይሁኑ፣ ወይም ${BONUS_INVITE_THRESHOLD} ጓደኞችን በመጋበዝ / ${BONUS_POINTS_THRESHOLD} ነጥብ በማሟላት ለዚህ 1 ትምህርት ነፃ መዳረሻ ያግኙ።
+              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ2 ወር) — <b>50 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
+              • ለሁሉም ትምህርቶች (Full VIP) — <b>100 ብር</b>
             </p>
             <div style="display:flex; gap:8px; margin-bottom:8px;">
-              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 VIP ሁን</button>
+              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 VIP ክፈት</button>
               <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 ሰው ጋብዝ</button>
             </div>
+            <a class="btn-action" style="background:#374151; color:white; margin-bottom:8px;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
             <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(eduNav.subject)}')">🔙 ተመለስ</button>
           </div>`;
         return;
@@ -1944,19 +2069,31 @@
     }
 
     // =========================================================================
-    // BIKAT PAYMENTS (VIP 30 ETB & SHORT NOTES 300 ETB)
+    // BIKAT PAYMENTS (50 ETB 1-Subject / 2 Months, 100 ETB Full VIP, 300 ETB Notes)
     // =========================================================================
-    function eduOpenPaymentModal(type, level, stream, amount) {
-      eduPendingPayment = { type, level, stream, amount };
+    function eduStartSingleSubjectVip() {
+      const subj = document.getElementById('eduVipSubjectInput').value.trim();
+      if (!subj) { notifyUser("እባክዎ መጀመሪያ የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology)"); return; }
+      const lev = myStudent?.education_level || 'Not Set';
+      eduOpenPaymentModal('subject_vip', lev, 'ለ2 ወር (1 ትምህርት)', '50 ብር', subj);
+    }
+
+    function eduOpenPaymentModal(type, level, stream, amount, subject = '') {
+      eduPendingPayment = { type, level, stream, amount, subject };
       eduReceiptBase64 = "";
       document.getElementById('eduPaymentForm').reset();
       document.getElementById('eduPayImgPreview').src = "";
       document.getElementById('eduPayImgPreview').style.display = 'none';
       document.getElementById('eduPayImgPlus').style.display = 'block';
 
-      document.getElementById('eduPayModalTitle').innerText = type === 'vip' ? '💎 የVIP ክፍያ (30 ብር)' : `📖 Short Note: ${level} (${amount})`;
+      let title = `📖 Short Note: ${level} (${amount})`;
+      if (type === 'subject_vip') title = `📘 1-Subject VIP: ${subject} (50 ብር)`;
+      else if (type === 'full_vip') title = `👑 Full VIP — ሁሉም ትምህርቶች (100 ብር)`;
+
+      document.getElementById('eduPayModalTitle').innerText = title;
       document.getElementById('eduPayModalInfo').innerHTML = `
         💵 <b>መጠን:</b> ${escHtml(amount)} (${escHtml(stream)})<br>
+        ${subject && subject !== 'ALL' ? `📘 <b>ትምህርት:</b> ${escHtml(subject)}<br>` : ''}
         🏦 <b>CBE:</b> <code>1000649943188</code> (በሶራ ታጁ)<br>
         📱 <b>Telebirr:</b> <code>0948944979</code> (በሶራ ታጁ)`;
       document.getElementById('eduPaymentModal').style.display = 'block';
@@ -1999,6 +2136,7 @@
         type: eduPendingPayment.type,
         level: eduPendingPayment.level,
         stream: eduPendingPayment.stream,
+        subject: eduPendingPayment.subject || '',
         amount: eduPendingPayment.amount,
         receipt_img: eduReceiptBase64,
         status: 'pending',
@@ -2019,11 +2157,15 @@
       const mine = Object.values(bikatPayments).filter(p => String(p.user_id) === String(currentUser.id)).reverse();
       if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.78rem; color:var(--gray);">እስካሁን የላኩት የክፍያ ጥያቄ የለም።</p>'; return; }
       const stMap = { pending: '⏳ በመጠባበቅ ላይ', approved: '✅ ጸድቋል', rejected: '❌ ውድቅ ሆኗል' };
-      box.innerHTML = mine.map(p => `
-        <div style="background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.8rem;">
-          <b>${p.type === 'vip' ? '💎 VIP' : '📖 Note: ' + escHtml(p.level)}</b> (${escHtml(p.amount)})<br>
+      box.innerHTML = mine.map(p => {
+        let label = '📖 Note: ' + escHtml(p.level);
+        if (p.type === 'full_vip') label = '👑 Full VIP (All Subjects)';
+        else if (p.type === 'subject_vip') label = '📘 1-Subject VIP: ' + escHtml(p.subject);
+        return `<div style="background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.8rem;">
+          <b>${label}</b> (${escHtml(p.amount)})<br>
           <span style="color:var(--gray);">${stMap[p.status] || p.status}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     // =========================================================================
@@ -2048,7 +2190,7 @@
       if (list.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">እስካሁን ምንም ተማሪ አልተመዘገበም።</p>'; return; }
       box.innerHTML = list.map((s, i) => {
         const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `${i + 1}.`));
-        return `<div class="rank-row"><span><b>${medal}</b> ${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '💎' : ''}</span><strong style="color:var(--edu-accent);">${s.total_points || 0} ነጥብ</strong></div>`;
+        return `<div class="rank-row"><span><b>${medal}</b> ${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '👑' : ''}</span><strong style="color:var(--edu-accent);">${s.total_points || 0} ነጥብ</strong></div>`;
       }).join('');
     }
 
@@ -2063,8 +2205,8 @@
           🏷 <b>ስም:</b> ${escHtml(myStudent.full_name)}<br>
           🆔 <b>ID:</b> <code>${myStudent.user_id}</code><br>
           📚 <b>የተመረጠ ክፍል:</b> ${escHtml(myStudent.education_level)}<br>
-          ⭐ <b>አባልነት:</b> ${myStudent.is_vip == 1 ? '💎 VIP (Full Access)' : '👤 Free Tier'}<br>
-          🎁 <b>ነፃ 1-ትምህርት:</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
+          ⭐ <b>አባልነት:</b> ${myStudent.is_vip == 1 ? '👑 Full VIP (All Subjects)' : '👤 Free Tier'}<br>
+          🎁 <b>ነፃ 1-ትምህርት (2 ወር):</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
           ✅ <b>በትክክል የተመለሱ:</b> ${ansCount} ጥያቄ<br>
           🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">(ቀሪ: ${remPts})</small><br>
           👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ቀሪ: ${remInv})</small>
@@ -2072,11 +2214,87 @@
     }
 
     // =========================================================================
-    // BIKAT ADMIN PANEL (ADD SINGLE/BULK, PAYMENTS, DELETE, STUDENTS)
+    // BIKAT ADMIN PANEL (CONTINUOUS + EXISTING CHAPTERS + NOTIFICATIONS + VIP)
     // =========================================================================
-    function eduAdminToggleStream() {
-      const lev = document.getElementById('eaLevel').value;
-      document.getElementById('eaStreamGroup').style.display = (lev === 'Grade 12') ? 'block' : 'none';
+    function eduAdminRefreshSubjectSelect(keepSubject = null, keepChapter = null) {
+      const level = document.getElementById('eaLevel').value;
+      const stream = document.getElementById('eaStream').value;
+      const qs = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None'));
+      const subs = [...new Set(qs.map(q => q.subject))];
+
+      const sel = document.getElementById('eaSubjectSelect');
+      let html = subs.map(s => `<option value="${escAttr(s)}">📘 ${escHtml(s)}</option>`).join('');
+      html += `<option value="__NEW__">➕ አዲስ ትምህርት ፍጠር (New Subject)</option>`;
+      sel.innerHTML = html;
+
+      if (keepSubject && subs.includes(keepSubject)) {
+        sel.value = keepSubject;
+      } else if (subs.length === 0) {
+        sel.value = '__NEW__';
+      }
+      eduAdminOnSubjectChange(keepChapter);
+    }
+
+    function eduAdminOnSubjectChange(keepChapter = null) {
+      const sel = document.getElementById('eaSubjectSelect');
+      const newInp = document.getElementById('eaSubjectNew');
+      if (sel.value === '__NEW__') {
+        newInp.style.display = 'block';
+        newInp.required = true;
+      } else {
+        newInp.style.display = 'none';
+        newInp.required = false;
+      }
+      eduAdminRefreshChapterSelect(keepChapter);
+    }
+
+    function eduAdminRefreshChapterSelect(keepChapter = null) {
+      const level = document.getElementById('eaLevel').value;
+      const stream = document.getElementById('eaStream').value;
+      const subSel = document.getElementById('eaSubjectSelect').value;
+      const chSel = document.getElementById('eaChapterSelect');
+
+      if (subSel === '__NEW__') {
+        chSel.innerHTML = `<option value="__NEW__">➕ አዲስ ምዕራፍ ፍጠር (New Chapter)</option>`;
+        chSel.value = '__NEW__';
+        eduAdminOnChapterChange();
+        return;
+      }
+
+      const qs = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel);
+      const chCounts = {};
+      qs.forEach(q => { chCounts[q.chapter] = (chCounts[q.chapter] || 0) + 1; });
+      const chaps = Object.keys(chCounts);
+
+      let html = chaps.map(c => `<option value="${escAttr(c)}">📑 ${escHtml(c)} (${chCounts[c]} ጥያቄ — እዚሁ ቀጥል)</option>`).join('');
+      html += `<option value="__NEW__">➕ አዲስ ምዕራፍ ፍጠር (New Chapter)</option>`;
+      chSel.innerHTML = html;
+
+      if (keepChapter && chaps.includes(keepChapter)) {
+        chSel.value = keepChapter;
+      } else if (chaps.length === 0) {
+        chSel.value = '__NEW__';
+      }
+      eduAdminOnChapterChange();
+    }
+
+    function eduAdminOnChapterChange() {
+      const level = document.getElementById('eaLevel').value;
+      const stream = document.getElementById('eaStream').value;
+      const subSel = document.getElementById('eaSubjectSelect').value;
+      const chSel = document.getElementById('eaChapterSelect').value;
+      const newChInp = document.getElementById('eaChapterNew');
+
+      if (chSel === '__NEW__') {
+        newChInp.style.display = 'block';
+        newChInp.required = true;
+        document.getElementById('eaChapterLiveCount').innerText = '📊 አዲስ ምዕራፍ (0 ጥያቄ)';
+      } else {
+        newChInp.style.display = 'none';
+        newChInp.required = false;
+        const cnt = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel && q.chapter === chSel).length;
+        document.getElementById('eaChapterLiveCount').innerText = `📊 በ ${subSel} → ${chSel} ያሉ ጥያቄዎች: ${cnt}`;
+      }
     }
 
     function eduGenerateNextCustomId(level, subject) {
@@ -2116,11 +2334,15 @@
     async function eduAdminAddQuestions(e) {
       e.preventDefault();
       const level = document.getElementById('eaLevel').value;
-      const stream = level === 'Grade 12' ? document.getElementById('eaStream').value : 'None';
-      const subject = document.getElementById('eaSubject').value.trim();
-      const chapter = document.getElementById('eaChapter').value.trim();
+      const stream = document.getElementById('eaStream').value;
+      const subSel = document.getElementById('eaSubjectSelect').value;
+      const subject = subSel === '__NEW__' ? document.getElementById('eaSubjectNew').value.trim() : subSel;
+      const chSel = document.getElementById('eaChapterSelect').value;
+      const chapter = chSel === '__NEW__' ? document.getElementById('eaChapterNew').value.trim() : chSel;
       const qType = document.getElementById('eaType').value;
       const rawText = document.getElementById('eaBulkText').value;
+
+      if (!subject || !chapter) { notifyUser("እባክዎ ትምህርት እና ምዕራፍ ያስገቡ!"); return; }
 
       const parsed = eduParseBulkQuestions(rawText);
       if (parsed.length === 0) {
@@ -2140,11 +2362,60 @@
           bikatQuestions.push({ id: qId, ...qObj });
           savedIds.push(cid);
         }
+        // Clear ONLY the textarea so Admin can immediately paste the next question(s) in the same chapter!
         document.getElementById('eaBulkText').value = '';
-        notifyUser(`✅ ${savedIds.length} ጥያቄ ገብቷል! (${savedIds.join(', ')})`);
-        eduRenderAdmin();
+        document.getElementById('eaSubjectNew').value = '';
+        document.getElementById('eaChapterNew').value = '';
+
+        // Keep same subject & chapter selected and update counts!
+        eduAdminRefreshSubjectSelect(subject, chapter);
+
+        lastAddedBatch = { level, stream, subject, chapter, count: savedIds.length };
+        const totalInChap = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subject && q.chapter === chapter).length;
+        document.getElementById('eaLastSavedMsg').innerHTML = `✅ <b>${savedIds.length} ጥያቄ ገብቷል!</b> (${savedIds.join(', ')})<br>📊 በ ${escHtml(subject)} → ${escHtml(chapter)} ጠቅላላ: <b>${totalInChap}</b> ጥያቄ። ቀጣዩን እዚሁ መቀጠል ትችላለህ!`;
+        document.getElementById('eaLastSavedBox').style.display = 'block';
+
+        document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
       } catch(err) { notifyUser("ስህተት ተፈጥሯል!"); }
-      finally { btn.innerText = "➕ ጥያቄዎቹን አስገባ (Save)"; btn.disabled = false; }
+      finally { btn.innerText = "➕ አስገባና እዚሁ ቀጥል (Save & Continue)"; btn.disabled = false; }
+    }
+
+    async function eduQuickNotifyNewQuestions() {
+      if (!lastAddedBatch) return;
+      const { level, stream, subject, chapter, count } = lastAddedBatch;
+      const text = `🔥 አዲስ ጥያቄዎች ተጭነዋል!\n\n📚 ክፍል: ${level} (${stream})\n📘 ትምህርት: ${subject}\n📑 ምዕራፍ: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
+      await eduPublishAnnouncementText(text);
+      document.getElementById('eaLastSavedBox').style.display = 'none';
+    }
+
+    async function eduAdminSendAnnouncement(e) {
+      e.preventDefault();
+      const text = document.getElementById('eaNotifInput').value.trim();
+      if (!text) return;
+      const btn = document.getElementById('eaNotifBtn');
+      btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
+      await eduPublishAnnouncementText(text);
+      document.getElementById('eaNotifInput').value = '';
+      btn.innerText = "🔔 ማስታወቂያውን ለጥፍ (Publish)"; btn.disabled = false;
+    }
+
+    async function eduPublishAnnouncementText(text) {
+      const id = `ANN_${Date.now()}`;
+      const obj = { text, date: new Date().toISOString() };
+      try {
+        await fetch(`${BIKAT_ANNOUNCEMENTS}/${id}.json`, { method: 'PUT', body: JSON.stringify(obj) });
+        bikatAnnouncements[id] = obj;
+        localStorage.removeItem('bikat_dismissed_notif');
+        eduRenderLatestNotification();
+        eduRenderAdmin();
+        notifyUser("✅ ማስታወቂያው ለሁሉም ተማሪዎች እንዲታይ ተለጥፏል! 🔔");
+      } catch(e) { notifyUser("ስህተት ተፈጥሯል!"); }
+    }
+
+    function eduShareAnnouncementToChannel() {
+      const txt = document.getElementById('eaNotifInput').value.trim() || "🔥 አዲስ ጥያቄዎች BIKAT App ላይ ተጭነዋል! አሁኑኑ ገብተው ይስሩ 👇";
+      const url = `https://t.me/share/url?url=${encodeURIComponent(BOT_APP_LINK + '?startapp=edu')}&text=${encodeURIComponent(txt)}`;
+      if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
     function eduRenderAdmin() {
@@ -2155,20 +2426,32 @@
       document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
       document.getElementById('eduStPendingPay').innerText = paymentsArr.filter(p => p.status === 'pending').length;
 
-      // Populate datalists for quick reuse
+      // Refresh subject/chapter dropdowns if empty
+      if (document.getElementById('eaSubjectSelect').options.length === 0) {
+        eduAdminRefreshSubjectSelect();
+      }
       const subSet = [...new Set(bikatQuestions.map(q => q.subject))];
-      const chapSet = [...new Set(bikatQuestions.map(q => q.chapter))];
       document.getElementById('eaSubjectList').innerHTML = subSet.map(s => `<option value="${escAttr(s)}">`).join('');
-      document.getElementById('eaChapterList').innerHTML = chapSet.map(c => `<option value="${escAttr(c)}">`).join('');
+
+      // Past Announcements
+      const annBox = document.getElementById('eaPastNotifs');
+      const annKeys = Object.keys(bikatAnnouncements || {}).sort().reverse().slice(0, 5);
+      annBox.innerHTML = annKeys.length ? `<h4 style="font-size:0.8rem; margin-bottom:6px;">የቅርብ ማስታወቂያዎች</h4>` + annKeys.map(k => `
+        <div style="background:#F9FAFB; padding:8px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.76rem;">
+          <div style="white-space:pre-wrap;">${escHtml(bikatAnnouncements[k].text)}</div>
+        </div>`).join('') : '';
 
       // Payments
       const payBox = document.getElementById('eduAdminPaymentsList');
       if (paymentsArr.length === 0) { payBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">ምንም የክፍያ ጥያቄ የለም።</p>'; }
       else {
-        payBox.innerHTML = paymentsArr.map(p => `
-          <div style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
+        payBox.innerHTML = paymentsArr.map(p => {
+          let pLabel = '📖 Note: ' + escHtml(p.level);
+          if (p.type === 'full_vip') pLabel = '👑 Full VIP (100 ብር)';
+          else if (p.type === 'subject_vip') pLabel = `📘 1-Subject VIP: ${escHtml(p.subject)} (50 ብር)`;
+          return `<div style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.82rem;">
-              <b>${p.type === 'vip' ? '💎 VIP (30 ብር)' : '📖 Note: ' + escHtml(p.level)}</b>
+              <b>${pLabel}</b>
               <span style="font-weight:bold; color:${p.status === 'approved' ? 'green' : (p.status === 'rejected' ? 'red' : 'orange')};">${p.status}</span>
             </div>
             <div style="font-size:0.75rem; color:var(--gray); margin-bottom:6px;">👤 ${escHtml(p.user_name)} (@${escHtml(p.user_tg || '-')}) | ID: ${p.user_id}</div>
@@ -2178,7 +2461,8 @@
               <button class="btn-action" style="flex:1; padding:6px; background:var(--danger); color:white;" onclick="eduAdminApprovePay('${escAttr(p.id)}', 'rejected')">❌ ውድቅ</button>
               <button class="btn-action btn-call" style="flex:1; padding:6px;" onclick="contactDirect('${escAttr(p.user_tg)}', 'ሰላም ${escAttr(p.user_name)}! የBIKAT ክፍያዎ ጸድቋል።')">💬 ቻት</button>
             </div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
       }
 
       // Stats & Chapter Bulk Delete
@@ -2194,7 +2478,7 @@
         statsBox.innerHTML = keys.map(k => {
           const [lev, str, sub, ch] = k.split('|');
           return `<div style="display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.78rem;">
-            <div><b>${escHtml(lev)}</b> • ${escHtml(sub)}<br><small style="color:var(--gray);">${escHtml(ch)} (${statsMap[k]} ጥያቄ)</small></div>
+            <div><b>${escHtml(lev)} (${escHtml(str)})</b> • ${escHtml(sub)}<br><small style="color:var(--gray);">${escHtml(ch)} (${statsMap[k]} ጥያቄ)</small></div>
             <button style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑 አጥፋ</button>
           </div>`;
         }).join('');
@@ -2204,8 +2488,8 @@
       const stuBox = document.getElementById('eduAdminStudentsList');
       stuBox.innerHTML = studentsArr.sort((a,b) => (b.total_points||0)-(a.total_points||0)).slice(0, 40).map(s => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.78rem;">
-          <div><b>${escHtml(s.full_name)}</b> (${s.total_points||0} ነጥብ)<br><small style="color:var(--gray);">ID: ${s.user_id} | ${s.is_vip == 1 ? '💎 VIP' : '👤 Free'}</small></div>
-          <button style="background:${s.is_vip == 1 ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${s.is_vip == 1 ? 0 : 1})">${s.is_vip == 1 ? 'Remove VIP' : 'Make VIP'}</button>
+          <div><b>${escHtml(s.full_name)}</b> (${s.total_points||0} ነጥብ)<br><small style="color:var(--gray);">ID: ${s.user_id} | ${s.is_vip == 1 ? '👑 Full VIP' : '👤 Free'}</small></div>
+          <button style="background:${s.is_vip == 1 ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${s.is_vip == 1 ? 0 : 1})">${s.is_vip == 1 ? 'Remove VIP' : 'Full VIP'}</button>
         </div>`).join('');
     }
 
@@ -2213,8 +2497,15 @@
       const p = bikatPayments[payId]; if (!p) return;
       try {
         await fetch(`${BIKAT_PAYMENTS}/${payId}.json`, { method: 'PATCH', body: JSON.stringify({ status }) });
-        if (status === 'approved' && p.type === 'vip') {
-          await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: 1 }) });
+        if (status === 'approved') {
+          if (p.type === 'full_vip' || p.type === 'vip') {
+            await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: 1 }) });
+          } else if (p.type === 'subject_vip' && p.subject) {
+            const exp = Date.now() + TWO_MONTHS_MS;
+            await fetch(`${BIKAT_STUDENTS}/${p.user_id}/subject_vips/${encodeURIComponent(p.subject)}.json`, {
+              method: 'PUT', body: JSON.stringify(exp)
+            });
+          }
         }
         notifyUser(status === 'approved' ? '✅ ክፍያው ጸድቋል!' : '❌ ክፍያው ውድቅ ሆኗል።');
         await eduLoadAllData();
