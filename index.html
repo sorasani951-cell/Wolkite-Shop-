@@ -3,84 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Wolkite Shop (Pro Marketplace)</title>
+  <title>Wolkite Shop & BIKAT Education</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --primary: #063B2E; --secondary: #00C897; --bg: #F8F7F2; --text: #1F2937;
-      --card-bg: #FFFFFF; --border: #E5E7EB; --gray: #6B7280; --danger: #EF4444; 
+      --card-bg: #FFFFFF; --border: #E5E7EB; --gray: #6B7280; --danger: #EF4444;
       --warning: #F59E0B; --gold: #D97706; --gold-bg: #FEF3C7; --silver: #9CA3AF; --silver-bg: #F3F4F6; --blue: #3B82F6;
+      --edu-accent: #4F46E5; --edu-bg: #EEF2FF;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
-    header { background-color: var(--primary); color: white; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.2rem; }
-    header p { font-size: 0.75rem; color: var(--secondary); }
+
+    /* =========================================
+       HUB / MODE SELECTOR SCREEN
+       ========================================= */
+    .hub-screen {
+      position: fixed; inset: 0; z-index: 999999; background: var(--bg);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 28px 20px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto;
+    }
+    .hub-header { text-align: center; margin-top: 12px; }
+    .hub-badge {
+      display: inline-block; background: #DCFCE7; color: var(--primary);
+      padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px;
+    }
+    .hub-header h1 { font-size: 1.5rem; color: var(--primary); margin-bottom: 6px; }
+    .hub-header p { font-size: 0.85rem; color: var(--gray); line-height: 1.4; }
+    .hub-cards { display: flex; flex-direction: column; gap: 14px; margin: 22px 0; }
+    .hub-card {
+      background: var(--card-bg); border: 2px solid var(--border); border-radius: 18px;
+      padding: 18px; display: flex; align-items: center; gap: 16px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05); transition: transform 0.15s, border-color 0.15s;
+      text-align: left; width: 100%;
+    }
+    .hub-card:active { transform: scale(0.98); }
+    .hub-card.shop-card { border-color: rgba(0, 200, 151, 0.45); }
+    .hub-card.edu-card { border-color: rgba(79, 70, 229, 0.35); }
+    .hub-icon-box {
+      width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.9rem; flex-shrink: 0;
+    }
+    .hub-card.shop-card .hub-icon-box { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+    .hub-card.edu-card .hub-icon-box { background: linear-gradient(135deg, #312E81, var(--edu-accent)); }
+    .hub-card-body h2 { font-size: 1.1rem; color: var(--text); margin-bottom: 4px; }
+    .hub-card-body p { font-size: 0.78rem; color: var(--gray); line-height: 1.4; }
+    .hub-arrow { font-size: 1.2rem; color: var(--gray); margin-left: auto; font-weight: bold; }
+    .hub-footer { text-align: center; font-size: 0.75rem; color: var(--gray); }
+
+    /* =========================================
+       STICKY HEADER & MODE SWITCHER
+       ========================================= */
+    header {
+      background-color: var(--primary); color: white; padding: 12px 14px 10px;
+      text-align: center; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .header-brand { text-align: left; }
+    .header-brand h1 { font-size: 1.1rem; line-height: 1.2; }
+    .header-brand p { font-size: 0.7rem; color: var(--secondary); }
+    .btn-hub-home {
+      background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25);
+      padding: 5px 10px; border-radius: 16px; font-size: 0.72rem; font-weight: bold; cursor: pointer;
+    }
+    .mode-switcher {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      background: rgba(0,0,0,0.25); padding: 4px; border-radius: 12px;
+    }
+    .mode-pill {
+      border: none; background: transparent; color: rgba(255,255,255,0.8);
+      padding: 7px 10px; border-radius: 9px; font-size: 0.8rem; font-weight: bold;
+      cursor: pointer; transition: 0.2s;
+    }
+    .mode-pill.active { background: white; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .mode-pill.edu-active { background: white; color: var(--edu-accent); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+
     .container { padding: 14px; }
+    .app-mode { display: none; }
+    .app-mode.active { display: block; }
     .view { display: none; }
     .view.active { display: block; }
-    
-    /* Search Box & Categories */
+
+    /* =========================================
+       WOLKITE SHOP STYLES
+       ========================================= */
     .search-box { display: flex; gap: 8px; margin-bottom: 14px; }
-    .search-box input { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 25px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size:0.9rem;}
+    .search-box input { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 25px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size:0.9rem; }
     .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; scrollbar-width: none; }
     .cat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
     .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
-    
-    /* 🌟 Product Grid Design (2x2) */
+
     .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .product-card { 
-      background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
+    .product-card {
+      background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
       display: flex; flex-direction: column; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    
     .product-card.sold-out { opacity: 0.7; border: 1px dashed var(--danger); }
     .product-card.pinned { border: 2px solid var(--gold); box-shadow: 0 0 8px rgba(217, 119, 6, 0.3); }
-    
     .status-badge { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; color: white; z-index: 2; }
     .badge-sold { background-color: var(--danger); }
     .badge-pinned { background-color: var(--gold); left: 8px; right: auto; top: 8px; }
-
     .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; cursor: pointer; }
-    
-    /* 🌟 Product Info Layout */
     .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; gap: 5px; }
-    .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text);}
-    
-    /* 🌟 Shop/Seller Profile Row */
-    .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; margin-top:2px; margin-bottom:2px;}
-    
+    .product-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text); }
+    .product-shop { font-size: 0.75rem; color: var(--text); font-weight:bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; margin-top:2px; margin-bottom:2px; }
     .pro-badge { color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.5rem; font-weight: bold; }
     .badge-gold { background: var(--gold); }
-    .badge-silver { background: #6B7280; } 
-    
-    /* Price */
+    .badge-silver { background: #6B7280; }
     .product-price { font-size: 0.95rem; font-weight: bold; color: var(--primary); }
-    
-    /* Like Button */
-    .like-btn-front { 
-        display: flex; align-items: center; gap: 4px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px;
-        font-size: 0.75rem; color: var(--gray); cursor: pointer; padding: 4px 8px; width: fit-content; transition: 0.2s;
+    .like-btn-front {
+      display: flex; align-items: center; gap: 4px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px;
+      font-size: 0.75rem; color: var(--gray); cursor: pointer; padding: 4px 8px; width: fit-content; transition: 0.2s;
     }
     .like-btn-front.liked { background: #FEE2E2; color: var(--danger); border-color: #FECACA; font-weight: bold; }
-    
-    /* Popup Action Buttons */
+
     .action-buttons { display: flex; flex-direction: column; gap: 6px; margin-top:10px; }
     .btn-action { border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; width: 100%; }
     .btn-tg { background: var(--secondary); color: white; }
     .btn-call { background: #2563EB; color: white; }
     .btn-order { background: #10B981; color: white; }
-    
+    .btn-edu { background: var(--edu-accent); color: white; }
+
     /* Fixed Bottom Navigation */
-    .nav-bar { 
-      position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--card-bg); 
-      display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); 
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--card-bg);
+      display: none; justify-content: space-around; align-items: center; border-top: 1px solid var(--border);
       z-index: 99999; padding-bottom: env(safe-area-inset-bottom, 0px); box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 2px; width: 100%; height: 100%; justify-content: center; }
+    .nav-bar.active { display: flex; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 0.68rem; color: var(--gray); background: none; border: none; cursor: pointer; gap: 2px; width: 100%; height: 100%; justify-content: center; }
     .nav-btn.active { color: var(--primary); font-weight: bold; }
+    .nav-bar.edu-nav .nav-btn.active { color: var(--edu-accent); }
     .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
-    
+
     /* Modals & Forms */
     .section-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 14px; }
     .shop-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; }
@@ -88,13 +145,13 @@
     .shop-avatar.avatar-gold { border-color: var(--gold); box-shadow: 0 0 10px rgba(217,119,6,0.5); }
     .shop-avatar.avatar-silver { border-color: var(--silver); box-shadow: 0 0 10px rgba(156,163,175,0.5); }
     .btn-edit-shop { position: absolute; right: 0; top: 0; background: #F3F4F6; color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
-    
-    .profile-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; justify-content: center;}
-    .p-tab { padding: 8px 16px; background: transparent; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap; color: var(--gray); }
+
+    .profile-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; justify-content: center; }
+    .p-tab { padding: 8px 14px; background: transparent; border-radius: 20px; font-size: 0.78rem; font-weight: bold; cursor: pointer; white-space: nowrap; color: var(--gray); }
     .p-tab.active { background: var(--primary); color: white; }
     .p-content { display: none; }
     .p-content.active { display: block; }
-    
+
     .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .stat-box { background: #F3F4F6; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #E5E7EB; }
     .stat-box.gold { background: var(--gold-bg); border-color: var(--gold); }
@@ -104,53 +161,29 @@
 
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
-    
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: white; }
+
     .modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
-    /* 🌟 NEW: a modal opened on top of another modal (e.g. order phone popup over the product popup) must always stack above it, regardless of DOM order */
     .modal.modal-stacked { z-index: 100010; }
     .modal-content { background-color: var(--card-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 92%; max-width: 450px; border-radius: 12px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
+    .modal-content.small-modal { max-width: 360px; }
     .close-modal { color: #aaa; position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-modal:hover { color: #333; }
-    
-    /* Popup Multi-image scroll */
-    .modal-image-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory;}
-    .modal-img { width: 100%; min-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; scroll-snap-align: start; background: #eee;}
-    
-    /* Upload Multi-image Box */
+
+    .modal-image-container { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .modal-img { width: 100%; min-width: 100%; height: 250px; object-fit: cover; border-radius: 8px; scroll-snap-align: start; background: #eee; }
+
     .upload-img-row { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
-    .upload-img-box { position: relative; width: 80px; height: 80px; border: 1px dashed var(--gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--gray); cursor: pointer; background: #fafafa; flex-shrink: 0;}
-    .upload-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top:0; left:0; display: none;}
-    .upload-img-box input { opacity: 0; position: absolute; top:0; left:0; width:100%; height:100%; cursor: pointer;}
-    .remove-img-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: none; cursor: pointer; z-index: 10;}
-    
+    .upload-img-box { position: relative; width: 80px; height: 80px; border: 1px dashed var(--gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--gray); cursor: pointer; background: #fafafa; flex-shrink: 0; }
+    .upload-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top:0; left:0; display: none; }
+    .upload-img-box input { opacity: 0; position: absolute; top:0; left:0; width:100%; height:100%; cursor: pointer; }
+    .remove-img-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: none; cursor: pointer; z-index: 10; }
+
     .comment-box { display:flex; flex-direction:column; gap:8px; margin-top:10px; border-top:1px solid #E5E7EB; padding-top:10px; }
     .comment-item { background: #F3F4F6; padding: 8px; border-radius: 8px; font-size: 0.8rem; margin-bottom:6px; }
     .comment-item strong { color: var(--primary); }
     .comment-item small { color: var(--gray); font-size:0.65rem; margin-left:6px; }
 
-    /* 🌟 NEW: Onboarding / Welcome Screen */
-    .onboarding-screen {
-      position: fixed; inset: 0; z-index: 999999; background: var(--bg);
-      display: flex; flex-direction: column; justify-content: space-between;
-      padding: 28px 20px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-    }
-    .onboarding-icons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-    .onboarding-icon-card {
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
-      display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
-      aspect-ratio: 1 / 1; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .onboarding-text-block { text-align: center; margin: 22px 0 10px; }
-    .onboarding-text-block h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 8px; line-height:1.3; }
-    .onboarding-text-block p { font-size: 0.85rem; color: var(--gray); line-height: 1.5; }
-    .btn-onboarding-start {
-      background: var(--primary); color: white; border: none; width: 100%; padding: 14px;
-      border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer;
-      box-shadow: 0 4px 12px rgba(6,59,46,0.25);
-    }
-
-    /* 🌟 NEW: Special Offers Carousel (admin-managed, round-rectangle 16:9 thumbnails, side-scroll) */
     .offers-carousel { display: flex; gap: 14px; overflow-x: auto; padding: 6px 2px 12px; margin-bottom: 6px; scrollbar-width: none; }
     .offers-carousel::-webkit-scrollbar { display: none; }
     .offer-circle {
@@ -170,7 +203,7 @@
     }
     .offer-admin-item { display:flex; align-items:center; gap:10px; background:white; border:1px solid #ddd; border-radius:8px; padding:8px; margin-bottom:8px; }
     .offer-admin-circle-preview { width:80px; height:45px; border-radius:8px; background: linear-gradient(145deg, var(--primary), var(--secondary)); background-size:cover; background-position:center; color:white; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; flex-shrink:0; text-align:center; overflow:hidden; }
-    /* 🌟 NEW: Shops tab - browse sellers by category (avatar + name card, reuses .product-grid layout) */
+
     .shop-browse-card {
       background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px; cursor: pointer;
@@ -180,266 +213,551 @@
     .shop-browse-avatar.avatar-silver { border-color: var(--silver); box-shadow: 0 0 8px rgba(156,163,175,0.4); }
     .shop-browse-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 
-    /* 🌟 NEW: image upload box for the offer's thumbnail */
-    .offer-img-upload-box { position: relative; width: 100%; aspect-ratio: 16/9; border: 1px dashed var(--gray); border-radius: 10px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--gray); cursor:pointer; background:#fafafa; overflow:hidden; margin-bottom: 10px; }
+    .offer-img-upload-box { position: relative; width: 100%; aspect-ratio: 16/9; border: 1px dashed var(--gray); border-radius: 10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:var(--gray); cursor:pointer; background:#fafafa; overflow:hidden; margin-bottom: 10px; }
     .offer-img-upload-box img { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; display:none; }
     .offer-img-upload-box input { opacity:0; position:absolute; top:0; left:0; width:100%; height:100%; cursor:pointer; }
 
-    /* 🌟 NEW: small modal variant (used by Add Offer / Order Phone popups) */
-    .modal-content.small-modal { max-width: 360px; }
+    /* =========================================
+       BIKAT EDUCATION STYLES
+       ========================================= */
+    .edu-hero {
+      background: linear-gradient(135deg, #1E1B4B, var(--edu-accent));
+      color: white; border-radius: 14px; padding: 16px; margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .edu-hero h2 { font-size: 1.05rem; margin-bottom: 6px; }
+    .edu-hero-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .edu-chip {
+      background: rgba(255,255,255,0.18); padding: 4px 10px; border-radius: 12px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .edu-chip.vip { background: var(--gold); color: white; }
+
+    .edu-list-btn {
+      width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 13px 14px; margin-bottom: 8px; display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer; text-align: left; font-size: 0.88rem; font-weight: 600;
+      color: var(--text); box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .edu-list-btn:active { background: #F3F4F6; }
+    .edu-level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .edu-level-card {
+      background: var(--card-bg); border: 2px solid var(--border); border-radius: 12px;
+      padding: 14px 10px; text-align: center; cursor: pointer; font-weight: bold; font-size: 0.85rem;
+    }
+    .edu-level-card.selected { border-color: var(--edu-accent); background: var(--edu-bg); color: var(--edu-accent); }
+
+    /* Quiz Runner */
+    .quiz-progress-bar { width: 100%; height: 6px; background: #E5E7EB; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+    .quiz-progress-fill { height: 100%; background: var(--edu-accent); transition: width 0.3s; }
+    .quiz-question-box {
+      background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+      margin-bottom: 12px; font-size: 0.92rem; line-height: 1.55; white-space: pre-wrap;
+    }
+    .quiz-opt-btn {
+      width: 100%; text-align: left; background: white; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px; margin-bottom: 8px; font-size: 0.86rem; cursor: pointer;
+      display: flex; gap: 10px; align-items: flex-start; line-height: 1.4; transition: 0.15s;
+    }
+    .quiz-opt-btn .opt-letter {
+      width: 24px; height: 24px; border-radius: 50%; background: #F3F4F6; color: var(--text);
+      display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.78rem; flex-shrink: 0;
+    }
+    .quiz-opt-btn.correct { background: #DCFCE7; border-color: #16A34A; color: #14532D; }
+    .quiz-opt-btn.correct .opt-letter { background: #16A34A; color: white; }
+    .quiz-opt-btn.wrong { background: #FEE2E2; border-color: #DC2626; color: #7F1D1D; }
+    .quiz-opt-btn.wrong .opt-letter { background: #DC2626; color: white; }
+    .quiz-opt-btn:disabled { cursor: default; }
+
+    .quiz-explanation {
+      background: #FEF9C3; border: 1px solid #FDE047; border-radius: 10px;
+      padding: 12px; margin: 10px 0; font-size: 0.82rem; line-height: 1.5; white-space: pre-wrap;
+    }
+    .edu-back-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .btn-back-sm {
+      background: #E5E7EB; color: var(--text); border: none; padding: 6px 12px;
+      border-radius: 8px; font-size: 0.78rem; font-weight: bold; cursor: pointer;
+    }
+    .rank-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; background: #F9FAFB; border-radius: 10px; margin-bottom: 6px; border: 1px solid #E5E7EB;
+    }
+    .payment-box {
+      background: #F3F4F6; border-radius: 10px; padding: 12px; margin: 10px 0; font-size: 0.82rem; line-height: 1.6;
+    }
+    .copy-box {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .copy-box input { flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.75rem; background: #F9FAFB; }
   </style>
 </head>
 <body>
 
-  <!-- 🌟 NEW: ONBOARDING / WELCOME SCREEN (shown only on first visit) -->
-  <div id="onboardingScreen" class="onboarding-screen">
+  <!-- =========================================================
+       HUB / WELCOME MODE SELECTOR (Shop vs Education)
+       ========================================================= -->
+  <div id="hubScreen" class="hub-screen">
     <div>
-      <div class="onboarding-icons-grid">
-        <div class="onboarding-icon-card">📱</div>
-        <div class="onboarding-icon-card">👕</div>
-        <div class="onboarding-icon-card">👟</div>
-        <div class="onboarding-icon-card">📚</div>
-        <div class="onboarding-icon-card">🛏️</div>
-        <div class="onboarding-icon-card">🍔</div>
+      <div class="hub-header">
+        <span class="hub-badge">🇪🇹 Wolkite University Super App</span>
+        <h1>እንኳን በደህና መጡ!</h1>
+        <p>የሚፈልጉትን አገልግሎት ይምረጡ — የወልቂጤ ዩኒቨርሲቲ የገበያ ቦታ ወይም የBIKAT የትምህርትና ፈተና መለማመጃ</p>
       </div>
-      <div class="onboarding-text-block">
-        <h2>ወደ Wolkite Shop<br>በደህና መጣችሁ</h2>
-        <p>የወልቂጤ ዩኒቨርሲቲ ተማሪዎች እርስ በርስ የሚሸጡበትና የሚገዙበት ቀላል የገበያ ቦታ። ልብስ፣ ጫማ፣ ኤሌክትሮኒክስና ሌሎችም እቃዎችን በቀላሉ ያግኙ!</p>
+
+      <div class="hub-cards">
+        <button class="hub-card shop-card" onclick="enterAppMode('shop')">
+          <div class="hub-icon-box">🛍️</div>
+          <div class="hub-card-body">
+            <h2>Wolkite Shop (ገበያ)</h2>
+            <p>ልብስ፣ ጫማ፣ ኤሌክትሮኒክስ፣ የዶርም እቃዎች እና ምግብ በቀላሉ ይግዙ ወይም ሱቅ ከፍተው ይሽጡ።</p>
+          </div>
+          <span class="hub-arrow">➔</span>
+        </button>
+
+        <button class="hub-card edu-card" onclick="enterAppMode('edu')">
+          <div class="hub-icon-box">📚</div>
+          <div class="hub-card-body">
+            <h2>BIKAT Education (ትምህርት)</h2>
+            <p>የGrade 12፣ Remedial እና Freshman የፈተና ጥያቄዎች ከነማብራሪያቸው፣ ልምምዶች እና Short Notes።</p>
+          </div>
+          <span class="hub-arrow">➔</span>
+        </button>
       </div>
     </div>
-    <button class="btn-onboarding-start" onclick="startApp()">Let's Get Started 🚀</button>
+
+    <div class="hub-footer">
+      በማንኛውም ሰዓት ከላይ ባለው ቁልፍ ከShop ወደ Education መቀያየር ይችላሉ ✨
+    </div>
   </div>
 
+  <!-- =========================================================
+       UNIFIED STICKY HEADER
+       ========================================================= -->
   <header>
-    <h1>Wolkite Shop</h1>
-    <p>Wolkite University Student Marketplace</p>
+    <div class="header-top">
+      <div class="header-brand">
+        <h1 id="headerTitle">Wolkite Shop</h1>
+        <p id="headerSub">Wolkite University Student Marketplace</p>
+      </div>
+      <button class="btn-hub-home" onclick="openHubScreen()">🏠 መምረጫ</button>
+    </div>
+    <div class="mode-switcher">
+      <button class="mode-pill active" id="modeBtnShop" onclick="switchAppMode('shop')">🛍️ Shop</button>
+      <button class="mode-pill" id="modeBtnEdu" onclick="switchAppMode('edu')">📚 Education</button>
+    </div>
   </header>
 
   <div class="container">
 
-    <!-- HOME VIEW -->
-    <div id="view-home" class="view active">
-      <div class="search-box">
-        <input type="text" id="homeSearch" placeholder="እቃዎችን ፈልግ (Search)..." oninput="filterProducts()">
-      </div>
-      
-      <div class="categories-bar" id="categoryBar">
-        <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
-        <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
-        <div class="cat-pill" onclick="selectCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
-        <div class="cat-pill" onclick="selectCategory('Books & Study Materials', this)">መጽሐፍት</div>
-        <div class="cat-pill" onclick="selectCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
-        <div class="cat-pill" onclick="selectCategory('Food', this)">ምግብ</div>
-        <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
-      </div>
+    <!-- =========================================================
+         MODE 1: WOLKITE SHOP
+         ========================================================= -->
+    <div id="mode-shop" class="app-mode active">
 
-      <!-- 🌟 NEW: Special Offers Carousel (admin adds/removes, side-scroll, round shape) -->
-      <div id="offersCarousel" class="offers-carousel" style="display:none;"></div>
-      
-      <!-- Shop Filter Banner -->
-      <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
-         <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
-         <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">🔙 ወደ ዋናው ተመለስ</button>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-        <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
-        <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
-      </div>
-      
-      <!-- Loading Indicator -->
-      <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
-      
-      <!-- Main Home Content (Grid) -->
-      <div id="productGrid" class="product-grid"></div>
-    </div>
-
-    <!-- 🌟 NEW: SHOPS VIEW (browse all sellers, grouped/filterable by category) -->
-    <div id="view-shops" class="view">
-      <h3 style="font-size: 0.95rem; margin-bottom: 10px;">🏬 ሻጮች</h3>
-      <div class="categories-bar" id="shopsCategoryBar">
-        <div class="cat-pill active" onclick="selectShopsCategory('All', this)">ሁሉም</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Books & Study Materials', this)">መጽሐፍት</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Food', this)">ምግብ</div>
-        <div class="cat-pill" onclick="selectShopsCategory('Other Products', this)">ሌሎች</div>
-      </div>
-      <div id="shopsGrid" class="product-grid"></div>
-    </div>
-
-    <!-- SELL VIEW -->
-    <div id="view-sell" class="view">
-      <div class="section-card" id="createShopPrompt" style="display:none; text-align:center;">
-        <h3>🏪 መጀመሪያ የራስዎን ሱቅ ይክፈቱ</h3>
-        <p style="font-size:0.8rem; color:var(--gray); margin:10px 0;">እቃ ለመለጠፍ የሱቅ ስም እና አድራሻዎን መመዝገብ አለብዎት።</p>
-        <button class="btn-action btn-tg" onclick="switchTab('profile', document.getElementById('navProfile'))">ወደ ፕሮፋይል ይሂዱ</button>
-      </div>
-      
-      <div id="sellFormContainer" style="display:none;">
-        <div class="section-card" id="planStatusBox" style="background:#F3F4F6; margin-bottom:14px; text-align:center;">
-          <h4 style="color:var(--text); font-size:0.9rem;" id="planStatusTitle">📊 የእርስዎ እቅድ: FREE (ነጻ)</h4>
-          <p style="font-size:0.8rem; margin-top:4px;" id="planStatusText">ጠቅላላ የጫኑት: 0/5</p>
+      <!-- HOME VIEW -->
+      <div id="view-home" class="view active">
+        <div class="search-box">
+          <input type="text" id="homeSearch" placeholder="እቃዎችን ፈልግ (Search)..." oninput="filterProducts()">
         </div>
-        <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
-        <form id="sellForm" onsubmit="handleProductSubmit(event)">
-          
-          <!-- Multi-image Upload -->
-          <div class="form-group">
-            <label>የእቃው ፎቶዎች (እስከ 3 ፎቶ)</label>
-            <div class="upload-img-row">
-                <div class="upload-img-box">
-                    <span id="plus-0">+</span>
-                    <input type="file" id="img-in-0" accept="image/*" onchange="handleMultiImageUpload(event, 0)" required>
-                    <img id="img-preview-0">
-                    <button type="button" class="remove-img-btn" id="rm-btn-0" onclick="removeImage(0)">X</button>
-                </div>
-                <div class="upload-img-box">
-                    <span id="plus-1">+</span>
-                    <input type="file" id="img-in-1" accept="image/*" onchange="handleMultiImageUpload(event, 1)">
-                    <img id="img-preview-1">
-                    <button type="button" class="remove-img-btn" id="rm-btn-1" onclick="removeImage(1)">X</button>
-                </div>
-                <div class="upload-img-box">
-                    <span id="plus-2">+</span>
-                    <input type="file" id="img-in-2" accept="image/*" onchange="handleMultiImageUpload(event, 2)">
-                    <img id="img-preview-2">
-                    <button type="button" class="remove-img-btn" id="rm-btn-2" onclick="removeImage(2)">X</button>
-                </div>
-            </div>
+
+        <div class="categories-bar" id="categoryBar">
+          <div class="cat-pill active" onclick="selectCategory('All', this)">ሁሉም</div>
+          <div class="cat-pill" onclick="selectCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
+          <div class="cat-pill" onclick="selectCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
+          <div class="cat-pill" onclick="selectCategory('Books & Study Materials', this)">መጽሐፍት</div>
+          <div class="cat-pill" onclick="selectCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
+          <div class="cat-pill" onclick="selectCategory('Food', this)">ምግብ</div>
+          <div class="cat-pill" onclick="selectCategory('Other Products', this)">ሌሎች</div>
+        </div>
+
+        <div id="offersCarousel" class="offers-carousel" style="display:none;"></div>
+
+        <div id="shopFilterBanner" style="display:none; background:var(--gold-bg); padding:10px; border-radius:8px; margin-bottom:14px; border:1px solid var(--gold); justify-content:space-between; align-items:center;">
+          <span id="shopFilterName" style="font-size:0.85rem; font-weight:bold; color:var(--primary);"></span>
+          <button onclick="clearShopFilter()" style="background:var(--danger); color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">🔙 ወደ ዋናው ተመለስ</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+          <h3 style="font-size: 0.95rem;">የእቃዎች ዝርዝር <small style="color:var(--gray); font-size:0.7rem;">(በላይክ ብዛት)</small></h3>
+          <button onclick="loadAllData()" style="background:none; border:none; color:var(--secondary); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+        </div>
+
+        <div id="loadingIndicator" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px;">እቃዎችን ከደመና (Cloud) በመጫን ላይ...</div>
+        <div id="productGrid" class="product-grid"></div>
+      </div>
+
+      <!-- SHOPS VIEW -->
+      <div id="view-shops" class="view">
+        <h3 style="font-size: 0.95rem; margin-bottom: 10px;">🏬 ሻጮች</h3>
+        <div class="categories-bar" id="shopsCategoryBar">
+          <div class="cat-pill active" onclick="selectShopsCategory('All', this)">ሁሉም</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Electronics', this)">ኤሌክትሮኒክስ</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Clothes & Shoes', this)">ልብሶችና ጫማዎች</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Books & Study Materials', this)">መጽሐፍት</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Dorm & Household Items', this)">የዶርም እቃዎች</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Food', this)">ምግብ</div>
+          <div class="cat-pill" onclick="selectShopsCategory('Other Products', this)">ሌሎች</div>
+        </div>
+        <div id="shopsGrid" class="product-grid"></div>
+      </div>
+
+      <!-- SELL VIEW -->
+      <div id="view-sell" class="view">
+        <div class="section-card" id="createShopPrompt" style="display:none; text-align:center;">
+          <h3>🏪 መጀመሪያ የራስዎን ሱቅ ይክፈቱ</h3>
+          <p style="font-size:0.8rem; color:var(--gray); margin:10px 0;">እቃ ለመለጠፍ የሱቅ ስም እና አድራሻዎን መመዝገብ አለብዎት።</p>
+          <button class="btn-action btn-tg" onclick="switchTab('profile', document.getElementById('navProfile'))">ወደ ፕሮፋይል ይሂዱ</button>
+        </div>
+
+        <div id="sellFormContainer" style="display:none;">
+          <div class="section-card" id="planStatusBox" style="background:#F3F4F6; margin-bottom:14px; text-align:center;">
+            <h4 style="color:var(--text); font-size:0.9rem;" id="planStatusTitle">📊 የእርስዎ እቅድ: FREE (ነጻ)</h4>
+            <p style="font-size:0.8rem; margin-top:4px;" id="planStatusText">ጠቅላላ የጫኑት: 0/5</p>
           </div>
-          
-          <div class="form-group">
-             <label>የእቃው ዘርፍ</label>
-             <select id="prodCategory">
+          <h3 style="font-size: 1rem; margin-bottom: 12px;">አዲስ እቃ መመዝገቢያ</h3>
+          <form id="sellForm" onsubmit="handleProductSubmit(event)">
+            <div class="form-group">
+              <label>የእቃው ፎቶዎች (እስከ 3 ፎቶ)</label>
+              <div class="upload-img-row">
+                <div class="upload-img-box">
+                  <span id="plus-0">+</span>
+                  <input type="file" id="img-in-0" accept="image/*" onchange="handleMultiImageUpload(event, 0)" required>
+                  <img id="img-preview-0">
+                  <button type="button" class="remove-img-btn" id="rm-btn-0" onclick="removeImage(0)">X</button>
+                </div>
+                <div class="upload-img-box">
+                  <span id="plus-1">+</span>
+                  <input type="file" id="img-in-1" accept="image/*" onchange="handleMultiImageUpload(event, 1)">
+                  <img id="img-preview-1">
+                  <button type="button" class="remove-img-btn" id="rm-btn-1" onclick="removeImage(1)">X</button>
+                </div>
+                <div class="upload-img-box">
+                  <span id="plus-2">+</span>
+                  <input type="file" id="img-in-2" accept="image/*" onchange="handleMultiImageUpload(event, 2)">
+                  <img id="img-preview-2">
+                  <button type="button" class="remove-img-btn" id="rm-btn-2" onclick="removeImage(2)">X</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>የእቃው ዘርፍ</label>
+              <select id="prodCategory">
                 <option value="Electronics">Electronics</option>
                 <option value="Clothes & Shoes">Clothes & Shoes</option>
                 <option value="Books & Study Materials">Books & Study Materials</option>
                 <option value="Dorm & Household Items">Dorm & Household Items</option>
                 <option value="Food">ምግብ (Food)</option>
                 <option value="Other Products">Other Products</option>
-             </select>
-          </div>
-          <div class="form-group"><label>የእቃው ስም</label><input type="text" id="prodTitle" required></div>
-          <div class="form-group"><label>የእቃው ሁኔታ</label><select id="prodCondition" required><option value="Brand New">አዲስ (Brand New)</option><option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option></select></div>
-          <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="sellerPrice" required></div>
-          <div class="form-group"><label>መግለጫ</label><textarea id="prodDesc" rows="3" required></textarea></div>
-          <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem;">እቃውን ለጥፍ (Upload)</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- SELLER PROFILE / SHOP VIEW -->
-    <div id="view-profile" class="view">
-      
-      <div id="shopSetupBox" class="section-card">
-        <h3 style="color:var(--primary); margin-bottom:10px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
-        <form onsubmit="handleShopSetup(event)">
-          <div class="form-group"><label>የሱቁ ስም (Shop Name)</label><input type="text" id="shopName" placeholder="Ex. Sora Electronics" required></div>
-          <div class="form-group"><label>ስልክ ቁጥር (ለገዢዎች የሚታይ)</label><input type="tel" id="shopPhone" placeholder="09..." required></div>
-          <div class="form-group"><label>ቴሌግራም ዩዘርኔም (@username)</label><input type="text" id="shopTg" required></div>
-          <button type="submit" class="btn-action btn-tg">ሱቁን ፍጠር (Create Shop)</button>
-        </form>
-      </div>
-
-      <div id="shopDashboardBox" style="display:none;">
-        <div class="section-card shop-profile-header">
-          <img id="shopAvatarDisplay" src="https://via.placeholder.com/65" class="shop-avatar">
-          <div style="flex:1;">
-            <h3 id="shopNameDisplay" style="font-size:1.1rem; margin-bottom:2px;">ሱቅ</h3>
-            <p id="shopDescDisplay" style="font-size:0.75rem; color:var(--gray); margin-bottom:4px; line-height:1.2;"></p>
-            <span id="shopProBadge" class="pro-badge" style="display:none;"></span>
-            <p id="shopIdDisplay" style="font-size:0.7rem; color:var(--gray); margin-top:4px;">ID: -</p>
-          </div>
-          <button class="btn-edit-shop" onclick="openEditShopModal()">⚙️ Edit</button>
-        </div>
-
-        <div class="profile-tabs">
-          <div class="p-tab active" onclick="switchProfileTab('p-products', this)">📦 My Products</div>
-          <div class="p-tab" onclick="switchProfileTab('p-orders', this)">🛍️ My Orders</div>
-          <div class="p-tab" id="upgradeTabBtn" onclick="switchProfileTab('p-upgrade', this)">⭐ Tiers</div>
-        </div>
-
-        <div id="p-products" class="p-content active section-card">
-          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">እስካሁን የጫኑት (Lifetime Uploads): <b id="myTotalUploads">0</b></p>
-          <div id="myListingsContainer"></div>
-        </div>
-        
-        <div id="p-orders" class="p-content section-card">
-          <h4 style="font-size:0.9rem; margin-bottom:10px; color:var(--primary);">ገዢዎች ያዘዙዎት እቃዎች</h4>
-          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">እስካሁን የተቀበሉት ትዕዛዝ: <b id="myTotalOrders">0</b></p>
-          <div id="myOrdersContainer"></div>
-        </div>
-        
-        <div id="p-upgrade" class="p-content section-card" style="text-align:center;">
-          <h3 style="color:var(--primary); margin-bottom:10px;">🚀 አካውንትዎን ያሳድጉ (Upgrade)</h3>
-          <p style="font-size:0.85rem; color:#444; margin-bottom:15px;">የነጻ ገደብዎን ሲጨርሱ ከሚከተሉት አንዱን ይምረጡ፦</p>
-          
-          <div style="background:var(--silver-bg); padding:10px; border-radius:8px; border:1px solid #D1D5DB; margin-bottom:10px; font-size:0.8rem; text-align:left;">
-            <b style="color:#4B5563;">🥈 SILVER (150 ETB ለ 3 ወር)</b><br>
-            - እስከ 15 እቃዎች መጫን<br>
-            - እስከ 150 ትዕዛዞች መቀበል<br>
-            - የ Silver ሻጭ ባጅ
-          </div>
-          
-          <div style="background:var(--gold-bg); padding:10px; border-radius:8px; border:1px solid var(--gold); margin-bottom:15px; font-size:0.8rem; text-align:left;">
-            <b style="color:var(--gold);">👑 GOLD (200 ETB ለ 3 ወር)</b><br>
-            - ያልተገደበ (Unlimited) እቃ መጫን<br>
-            - ያልተገደበ ትዕዛዞች መቀበል<br>
-            - የ Gold ሻጭ ባጅ
-          </div>
-          <a class="btn-action btn-tg" href="https://t.me/sorataju1" target="_blank">አድሚንን አናግረው ያስከፍቱ 💬</a>
+              </select>
+            </div>
+            <div class="form-group"><label>የእቃው ስም</label><input type="text" id="prodTitle" required></div>
+            <div class="form-group"><label>የእቃው ሁኔታ</label><select id="prodCondition" required><option value="Brand New">አዲስ (Brand New)</option><option value="Slightly Used">ትንሽ የተጠቀመ (Slightly Used)</option><option value="Used">ጥሩ ሁኔታ ላይ ያለ (Used)</option></select></div>
+            <div class="form-group"><label>ዋጋ (ETB)</label><input type="number" id="sellerPrice" required></div>
+            <div class="form-group"><label>መግለጫ</label><textarea id="prodDesc" rows="3" required></textarea></div>
+            <button type="submit" id="submitBtn" class="btn-action btn-tg" style="padding: 12px; font-size: 0.9rem;">እቃውን ለጥፍ (Upload)</button>
+          </form>
         </div>
       </div>
-      
-      <!-- ADMIN DASHBOARD -->
-      <div id="adminPanel" style="display:none;" class="section-card">
-        <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Admin Control Center</h3>
-        
-        <div class="analytics-grid">
-          <div class="stat-box" style="grid-column: span 2; background:#E0F2FE; border-color:#BAE6FD;">
-            <div class="stat-num" id="st-total-users" style="color:#0284C7;">0</div>
-            <div class="stat-title" style="color:#0369A1;">Total Bot Users</div>
-          </div>
-          <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-cancelled-orders" style="color:var(--gray);">0</div><div class="stat-title">Cancelled Orders</div></div>
-        </div>
-        
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; margin-top:10px;">
-          <h4 style="font-size:0.85rem; color:var(--gray); margin:0;">👥 የሻጮች መረጃ (Sellers)</h4>
-          <button class="btn-action" id="syncBtn" style="background:var(--primary); color:white; width:auto; padding:4px 10px; font-size:0.7rem;" onclick="syncOldSellers()">🔄 የድሮ ሻጮችን ፈልግ</button>
-        </div>
-        
-        <div class="analytics-grid">
-          <div class="stat-box"><div class="stat-num" id="st-active-sellers">0</div><div class="stat-title">Total Sellers</div></div>
-          <div class="stat-box gold"><div class="stat-num" id="st-gold-sellers" style="color:var(--gold);">0</div><div class="stat-title">Gold Sellers</div></div>
-          <div class="stat-box silver"><div class="stat-num" id="st-silver-sellers">0</div><div class="stat-title">Silver Sellers</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-free-sellers">0</div><div class="stat-title">Free Sellers</div></div>
+
+      <!-- SELLER PROFILE / SHOP VIEW -->
+      <div id="view-profile" class="view">
+        <div id="shopSetupBox" class="section-card">
+          <h3 style="color:var(--primary); margin-bottom:10px;">🏪 ሱቅዎን ይክፈቱ (Setup Shop)</h3>
+          <form onsubmit="handleShopSetup(event)">
+            <div class="form-group"><label>የሱቁ ስም (Shop Name)</label><input type="text" id="shopName" placeholder="Ex. Sora Electronics" required></div>
+            <div class="form-group"><label>ስልክ ቁጥር (ለገዢዎች የሚታይ)</label><input type="tel" id="shopPhone" placeholder="09..." required></div>
+            <div class="form-group"><label>ቴሌግራም ዩዘርኔም (@username)</label><input type="text" id="shopTg" required></div>
+            <button type="submit" class="btn-action btn-tg">ሱቁን ፍጠር (Create Shop)</button>
+          </form>
         </div>
 
-        <div class="profile-tabs" style="margin-top:15px; font-size:0.8rem;">
-          <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
-          <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
-          <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
-          <div class="p-tab" onclick="switchAdminTab('a-offers', this)">🎁 Offers</div>
+        <div id="shopDashboardBox" style="display:none;">
+          <div class="section-card shop-profile-header">
+            <img id="shopAvatarDisplay" src="https://via.placeholder.com/65" class="shop-avatar">
+            <div style="flex:1;">
+              <h3 id="shopNameDisplay" style="font-size:1.1rem; margin-bottom:2px;">ሱቅ</h3>
+              <p id="shopDescDisplay" style="font-size:0.75rem; color:var(--gray); margin-bottom:4px; line-height:1.2;"></p>
+              <span id="shopProBadge" class="pro-badge" style="display:none;"></span>
+              <p id="shopIdDisplay" style="font-size:0.7rem; color:var(--gray); margin-top:4px;">ID: -</p>
+            </div>
+            <button class="btn-edit-shop" onclick="openEditShopModal()">⚙️ Edit</button>
+          </div>
+
+          <div class="profile-tabs">
+            <div class="p-tab active" onclick="switchProfileTab('p-products', this)">📦 My Products</div>
+            <div class="p-tab" onclick="switchProfileTab('p-orders', this)">🛍️ My Orders</div>
+            <div class="p-tab" id="upgradeTabBtn" onclick="switchProfileTab('p-upgrade', this)">⭐ Tiers</div>
+          </div>
+
+          <div id="p-products" class="p-content active section-card">
+            <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">እስካሁን የጫኑት (Lifetime Uploads): <b id="myTotalUploads">0</b></p>
+            <div id="myListingsContainer"></div>
+          </div>
+
+          <div id="p-orders" class="p-content section-card">
+            <h4 style="font-size:0.9rem; margin-bottom:10px; color:var(--primary);">ገዢዎች ያዘዙዎት እቃዎች</h4>
+            <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">እስካሁን የተቀበሉት ትዕዛዝ: <b id="myTotalOrders">0</b></p>
+            <div id="myOrdersContainer"></div>
+          </div>
+
+          <div id="p-upgrade" class="p-content section-card" style="text-align:center;">
+            <h3 style="color:var(--primary); margin-bottom:10px;">🚀 አካውንትዎን ያሳድጉ (Upgrade)</h3>
+            <p style="font-size:0.85rem; color:#444; margin-bottom:15px;">የነጻ ገደብዎን ሲጨርሱ ከሚከተሉት አንዱን ይምረጡ፦</p>
+            <div style="background:var(--silver-bg); padding:10px; border-radius:8px; border:1px solid #D1D5DB; margin-bottom:10px; font-size:0.8rem; text-align:left;">
+              <b style="color:#4B5563;">🥈 SILVER (150 ETB ለ 3 ወር)</b><br>
+              - እስከ 15 እቃዎች መጫን<br>- እስከ 150 ትዕዛዞች መቀበል<br>- የ Silver ሻጭ ባጅ
+            </div>
+            <div style="background:var(--gold-bg); padding:10px; border-radius:8px; border:1px solid var(--gold); margin-bottom:15px; font-size:0.8rem; text-align:left;">
+              <b style="color:var(--gold);">👑 GOLD (200 ETB ለ 3 ወር)</b><br>
+              - ያልተገደበ (Unlimited) እቃ መጫን<br>- ያልተገደበ ትዕዛዞች መቀበል<br>- የ Gold ሻጭ ባጅ
+            </div>
+            <a class="btn-action btn-tg" href="https://t.me/sorataju1" target="_blank">አድሚንን አናግረው ያስከፍቱ 💬</a>
+          </div>
         </div>
-        
-        <div id="a-pending" class="p-content active"><div id="adminPendingList"></div></div>
-        <div id="a-sellers" class="p-content"><div id="adminSellersList"></div></div>
-        <div id="a-orders" class="p-content"><div id="adminOrdersList"></div></div>
-        <!-- 🌟 NEW: Admin manages the special-offer circles here -->
-        <div id="a-offers" class="p-content">
-          <button class="btn-action btn-tg" style="margin-bottom:10px;" onclick="openAddOfferModal()">➕ አዲስ ቅናሽ ጨምር</button>
-          <div id="adminOffersList"></div>
+
+        <!-- SHOP ADMIN DASHBOARD -->
+        <div id="adminPanel" style="display:none;" class="section-card">
+          <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:5px; margin-bottom:15px;">👑 Shop Admin Control Center</h3>
+          <div class="analytics-grid">
+            <div class="stat-box" style="grid-column: span 2; background:#E0F2FE; border-color:#BAE6FD;">
+              <div class="stat-num" id="st-total-users" style="color:#0284C7;">0</div>
+              <div class="stat-title" style="color:#0369A1;">Total Bot Users</div>
+            </div>
+            <div class="stat-box"><div class="stat-num" id="st-total-orders">0</div><div class="stat-title">Total Orders</div></div>
+            <div class="stat-box"><div class="stat-num" id="st-new-orders" style="color:var(--danger);">0</div><div class="stat-title">Pending Orders</div></div>
+            <div class="stat-box"><div class="stat-num" id="st-completed-orders" style="color:var(--secondary);">0</div><div class="stat-title">Completed Orders</div></div>
+            <div class="stat-box"><div class="stat-num" id="st-cancelled-orders" style="color:var(--gray);">0</div><div class="stat-title">Cancelled Orders</div></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; margin-top:10px;">
+            <h4 style="font-size:0.85rem; color:var(--gray); margin:0;">👥 የሻጮች መረጃ (Sellers)</h4>
+            <button class="btn-action" id="syncBtn" style="background:var(--primary); color:white; width:auto; padding:4px 10px; font-size:0.7rem;" onclick="syncOldSellers()">🔄 የድሮ ሻጮችን ፈልግ</button>
+          </div>
+
+          <div class="analytics-grid">
+            <div class="stat-box"><div class="stat-num" id="st-active-sellers">0</div><div class="stat-title">Total Sellers</div></div>
+            <div class="stat-box gold"><div class="stat-num" id="st-gold-sellers" style="color:var(--gold);">0</div><div class="stat-title">Gold Sellers</div></div>
+            <div class="stat-box silver"><div class="stat-num" id="st-silver-sellers">0</div><div class="stat-title">Silver Sellers</div></div>
+            <div class="stat-box"><div class="stat-num" id="st-free-sellers">0</div><div class="stat-title">Free Sellers</div></div>
+          </div>
+
+          <div class="profile-tabs" style="margin-top:15px; font-size:0.8rem;">
+            <div class="p-tab active" onclick="switchAdminTab('a-pending', this)">⏳ Pending</div>
+            <div class="p-tab" onclick="switchAdminTab('a-sellers', this)">👥 Sellers</div>
+            <div class="p-tab" onclick="switchAdminTab('a-orders', this)">🛍️ Orders</div>
+            <div class="p-tab" onclick="switchAdminTab('a-offers', this)">🎁 Offers</div>
+          </div>
+
+          <div id="a-pending" class="p-content active"><div id="adminPendingList"></div></div>
+          <div id="a-sellers" class="p-content"><div id="adminSellersList"></div></div>
+          <div id="a-orders" class="p-content"><div id="adminOrdersList"></div></div>
+          <div id="a-offers" class="p-content">
+            <button class="btn-action btn-tg" style="margin-bottom:10px;" onclick="openAddOfferModal()">➕ አዲስ ቅናሽ ጨምር</button>
+            <div id="adminOffersList"></div>
+          </div>
         </div>
       </div>
-      
-    </div>
-  </div>
+    </div> <!-- /mode-shop -->
 
+    <!-- =========================================================
+         MODE 2: BIKAT EDUCATION
+         ========================================================= -->
+    <div id="mode-edu" class="app-mode">
+
+      <!-- EDU QUIZ / HOME VIEW -->
+      <div id="view-edu-quiz" class="view active">
+        <div id="eduLoading" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px; display:none;">የBIKAT መረጃዎችን በመጫን ላይ...</div>
+
+        <!-- Student Summary Banner -->
+        <div class="edu-hero" id="eduHeroBanner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <h2 id="eduWelcomeName">👋 ሰላም ተማሪ!</h2>
+              <div style="font-size:0.78rem; opacity:0.9;" id="eduLevelDisplay">📚 ክፍል: ገና አልተመረጠም</div>
+            </div>
+            <button onclick="eduShowLevelPicker()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.72rem; font-weight:bold; cursor:pointer;">🔄 ክፍል ቀይር</button>
+          </div>
+          <div class="edu-hero-meta">
+            <span class="edu-chip" id="eduVipChip">👤 Free Tier</span>
+            <span class="edu-chip" id="eduPointsChip">🏆 0 / 50 ነጥብ</span>
+            <span class="edu-chip" id="eduInviteChip">👥 0 / 5 ግብዣ</span>
+          </div>
+          <div id="eduBonusLine" style="font-size:0.72rem; margin-top:8px; color:#A7F3D0; display:none;"></div>
+        </div>
+
+        <!-- Resume Paused Quiz Banner -->
+        <div id="eduResumeBanner" class="section-card" style="display:none; background:#EEF2FF; border-color:var(--edu-accent);">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div>
+              <strong style="font-size:0.85rem; color:var(--edu-accent);">⏸ የቆመ ፈተና አለዎት</strong>
+              <p id="eduResumeInfo" style="font-size:0.75rem; color:var(--gray); margin-top:2px;"></p>
+            </div>
+            <button class="btn-action btn-edu" style="width:auto; padding:8px 14px;" onclick="eduResumeQuiz()">▶️ ቀጥል</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Quiz Navigation Container -->
+        <div id="eduQuizStage"></div>
+      </div>
+
+      <!-- EDU VIP & SHORT NOTES VIEW -->
+      <div id="view-edu-vip" class="view">
+        <div class="section-card">
+          <h3 style="color:var(--edu-accent); margin-bottom:6px;">💎 VIP Membership (30 ብር / ወር)</h3>
+          <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
+            🔓 ሁሉንም የተቆለፉ (Paid) ጥያቄዎችና ምዕራፎች ያለ ገደብ ይሰራሉ!<br>
+            🔓 የ 50 ጥያቄ (Free-tier) ገደብ ይነሳልዎታል!
+          </p>
+          <div class="payment-box">
+            🏦 <b>ንግድ ባንክ (CBE):</b> <code>1000649943188</code> (በሶራ ታጁ)<br>
+            📱 <b>ቴሌብር (Telebirr):</b> <code>0948944979</code> (በሶራ ታጁ)
+          </div>
+          <button class="btn-action btn-edu" onclick="eduOpenPaymentModal('vip', 'VIP Membership', 'All Levels', '30 ብር')">📸 የVIP (30 ብር) ደረሰኝ ላክ</button>
+        </div>
+
+        <div class="section-card">
+          <h3 style="color:var(--primary); margin-bottom:6px;">📖 Short Notes (300 ብር)</h3>
+          <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">የሚፈልጉትን የትምህርት ደረጃ መርጠው ክፍያ ሲፈጽሙ የፕራይቬት ቻናል መግቢያ ሊንክ ይላክልዎታል!</p>
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Grade 12', 'ሙሉ ዓመት', '300 ብር')">
+            <span>📚 Grade 12 (ሙሉ ዓመት)</span><span style="color:var(--primary);">300 ብር ➔</span>
+          </button>
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Remedial', 'ለሴሚስተር', '300 ብር')">
+            <span>📖 Remedial (ለሴሚስተር)</span><span style="color:var(--primary);">300 ብር ➔</span>
+          </button>
+          <button class="edu-list-btn" onclick="eduOpenPaymentModal('note', 'Freshman', 'ለሴሚስተር', '300 ብር')">
+            <span>🎓 Freshman (ለሴሚስተር)</span><span style="color:var(--primary);">300 ብር ➔</span>
+          </button>
+        </div>
+
+        <div class="section-card">
+          <h4 style="font-size:0.88rem; margin-bottom:8px;">🧾 የእኔ የክፍያ ጥያቄዎች</h4>
+          <div id="eduMyPaymentsList"><p style="font-size:0.78rem; color:var(--gray);">እስካሁን የላኩት የክፍያ ጥያቄ የለም።</p></div>
+        </div>
+      </div>
+
+      <!-- EDU LEADERBOARD & INVITE VIEW -->
+      <div id="view-edu-rank" class="view">
+        <div class="section-card">
+          <h3 style="color:var(--edu-accent); margin-bottom:6px;">🎁 ጓደኞችን በመጋበዝ ነፃ መዳረሻ ያግኙ!</h3>
+          <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
+            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
+          </p>
+          <div class="copy-box">
+            <input type="text" id="eduRefLinkInput" readonly>
+            <button class="btn-action btn-edu" style="width:auto; padding:8px 12px;" onclick="eduCopyRefLink()">📋 ኮፒ</button>
+          </div>
+          <button class="btn-action btn-tg" style="margin-top:8px;" onclick="eduShareRefLink()">📤 ለጓደኞች ሼር አድርግ</button>
+        </div>
+
+        <div class="section-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-size:0.95rem;">🏆 Top 10 Leaderboard</h3>
+            <button onclick="eduLoadAllData()" style="background:none; border:none; color:var(--edu-accent); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+          </div>
+          <div id="eduLeaderboardList"></div>
+        </div>
+      </div>
+
+      <!-- EDU PROFILE VIEW -->
+      <div id="view-edu-profile" class="view">
+        <div class="section-card" id="eduProfileCard"></div>
+        <div class="section-card">
+          <h4 style="font-size:0.88rem; margin-bottom:10px;">📢 ጠቃሚ ሊንኮች</h4>
+          <a class="btn-action btn-edu" style="margin-bottom:8px;" href="https://t.me/bikat_quiz" target="_blank">📢 የBIKAT ቻናል (@bikat_quiz)</a>
+          <a class="btn-action btn-tg" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
+        </div>
+      </div>
+
+      <!-- EDU ADMIN VIEW (ADMIN ONLY) -->
+      <div id="view-edu-admin" class="view">
+        <div class="section-card">
+          <h3 style="color:var(--danger); border-bottom:2px solid var(--danger); padding-bottom:6px; margin-bottom:12px;">🛠 BIKAT Admin Control</h3>
+          <div class="analytics-grid">
+            <div class="stat-box"><div class="stat-num" id="eduStStudents">0</div><div class="stat-title">Students</div></div>
+            <div class="stat-box gold"><div class="stat-num" id="eduStVip" style="color:var(--gold);">0</div><div class="stat-title">VIP Students</div></div>
+            <div class="stat-box"><div class="stat-num" id="eduStQuestions">0</div><div class="stat-title">Questions</div></div>
+            <div class="stat-box"><div class="stat-num" id="eduStPendingPay" style="color:var(--danger);">0</div><div class="stat-title">Pending Pay</div></div>
+          </div>
+
+          <div class="profile-tabs">
+            <div class="p-tab active" onclick="eduSwitchAdminTab('ea-add', this)">➕ ጥያቄ አስገባ</div>
+            <div class="p-tab" onclick="eduSwitchAdminTab('ea-pay', this)">💳 ክፍያዎች</div>
+            <div class="p-tab" onclick="eduSwitchAdminTab('ea-manage', this)">🗑 አጥፋ/Stats</div>
+            <div class="p-tab" onclick="eduSwitchAdminTab('ea-students', this)">👥 ተማሪዎች</div>
+          </div>
+
+          <!-- ADD QUESTIONS (SINGLE & BULK 8-LINE FORMAT) -->
+          <div id="ea-add" class="p-content active">
+            <form id="eduAddQuizForm" onsubmit="eduAdminAddQuestions(event)">
+              <div class="form-group">
+                <label>የትምህርት ደረጃ (Level)</label>
+                <select id="eaLevel" onchange="eduAdminToggleStream()">
+                  <option value="Grade 12">Grade 12</option>
+                  <option value="Remedial">Remedial</option>
+                  <option value="Freshman">Freshman</option>
+                </select>
+              </div>
+              <div class="form-group" id="eaStreamGroup">
+                <label>ስትሪም (Stream)</label>
+                <select id="eaStream">
+                  <option value="Natural">Natural</option>
+                  <option value="Social">Social</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ትምህርት (Subject - ነባር ወይም አዲስ ይጻፉ)</label>
+                <input type="text" id="eaSubject" list="eaSubjectList" placeholder="ምሳሌ: Biology, Chemistry, Psychology" required>
+                <datalist id="eaSubjectList"></datalist>
+              </div>
+              <div class="form-group">
+                <label>ምዕራፍ (Chapter - ነባር ወይም አዲስ ይጻፉ)</label>
+                <input type="text" id="eaChapter" list="eaChapterList" placeholder="ምሳሌ: Chapter 1, Unit 2" required>
+                <datalist id="eaChapterList"></datalist>
+              </div>
+              <div class="form-group">
+                <label>የጥያቄው ዓይነት (Free / Paid)</label>
+                <select id="eaType">
+                  <option value="free">🆓 ነፃ (Free)</option>
+                  <option value="paid">🔒 የክፍያ (Paid / VIP)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ጥያቄዎችን ይለጥፉ (8 መስመር format — ብዙ ጥያቄ በባዶ መስመር ይለዩ)</label>
+                <textarea id="eaBulkText" rows="9" placeholder="ጥያቄው እዚህ...&#10;ምርጫ A&#10;ምርጫ B&#10;ምርጫ C&#10;ምርጫ D&#10;A&#10;ማብራሪያ (ከሌለ 0)&#10;ምንጭ (ምሳሌ: 2015 EUEE)" required></textarea>
+              </div>
+              <button type="submit" id="eaSubmitBtn" class="btn-action btn-edu">➕ ጥያቄዎቹን አስገባ (Save)</button>
+            </form>
+          </div>
+
+          <!-- PAYMENT APPROVALS -->
+          <div id="ea-pay" class="p-content">
+            <div id="eduAdminPaymentsList"></div>
+          </div>
+
+          <!-- DELETE & STATS -->
+          <div id="ea-manage" class="p-content">
+            <div style="display:flex; gap:6px; margin-bottom:12px;">
+              <input type="text" id="eaDeleteIdInput" placeholder="የጥያቄ ID (ምሳሌ: G12BIO1)" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:8px; font-size:0.85rem;">
+              <button class="btn-action" style="width:auto; background:var(--danger); color:white; padding:8px 14px;" onclick="eduAdminDeleteById()">🗑 አጥፋ</button>
+            </div>
+            <h4 style="font-size:0.85rem; margin-bottom:8px;">📊 የምዕራፎች ዝርዝር (Chapter Bulk Delete)</h4>
+            <div id="eduAdminStatsList"></div>
+          </div>
+
+          <!-- STUDENTS LIST -->
+          <div id="ea-students" class="p-content">
+            <div id="eduAdminStudentsList"></div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /mode-edu -->
+  </div> <!-- /container -->
+
+  <!-- =========================================================
+       MODALS (WOLKITE SHOP + BIKAT PAYMENT)
+       ========================================================= -->
   <!-- EDIT SHOP MODAL -->
   <div id="editShopModal" class="modal">
     <div class="modal-content">
@@ -480,14 +798,14 @@
     </div>
   </div>
 
-  <!-- 🌟 NEW: ADD OFFER MODAL (Admin only) -->
+  <!-- ADD OFFER MODAL -->
   <div id="addOfferModal" class="modal">
     <div class="modal-content small-modal">
       <span class="close-modal" onclick="closeAddOfferModal()">&times;</span>
       <h3 style="margin-bottom:15px; color:var(--primary); font-size:1.1rem;">🎁 አዲስ ቅናሽ ጨምር</h3>
       <form id="addOfferForm" onsubmit="saveNewOffer(event)">
         <div class="form-group">
-          <label>የቅናሹ ፎቶ (16:9, እንደ Thumbnail - አማራጭ ነው)</label>
+          <label>የቅናሹ ፎቶ (16:9 - አማራጭ ነው)</label>
           <div class="offer-img-upload-box" id="offerImgUploadBox">
             <span id="offerImgPlus">+ ፎቶ ጨምር</span>
             <input type="file" id="offerImgInput" accept="image/*" onchange="handleOfferImageUpload(event)">
@@ -497,15 +815,15 @@
         <div class="form-group"><label>የቅናሽ መጠን (ለምሳሌ 40% ቅናሽ)</label><input type="text" id="offerDiscountText" placeholder="40% ቅናሽ" required></div>
         <div class="form-group"><label>አጭር ርዕስ</label><input type="text" id="offerTitleText" placeholder="ልዩ ቅናሽ" required></div>
         <div class="form-group">
-          <label>የእቃው ሊንክ (አማራጭ - ሲነካ ወደ እቃው ይወስዳል)</label>
-          <input type="text" id="offerLinkText" placeholder="የእቃውን 🔗 አጋራ ሊንክ ይለጥፉ ወይም የእቃውን ID ያስገቡ">
+          <label>የእቃው ሊንክ (አማራጭ)</label>
+          <input type="text" id="offerLinkText" placeholder="የእቃውን 🔗 አጋራ ሊንክ ወይም ID">
         </div>
         <button type="submit" class="btn-action btn-tg" id="saveOfferBtn" style="padding:10px;">ጨምር</button>
       </form>
     </div>
   </div>
 
-  <!-- 🌟 NEW: ORDER PHONE NUMBER MODAL (shown when buyer taps "🛒 አሁን አዝዝ") -->
+  <!-- ORDER PHONE MODAL -->
   <div id="orderPhoneModal" class="modal modal-stacked">
     <div class="modal-content small-modal">
       <span class="close-modal" onclick="closeOrderPhoneModal()">&times;</span>
@@ -518,34 +836,28 @@
     </div>
   </div>
 
-  <!-- 🌟 NEW: SHARE-IMAGE HELPER MODAL (channel post can't attach a photo automatically; this makes saving it easy) -->
+  <!-- SHARE IMAGE MODAL -->
   <div id="shareImageModal" class="modal">
     <div class="modal-content small-modal" style="text-align:center;">
       <span class="close-modal" onclick="closeShareImageModal()">&times;</span>
       <h3 style="margin-bottom:10px; color:var(--primary); font-size:1rem;">📸 ፎቶውን ያስቀምጡ</h3>
       <img id="shareImagePreview" src="" style="width:100%; border-radius:8px; margin-bottom:10px;">
-      <p style="font-size:0.78rem; color:var(--gray); line-height:1.5;">ፎቶውን ረዘም አድርገው ይጫኑት (Long-press) እና ያስቀምጡት፣ ከዚያ ከሊንኩ ጋር በቻናሉ ላይ አብረው ይለጥፉት። (ፎቶ ከሊንኩ ጋር በራስ-ሰር መላክ በዚህ መተግበሪያ ውስጥ አይቻልም።)</p>
+      <p style="font-size:0.78rem; color:var(--gray); line-height:1.5;">ፎቶውን ረዘም አድርገው ይጫኑት (Long-press) እና ያስቀምጡት፣ ከዚያ ከሊንኩ ጋር በቻናሉ ላይ አብረው ይለጥፉት።</p>
     </div>
   </div>
 
-  <!-- PRODUCT DETAILS MODAL (POPUP) -->
+  <!-- PRODUCT DETAILS MODAL -->
   <div id="productModal" class="modal">
     <div class="modal-content">
       <span class="close-modal" onclick="closeModal()">&times;</span>
-      
-      <!-- Multi-image Slider Container -->
       <div id="modalImageContainer" class="modal-image-container"></div>
-      
       <h2 id="modalTitle" style="font-size:1.1rem; margin-bottom:5px; color:var(--primary);"></h2>
       <div style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">
         <span>ሁኔታ: <b id="modalCondition"></b></span> | <span>ዋጋ: <b id="modalPrice" style="color:var(--primary); font-size:1rem;"></b></span>
       </div>
       <p style="font-size:0.85rem; font-weight:bold; margin-bottom:5px;">የእቃው መግለጫ:</p>
       <p id="modalDesc" style="font-size:0.85rem; color:#444; line-height:1.5; margin-bottom:10px; background:#f9f9f9; padding:10px; border-radius:8px; white-space: pre-wrap;"></p>
-      
       <div id="modalButtons" class="action-buttons"></div>
-      
-      <!-- Public Comments Section -->
       <div class="comment-box">
         <h4 style="font-size:0.85rem; color:var(--primary);">💬 አስተያየቶች (Reviews)</h4>
         <div id="modalCommentsList" style="max-height:120px; overflow-y:auto; background:#f9f9f9; border-radius:6px; padding:6px;"></div>
@@ -557,61 +869,84 @@
     </div>
   </div>
 
-  <!-- 🌟 Fixed Bottom Navigation Tabs -->
-  <div class="nav-bar">
+  <!-- BIKAT PAYMENT SCREENSHOT MODAL -->
+  <div id="eduPaymentModal" class="modal">
+    <div class="modal-content small-modal">
+      <span class="close-modal" onclick="eduClosePaymentModal()">&times;</span>
+      <h3 id="eduPayModalTitle" style="margin-bottom:8px; color:var(--edu-accent); font-size:1.05rem;">💳 የክፍያ ደረሰኝ መላኪያ</h3>
+      <div class="payment-box" id="eduPayModalInfo"></div>
+      <form id="eduPaymentForm" onsubmit="eduSubmitPayment(event)">
+        <div class="form-group">
+          <label>የደረሰኙን ስክሪንሾት (Screenshot) ይምረጡ</label>
+          <div class="offer-img-upload-box">
+            <span id="eduPayImgPlus">+ ስክሪንሾት ምረጥ</span>
+            <input type="file" id="eduPayImgInput" accept="image/*" onchange="eduHandleReceiptUpload(event)" required>
+            <img id="eduPayImgPreview">
+          </div>
+        </div>
+        <button type="submit" id="eduPaySubmitBtn" class="btn-action btn-edu">📤 ደረሰኙን ላክ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       BOTTOM NAVIGATION BARS (SHOP & EDUCATION)
+       ========================================================= -->
+  <div class="nav-bar active" id="navBarShop">
     <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
     <button class="nav-btn" id="navShops" onclick="switchTab('shops', this)"><span class="nav-icon">🏬</span><span>ሻጮች</span></button>
     <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
     <button class="nav-btn" id="navProfile" onclick="switchTab('profile', this)"><span class="nav-icon">🏪</span><span>My Shop</span></button>
   </div>
 
+  <div class="nav-bar edu-nav" id="navBarEdu">
+    <button class="nav-btn active" id="navEduQuiz" onclick="eduSwitchTab('edu-quiz', this)"><span class="nav-icon">📝</span><span>ፈተና</span></button>
+    <button class="nav-btn" id="navEduVip" onclick="eduSwitchTab('edu-vip', this)"><span class="nav-icon">💎</span><span>VIP & Notes</span></button>
+    <button class="nav-btn" id="navEduRank" onclick="eduSwitchTab('edu-rank', this)"><span class="nav-icon">🏆</span><span>ደረጃ</span></button>
+    <button class="nav-btn" id="navEduProfile" onclick="eduSwitchTab('edu-profile', this)"><span class="nav-icon">👤</span><span>ፕሮፋይል</span></button>
+    <button class="nav-btn" id="navEduAdmin" style="display:none;" onclick="eduSwitchTab('edu-admin', this)"><span class="nav-icon">🛠</span><span>Admin</span></button>
+  </div>
+
   <script>
-    const tg = window.Telegram.WebApp; 
-    tg.ready(); 
+    // =========================================================================
+    // GLOBAL CONFIG & TELEGRAM INIT
+    // =========================================================================
+    const tg = window.Telegram.WebApp;
+    tg.ready();
     tg.expand();
-    
-    const CHANNEL_USERNAME = "@wolkiteshop";
+
     const DB_BASE = "https://wolkite-shop-default-rtdb.firebaseio.com";
     const FIREBASE_PRODUCTS = `${DB_BASE}/products`;
     const FIREBASE_SHOPS = `${DB_BASE}/shops`;
     const FIREBASE_ORDERS = `${DB_BASE}/orders`;
-    const FIREBASE_USERS = `${DB_BASE}/users`; 
-    const FIREBASE_OFFERS = `${DB_BASE}/offers`; // 🌟 NEW: special-offer circles
-    
+    const FIREBASE_USERS = `${DB_BASE}/users`;
+    const FIREBASE_OFFERS = `${DB_BASE}/offers`;
+
+    // BIKAT FIREBASE ENDPOINTS
+    const BIKAT_STUDENTS = `${DB_BASE}/bikat/students`;
+    const BIKAT_QUESTIONS = `${DB_BASE}/bikat/questions`;
+    const BIKAT_PAYMENTS = `${DB_BASE}/bikat/payment_requests`;
+
     const ADMIN_ID = 8356035160;
+    const ADMIN_TG = "sorataju1";
+    const BOT_APP_LINK = "https://t.me/wolkite_shopbot/wolkiteshop";
     const currentUser = tg.initDataUnsafe?.user || { id: 8356035160, first_name: "Developer", username: "sorataju1" };
 
-    let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0; let offers = {}; // 🌟 NEW: offers
-    let myShop = null; 
-    let uploadedImages = ["", "", ""];
-    let uploadedAvatarBase64 = "";
-    let editingProductId = null; let editingProductImageBase64 = "";
-    let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null; 
-    let pendingOrderProductId = null; // 🌟 NEW: holds the product id while the phone-number popup is open
-    let uploadedOfferImageBase64 = ""; // 🌟 NEW: holds the offer thumbnail image being added
-    let currentShopsCategory = 'All'; // 🌟 NEW: active category filter on the Shops tab
+    let currentAppMode = 'shop';
 
-    // 🌟 1. FIX: Switch Tab Logic (This was missing from the slider update)
-    function switchTab(viewName, btn) { 
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
-      document.getElementById(`view-${viewName}`).classList.add('active'); 
-      if(btn) btn.classList.add('active'); 
+    function escHtml(s) {
+      return String(s === undefined || s === null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function escAttr(s) {
+      return escHtml(String(s === undefined || s === null ? '' : s)
+        .replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' '));
+    }
+    function notifyUser(msg) {
+      if (tg.showAlert) tg.showAlert(msg); else alert(msg);
     }
 
-    async function initApp() {
-      if(currentUser.id === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
-      trackUser();
-      await loadAllData();
-      
-      const startParam = getStartParam();
-      if(startParam && startParam.startsWith('p_')) {
-         const pId = startParam.substring(2);
-         if(products.some(p => p.id === pId)) { openModal(pId); }
-      }
-    }
-    
-    // 🌟 FIX #1: ፈልግ start_param ን ከሁሉም ቦታ (initDataUnsafe ካልሰራ URL ላይ ፈልግ)
     function getStartParam() {
       if (tg.initDataUnsafe?.start_param) return tg.initDataUnsafe.start_param;
       try {
@@ -624,24 +959,84 @@
       return null;
     }
 
+    // =========================================================================
+    // HUB & MODE SWITCHER (SHOP <-> EDUCATION)
+    // =========================================================================
+    function openHubScreen() {
+      document.getElementById('hubScreen').style.display = 'flex';
+    }
+    function enterAppMode(mode) {
+      document.getElementById('hubScreen').style.display = 'none';
+      switchAppMode(mode);
+    }
+    function switchAppMode(mode) {
+      currentAppMode = mode;
+      document.getElementById('mode-shop').classList.toggle('active', mode === 'shop');
+      document.getElementById('mode-edu').classList.toggle('active', mode === 'edu');
+      document.getElementById('navBarShop').classList.toggle('active', mode === 'shop');
+      document.getElementById('navBarEdu').classList.toggle('active', mode === 'edu');
+
+      const btnShop = document.getElementById('modeBtnShop');
+      const btnEdu = document.getElementById('modeBtnEdu');
+      btnShop.className = 'mode-pill' + (mode === 'shop' ? ' active' : '');
+      btnEdu.className = 'mode-pill' + (mode === 'edu' ? ' edu-active' : '');
+
+      if (mode === 'shop') {
+        document.getElementById('headerTitle').innerText = 'Wolkite Shop';
+        document.getElementById('headerSub').innerText = 'Wolkite University Student Marketplace';
+      } else {
+        document.getElementById('headerTitle').innerText = 'BIKAT Education';
+        document.getElementById('headerSub').innerText = 'Grade 12 • Remedial • Freshman Quiz & Notes';
+        if (!eduDataLoaded) eduLoadAllData();
+      }
+      window.scrollTo(0, 0);
+    }
+
+    // =========================================================================
+    // PART 1: WOLKITE SHOP LOGIC
+    // =========================================================================
+    let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0; let offers = {};
+    let myShop = null;
+    let uploadedImages = ["", "", ""];
+    let uploadedAvatarBase64 = "";
+    let editingProductId = null; let editingProductImageBase64 = "";
+    let currentOpenedProductId = null; let currentCategory = 'All'; let currentSellerFilter = null;
+    let pendingOrderProductId = null;
+    let uploadedOfferImageBase64 = "";
+    let currentShopsCategory = 'All';
+
+    function switchTab(viewName, btn) {
+      document.querySelectorAll('#mode-shop .view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('#navBarShop .nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      if(btn) btn.classList.add('active');
+    }
+
     async function trackUser() {
-       try { await fetch(`${FIREBASE_USERS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ id: currentUser.id, name: currentUser.first_name || currentUser.username || "User", lastActive: new Date().toISOString() }) }); } catch(e) {}
+      try {
+        await fetch(`${FIREBASE_USERS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({ id: currentUser.id, name: currentUser.first_name || currentUser.username || "User", lastActive: new Date().toISOString() })
+        });
+      } catch(e) {}
     }
 
     async function loadAllData() {
       document.getElementById('loadingIndicator').style.display = 'block';
       try {
-        const [resP, resS, resO, resU, resOf] = await Promise.all([ fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`), fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`), fetch(`${FIREBASE_OFFERS}.json`) ]);
+        const [resP, resS, resO, resU, resOf] = await Promise.all([
+          fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`),
+          fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`), fetch(`${FIREBASE_OFFERS}.json`)
+        ]);
         const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json(); const dataOf = await resOf.json();
-        
         products = []; if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
-        shops = dataS || {}; orders = dataO || {}; offers = dataOf || {}; // 🌟 NEW
+        shops = dataS || {}; orders = dataO || {}; offers = dataOf || {};
         const usersData = dataU || {}; totalBotUsers = Object.keys(usersData).length;
         myShop = shops[currentUser.id] || null;
       } catch(e) {}
       document.getElementById('loadingIndicator').style.display = 'none';
-      renderShopUI(); filterProducts(); renderMyListings(); renderMyOrders(); renderOffers(); renderShopsGrid(); // 🌟 NEW: renderOffers(), renderShopsGrid()
-      if(currentUser.id === ADMIN_ID) renderAdminDashboard();
+      renderShopUI(); filterProducts(); renderMyListings(); renderMyOrders(); renderOffers(); renderShopsGrid();
+      if(Number(currentUser.id) === ADMIN_ID) renderAdminDashboard();
     }
 
     async function syncOldSellers() {
@@ -653,8 +1048,8 @@
           try { await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); shops[p.sellerId] = shopData; foundCount++; } catch(e) {}
         }
       }
-      if(foundCount > 0) { if(tg.showAlert) tg.showAlert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); else alert(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`); } 
-      else { alert("ሁሉም ሻጮች አስቀድመው ተመዝግበዋል (አዲስ የለም)።"); }
+      if(foundCount > 0) notifyUser(`${foundCount} የድሮ ሻጮች ተገኝተዋል! ✅`);
+      else notifyUser("ሁሉም ሻጮች አስቀድመው ተመዝግበዋል (አዲስ የለም)።");
       if(btn) { btn.innerText = "🔄 የድሮ ሻጮችን ፈልግ"; btn.disabled = false; }
       await loadAllData();
     }
@@ -676,7 +1071,7 @@
       }
     }
 
-    async function handleShopSetup(e) { e.preventDefault(); const shopData = { name: document.getElementById('shopName').value, phone: document.getElementById('shopPhone').value, tg: document.getElementById('shopTg').value.replace(/^@/, ''), tier: 'Free', totalUploads: 0, totalOrdersReceived: 0, createdAt: new Date().toISOString() }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); alert("ሱቅዎ ተፈጥሯል!"); await loadAllData(); } catch(err) {} }
+    async function handleShopSetup(e) { e.preventDefault(); const shopData = { name: document.getElementById('shopName').value, phone: document.getElementById('shopPhone').value, tg: document.getElementById('shopTg').value.replace(/^@/, ''), tier: 'Free', totalUploads: 0, totalOrdersReceived: 0, createdAt: new Date().toISOString() }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(shopData) }); notifyUser("ሱቅዎ ተፈጥሯል!"); await loadAllData(); } catch(err) {} }
 
     function openEditShopModal() { if(!myShop) return; document.getElementById('editShopName').value = myShop.name || ""; document.getElementById('editShopDesc').value = myShop.desc || ""; document.getElementById('editShopPhone').value = myShop.phone || ""; document.getElementById('editShopTg').value = myShop.tg || ""; uploadedAvatarBase64 = myShop.avatar || ""; document.getElementById('editShopAvatarPreview').src = uploadedAvatarBase64 || "https://via.placeholder.com/65"; document.getElementById('editShopModal').style.display = 'block'; }
     function closeEditShopModal() { document.getElementById('editShopModal').style.display = 'none'; }
@@ -688,8 +1083,8 @@
         }; img.src = event.target.result;
       }; reader.readAsDataURL(file);
     }
-    async function saveShopProfile(e) { e.preventDefault(); document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveShopBtn').disabled = true; const updatedShop = { name: document.getElementById('editShopName').value, desc: document.getElementById('editShopDesc').value, phone: document.getElementById('editShopPhone').value, tg: document.getElementById('editShopTg').value.replace(/^@/, ''), avatar: uploadedAvatarBase64 }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify(updatedShop) }); myShop = { ...myShop, ...updatedShop }; shops[currentUser.id] = myShop; if(tg.showAlert) tg.showAlert("ፕሮፋይልዎ ተስተካክሏል! ✅"); else alert("ፕሮፋይልዎ ተስተካክሏል! ✅"); closeEditShopModal(); renderShopUI(); filterProducts(); } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveShopBtn').disabled = false; } }
-    
+    async function saveShopProfile(e) { e.preventDefault(); document.getElementById('saveShopBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveShopBtn').disabled = true; const updatedShop = { name: document.getElementById('editShopName').value, desc: document.getElementById('editShopDesc').value, phone: document.getElementById('editShopPhone').value, tg: document.getElementById('editShopTg').value.replace(/^@/, ''), avatar: uploadedAvatarBase64 }; try { await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify(updatedShop) }); myShop = { ...myShop, ...updatedShop }; shops[currentUser.id] = myShop; notifyUser("ፕሮፋይልዎ ተስተካክሏል! ✅"); closeEditShopModal(); renderShopUI(); filterProducts(); } catch(err) { notifyUser("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveShopBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveShopBtn').disabled = false; } }
+
     function openEditProductModal(id) { const p = products.find(x => x.id === id); if(!p) return; editingProductId = id; editingProductImageBase64 = p.img || ""; document.getElementById('editProdImagePreview').src = p.img || "https://via.placeholder.com/150"; document.getElementById('editProdCategory').value = p.category || "Electronics"; document.getElementById('editProdTitle').value = p.title || ""; document.getElementById('editProdCondition').value = p.condition || "Brand New"; document.getElementById('editProdPrice').value = p.price || p.finalPrice || ""; document.getElementById('editProdDesc').value = p.desc || ""; document.getElementById('editProductModal').style.display = 'block'; }
     function closeEditProductModal() { document.getElementById('editProductModal').style.display = 'none'; editingProductId = null; }
     function handleEditProductImageUpload(e) {
@@ -700,41 +1095,34 @@
         }; img.src = event.target.result;
       }; reader.readAsDataURL(file);
     }
-    async function saveProductChanges(e) { e.preventDefault(); if(!editingProductId) return; document.getElementById('saveProdBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveProdBtn').disabled = true; const updatedProd = { title: document.getElementById('editProdTitle').value, price: document.getElementById('editProdPrice').value, category: document.getElementById('editProdCategory').value, condition: document.getElementById('editProdCondition').value, desc: document.getElementById('editProdDesc').value, img: editingProductImageBase64 }; try { await fetch(`${FIREBASE_PRODUCTS}/${editingProductId}.json`, { method: 'PATCH', body: JSON.stringify(updatedProd) }); if(tg.showAlert) tg.showAlert("እቃው ተስተካክሏል! ✅"); else alert("እቃው ተስተካክሏል! ✅"); closeEditProductModal(); await loadAllData(); } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveProdBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveProdBtn').disabled = false; } }
+    async function saveProductChanges(e) { e.preventDefault(); if(!editingProductId) return; document.getElementById('saveProdBtn').innerText = "በማስቀመጥ ላይ..."; document.getElementById('saveProdBtn').disabled = true; const updatedProd = { title: document.getElementById('editProdTitle').value, price: document.getElementById('editProdPrice').value, category: document.getElementById('editProdCategory').value, condition: document.getElementById('editProdCondition').value, desc: document.getElementById('editProdDesc').value, img: editingProductImageBase64 }; try { await fetch(`${FIREBASE_PRODUCTS}/${editingProductId}.json`, { method: 'PATCH', body: JSON.stringify(updatedProd) }); notifyUser("እቃው ተስተካክሏል! ✅"); closeEditProductModal(); await loadAllData(); } catch(err) { notifyUser("ስህተት ተፈጥሯል"); } finally { document.getElementById('saveProdBtn').innerText = "ሴቭ አድርግ"; document.getElementById('saveProdBtn').disabled = false; } }
 
     function openModal(id) {
-      const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id; 
-      
+      const p = products.find(x => x.id === id); if(!p) return; currentOpenedProductId = id;
       const imgContainer = document.getElementById('modalImageContainer'); imgContainer.innerHTML = '';
-      if(p.images && p.images.length > 0) {
-          p.images.forEach(imgData => { if(imgData) imgContainer.innerHTML += `<img class="modal-img" src="${imgData}">`; });
-      } else {
-          imgContainer.innerHTML = `<img class="modal-img" src="${p.img || 'https://via.placeholder.com/400'}">`;
-      }
-      
+      if(p.images && p.images.length > 0) { p.images.forEach(imgData => { if(imgData) imgContainer.innerHTML += `<img class="modal-img" src="${imgData}">`; }); }
+      else { imgContainer.innerHTML = `<img class="modal-img" src="${p.img || 'https://via.placeholder.com/400'}">`; }
       document.getElementById('modalTitle').innerText = p.title; document.getElementById('modalCondition').innerText = p.condition; document.getElementById('modalPrice').innerText = (p.price || p.finalPrice || 0) + " ETB"; document.getElementById('modalDesc').innerText = p.desc || "ተጨማሪ መግለጫ አልተጻፈም።";
       const sShop = shops[p.sellerId]; const sPhone = sShop ? sShop.phone : p.sellerPhone; const sTg = sShop ? sShop.tg : p.sellerTg;
       let buttonsHtml = p.isSold ? `<div class="sold-text" style="font-size:0.85rem; font-weight:bold; color:var(--danger); text-align:center; padding:10px;">❌ ይህ እቃ ተሽጧል</div>` : `
-          <button class="btn-action btn-order" onclick="openOrderPhoneModal('${p.id}')">🛒 አሁን አዝዝ (Order)</button>
+          <button class="btn-action btn-order" onclick="openOrderPhoneModal('${escAttr(p.id)}')">🛒 አሁን አዝዝ (Order)</button>
           <div style="display:flex; gap:4px; margin-top:4px;">
-            <a class="btn-action btn-call" style="flex:1;" href="tel:${sPhone}">📞 ደውል</a>
-            <button class="btn-action btn-tg" style="flex:1;" onclick="contactDirect('${sTg}', '${p.title}')">💬 ቻት</button>
-            <button class="btn-action" style="flex:1; background:#8B5CF6; color:white;" onclick="shareProduct('${p.id}', '${p.title}')">🔗 አጋራ</button>
+            <a class="btn-action btn-call" style="flex:1;" href="tel:${escAttr(sPhone)}">📞 ደውል</a>
+            <button class="btn-action btn-tg" style="flex:1;" onclick="contactDirect('${escAttr(sTg)}', '${escAttr(p.title)}')">💬 ቻት</button>
+            <button class="btn-action" style="flex:1; background:#8B5CF6; color:white;" onclick="shareProduct('${escAttr(p.id)}', '${escAttr(p.title)}')">🔗 አጋራ</button>
           </div>
-          <button class="btn-action" style="margin-top:4px; background:#F59E0B; color:white;" onclick="viewShop('${p.sellerId}')">🏪 የ ${sShop ? sShop.name : 'ሻጭ'} ሱቅ ሙሉ እቃዎችን እይ</button>
-          `;
+          <button class="btn-action" style="margin-top:4px; background:#F59E0B; color:white;" onclick="viewShop('${escAttr(p.sellerId)}')">🏪 የ ${escHtml(sShop ? sShop.name : 'ሻጭ')} ሱቅ ሙሉ እቃዎችን እይ</button>`;
       document.getElementById('modalButtons').innerHTML = buttonsHtml; renderComments(p.comments); document.getElementById('productModal').style.display = "block";
     }
     function closeModal() { document.getElementById('productModal').style.display = "none"; currentOpenedProductId = null; }
-    
+
     function shareProduct(id, title) {
-      const appLink = `https://t.me/wolkite_shopbot/wolkiteshop?startapp=p_${id}`; // 🌟 UPDATED: /shop? → /wolkiteshop?
+      const appLink = `${BOT_APP_LINK}?startapp=p_${id}`;
       const text = `🛍️ የወልቂጤ ዩኒቨርሲቲ ገበያ ላይ ይሄንን አይተሃል?\n\n📌 ${title}\n\nአሁኑኑ ለማየት ሊንኩን ይጫኑ 👇`;
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(appLink)}&text=${encodeURIComponent(text)}`;
       if(tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
-    // 🌟 SHOP FILTER (FIXED BACK BUTTON TEXT)
     function viewShop(sellerId) {
       currentSellerFilter = sellerId; currentCategory = 'All';
       document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
@@ -744,130 +1132,102 @@
       document.getElementById('shopFilterName').innerText = `🏪 የ ${shop ? shop.name : 'ሻጭ'} ሱቅ እቃዎች`;
       closeModal(); switchTab('home', document.getElementById('navHome')); filterProducts();
     }
-    
     function clearShopFilter() { currentSellerFilter = null; document.getElementById('shopFilterBanner').style.display = 'none'; filterProducts(); }
 
     function renderComments(commentsObj) {
       const list = document.getElementById('modalCommentsList'); list.innerHTML = ''; if(!commentsObj) { list.innerHTML = '<p style="color:#888; font-size:0.75rem; text-align:center;">ምንም አስተያየት የለም። የመጀመሪያው ይሁኑ!</p>'; return; }
-      Object.keys(commentsObj).forEach(k => { const c = commentsObj[k]; list.innerHTML += `<div class="comment-item"><strong>${c.name}</strong><small>${new Date(c.date).toLocaleDateString()}</small><br><span style="color:#333;">${c.text}</span></div>`; });
+      Object.keys(commentsObj).forEach(k => { const c = commentsObj[k]; list.innerHTML += `<div class="comment-item"><strong>${escHtml(c.name)}</strong><small>${new Date(c.date).toLocaleDateString()}</small><br><span style="color:#333;">${escHtml(c.text)}</span></div>`; });
     }
-    
     async function postComment() {
       if(!currentOpenedProductId) return; const inp = document.getElementById('newCommentInput'); const text = inp.value.trim(); if(!text) return;
       const cId = `C-${Date.now()}`; const cData = { name: currentUser.first_name || currentUser.username || "ተጠቃሚ", text: text, date: new Date().toISOString() }; inp.value = '';
       try { await fetch(`${FIREBASE_PRODUCTS}/${currentOpenedProductId}/comments/${cId}.json`, { method: 'PUT', body: JSON.stringify(cData) }); const pIndex = products.findIndex(x => x.id === currentOpenedProductId); if(pIndex > -1) { if(!products[pIndex].comments) products[pIndex].comments = {}; products[pIndex].comments[cId] = cData; renderComments(products[pIndex].comments); } } catch(e) {}
     }
-    
-    window.onclick = function(event) { 
-      const pModal = document.getElementById('productModal'); const sModal = document.getElementById('editShopModal'); const eProdModal = document.getElementById('editProductModal');
-      const offModal = document.getElementById('addOfferModal'); const phoneModal = document.getElementById('orderPhoneModal'); const shareImgModal = document.getElementById('shareImageModal'); // 🌟 NEW
-      if (event.target === pModal) { pModal.style.display = "none"; currentOpenedProductId = null;} if (event.target === sModal) sModal.style.display = "none"; if (event.target === eProdModal) eProdModal.style.display = "none"; 
-      if (event.target === offModal) offModal.style.display = "none"; if (event.target === phoneModal) { phoneModal.style.display = "none"; pendingOrderProductId = null; } // 🌟 NEW
-      if (event.target === shareImgModal) shareImgModal.style.display = "none"; // 🌟 NEW
-    }
 
-    // 🌟 CATEGORY & SEARCH 
-    function selectCategory(cat, btn) { 
-      currentCategory = cat; 
-      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active')); 
-      btn.classList.add('active'); 
-      filterProducts(); 
+    window.onclick = function(event) {
+      const modals = ['productModal', 'editShopModal', 'editProductModal', 'addOfferModal', 'orderPhoneModal', 'shareImageModal', 'eduPaymentModal'];
+      modals.forEach(mId => {
+        const el = document.getElementById(mId);
+        if (event.target === el) {
+          el.style.display = "none";
+          if (mId === 'productModal') currentOpenedProductId = null;
+          if (mId === 'orderPhoneModal') pendingOrderProductId = null;
+        }
+      });
+    };
+
+    function selectCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      filterProducts();
     }
 
     function filterProducts() {
       const q = document.getElementById('homeSearch').value.toLowerCase().trim();
       const filtered = products.filter(p => {
         if (p.status !== 'approved') return false;
-        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false; 
-        
+        if (currentSellerFilter && String(p.sellerId) !== String(currentSellerFilter)) return false;
         let pCat = (p.category || "").trim(); let matchesCategory = false;
-        if (currentCategory === 'All') { matchesCategory = true; } else if (currentCategory === 'Other Products' && pCat === 'Other') { matchesCategory = true; } else { matchesCategory = pCat === currentCategory; }
-        
+        if (currentCategory === 'All') matchesCategory = true;
+        else if (currentCategory === 'Other Products' && pCat === 'Other') matchesCategory = true;
+        else matchesCategory = pCat === currentCategory;
         let matchesSearch = true;
         if (q !== "") { const pTitle = (p.title || "").toLowerCase(); const pDesc = (p.desc || "").toLowerCase(); matchesSearch = pTitle.includes(q) || pDesc.includes(q); }
-        
         return matchesCategory && matchesSearch;
       });
       renderProducts(filtered);
     }
 
-    // 🌟 ORIGINAL GRID DESIGN (NO BUTTONS ON FRONT, SHORT HEIGHT, AVATARS RESTORED) 🌟
     function renderProducts(items) {
       const grid = document.getElementById('productGrid'); grid.innerHTML = '';
       if(items.length === 0) { grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>'; return; }
-      
       items.sort((a, b) => { if(a.isPinned && !b.isPinned) return -1; if(!a.isPinned && b.isPinned) return 1; return (b.likes || 0) - (a.likes || 0); });
       const isAdmin = (Number(currentUser.id) === ADMIN_ID);
       const userLikes = JSON.parse(localStorage.getItem('user_likes') || '[]');
-      
       items.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
-        const sellerShop = shops[p.sellerId]; 
-        const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ'); 
-        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50'; 
+        const sellerShop = shops[p.sellerId];
+        const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ');
+        const sAvatar = (sellerShop && sellerShop.avatar) ? sellerShop.avatar : 'https://via.placeholder.com/50';
         const sTier = sellerShop ? (sellerShop.tier || 'Free') : 'Free';
         const isLiked = userLikes.includes(p.id) ? 'liked' : '';
-        
-        let proHtml = ''; 
-        let avatarStyle = "width:22px; height:22px; border-radius:50%; object-fit:cover;";
-        if(sTier === 'Gold') { 
-           proHtml = `<span class="pro-badge badge-gold">👑</span>`; 
-           avatarStyle += "border: 2px solid var(--gold);";
-        } 
-        else if(sTier === 'Silver') { 
-           proHtml = `<span class="pro-badge badge-silver">🥈</span>`; 
-           avatarStyle += "border: 1px solid var(--silver);";
-        } else {
-           avatarStyle += "border: 1px solid var(--border);";
-        }
-        
+        let proHtml = ''; let avatarStyle = "width:22px; height:22px; border-radius:50%; object-fit:cover;";
+        if(sTier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; avatarStyle += "border: 2px solid var(--gold);"; }
+        else if(sTier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; avatarStyle += "border: 1px solid var(--silver);"; }
+        else { avatarStyle += "border: 1px solid var(--border);"; }
         let adminActions = '';
         if(isAdmin) {
           adminActions = `
             <div style="margin-top:4px; display:flex; gap:4px; font-size:0.7rem;">
-                <button style="flex:1; background:#4F46E5; color:white; border:none; padding:4px; border-radius:4px;" onclick="togglePin('${p.id}', ${p.isPinned}); event.stopPropagation();">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
-                <button style="flex:1; background:var(--blue); color:white; border:none; padding:4px; border-radius:4px;" onclick="openEditProductModal('${p.id}'); event.stopPropagation();">⚙️ Edit</button>
-                <button style="flex:1; background:var(--danger); color:white; border:none; padding:4px; border-radius:4px;" onclick="deleteProduct('${p.id}'); event.stopPropagation();">🗑️ አጥፋ</button>
+              <button style="flex:1; background:#4F46E5; color:white; border:none; padding:4px; border-radius:4px;" onclick="togglePin('${escAttr(p.id)}', ${!!p.isPinned}); event.stopPropagation();">📌 ${p.isPinned ? 'Unpin' : 'Pin'}</button>
+              <button style="flex:1; background:var(--blue); color:white; border:none; padding:4px; border-radius:4px;" onclick="openEditProductModal('${escAttr(p.id)}'); event.stopPropagation();">⚙️ Edit</button>
+              <button style="flex:1; background:var(--danger); color:white; border:none; padding:4px; border-radius:4px;" onclick="deleteProduct('${escAttr(p.id)}'); event.stopPropagation();">🗑️ አጥፋ</button>
             </div>
-            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${p.id}'); event.stopPropagation();">📢 ቻናል ላክ</button>`;
+            <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${escAttr(p.id)}'); event.stopPropagation();">📢 ቻናል ላክ</button>`;
         }
-        
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
-
         grid.innerHTML += `
-          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${p.id}')" style="cursor:pointer;">
+          <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${escAttr(p.id)}')" style="cursor:pointer;">
             ${isPinnedHtml}
             ${p.isSold ? `<span class="status-badge badge-sold">❌ ተሽጧል</span>` : ''}
-            
             <img src="${displayImg}" class="product-img">
-            
             <div class="product-info">
-              <div class="product-title">${p.title}</div>
-              
-              <div class="product-shop" onclick="viewShop('${p.sellerId}'); event.stopPropagation();">
+              <div class="product-title">${escHtml(p.title)}</div>
+              <div class="product-shop" onclick="viewShop('${escAttr(p.sellerId)}'); event.stopPropagation();">
                 <img src="${sAvatar}" style="${avatarStyle}" alt="Avatar">
-                ${sName} ${proHtml}
+                ${escHtml(sName)} ${proHtml}
               </div>
-              
-              <div class="product-price">${p.price || p.finalPrice || 0} ETB</div>
-              
-              <button class="like-btn-front like-btn-front-${p.id} ${isLiked}" onclick="likeProduct('${p.id}', event)">
-                 <span class="like-icon">❤️</span> <span class="like-count-${p.id}">${p.likes || 0}</span>
+              <div class="product-price">${escHtml(p.price || p.finalPrice || 0)} ETB</div>
+              <button class="like-btn-front like-btn-front-${escAttr(p.id)} ${isLiked}" onclick="likeProduct('${escAttr(p.id)}', event)">
+                <span class="like-icon">❤️</span> <span class="like-count-${escAttr(p.id)}">${p.likes || 0}</span>
               </button>
-              
               ${adminActions}
             </div>
           </div>`;
       });
     }
 
-    // =====================================================================
-    // 🌟 NEW: Shops tab - browse sellers grouped/filterable by category
-    // Tapping a shop card reuses the existing viewShop() (no popup - it goes
-    // straight to that seller's product listing on Home, where tapping a
-    // product image still opens the normal popup, and ordering still shows
-    // the phone-number popup, unchanged).
-    // =====================================================================
     function selectShopsCategory(cat, btn) {
       currentShopsCategory = cat;
       document.querySelectorAll('#shopsCategoryBar .cat-pill').forEach(p => p.classList.remove('active'));
@@ -894,23 +1254,19 @@
         let proHtml = ''; let avatarCls = 'shop-browse-avatar';
         if (tier === 'Gold') { proHtml = `<span class="pro-badge badge-gold">👑</span>`; avatarCls += ' avatar-gold'; }
         else if (tier === 'Silver') { proHtml = `<span class="pro-badge badge-silver">🥈</span>`; avatarCls += ' avatar-silver'; }
-        return `
-          <div class="shop-browse-card" onclick="viewShop('${escAttr(sellerId)}')">
-            <img src="${s.avatar || 'https://via.placeholder.com/70'}" class="${avatarCls}">
-            <div class="shop-browse-name">${escHtml(s.name || 'ሻጭ')} ${proHtml}</div>
-          </div>`;
+        return `<div class="shop-browse-card" onclick="viewShop('${escAttr(sellerId)}')"><img src="${s.avatar || 'https://via.placeholder.com/70'}" class="${avatarCls}"><div class="shop-browse-name">${escHtml(s.name || 'ሻጭ')} ${proHtml}</div></div>`;
       }).join('');
     }
 
     function switchProfileTab(tabId, btn) { document.querySelectorAll('#shopDashboardBox .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#shopDashboardBox .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
     function switchAdminTab(tabId, btn) { document.querySelectorAll('#adminPanel .p-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('#adminPanel .p-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
-    
+
     async function likeProduct(id, event) {
       if(event) { event.preventDefault(); event.stopPropagation(); }
       const p = products.find(x => x.id === id); if(!p) return;
-      if(currentUser.id !== ADMIN_ID) {
+      if(Number(currentUser.id) !== ADMIN_ID) {
         let likedItems = JSON.parse(localStorage.getItem('user_likes') || '[]');
-        if(likedItems.includes(id)) { if(tg.showAlert) tg.showAlert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); else alert("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
+        if(likedItems.includes(id)) { notifyUser("ይህንን እቃ አስቀድመው Like አድርገውታል! ❤️"); return; }
         likedItems.push(id); localStorage.setItem('user_likes', JSON.stringify(likedItems));
       }
       const newLikes = (p.likes || 0) + 1; p.likes = newLikes;
@@ -925,7 +1281,7 @@
         const img = new Image(); img.onload = function() {
           const canvas = document.createElement('canvas'); const maxDim = 400; let width = img.width; let height = img.height;
           if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
-          canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); 
+          canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
           const base64 = canvas.toDataURL('image/jpeg', 0.6);
           uploadedImages[index] = base64;
           document.getElementById(`img-preview-${index}`).src = base64;
@@ -935,206 +1291,101 @@
         }; img.src = event.target.result;
       }; reader.readAsDataURL(file);
     }
-    
     function removeImage(index) {
-       uploadedImages[index] = "";
-       document.getElementById(`img-preview-${index}`).src = "";
-       document.getElementById(`img-preview-${index}`).style.display = 'none';
-       document.getElementById(`plus-${index}`).style.display = 'block';
-       document.getElementById(`rm-btn-${index}`).style.display = 'none';
-       document.getElementById(`img-in-${index}`).value = "";
+      uploadedImages[index] = "";
+      document.getElementById(`img-preview-${index}`).src = ""; document.getElementById(`img-preview-${index}`).style.display = 'none';
+      document.getElementById(`plus-${index}`).style.display = 'block'; document.getElementById(`rm-btn-${index}`).style.display = 'none';
+      document.getElementById(`img-in-${index}`).value = "";
     }
 
     async function handleProductSubmit(e) {
       e.preventDefault(); if(!myShop) return;
       const tUploads = myShop.totalUploads || 0; const tier = myShop.tier || 'Free'; const allowed = tier === 'Gold' ? Infinity : (tier === 'Silver' ? 15 : 5);
-      if(tUploads >= allowed) { alert(`የ ${tier} እቅድ ገደብ (${allowed} ጭነቶች) አልቋል! ወደሚቀጥለው ያሳድጉ።`); return; }
+      if(tUploads >= allowed) { notifyUser(`የ ${tier} እቅድ ገደብ (${allowed} ጭነቶች) አልቋል! ወደሚቀጥለው ያሳድጉ።`); return; }
       const validImages = uploadedImages.filter(img => img !== "");
-      if(validImages.length === 0) { alert("እባክዎ ቢያንስ 1 የእቃ ፎቶ ያስገቡ"); return; }
-      
+      if(validImages.length === 0) { notifyUser("እባክዎ ቢያንስ 1 የእቃ ፎቶ ያስገቡ"); return; }
       document.getElementById('submitBtn').innerText = "በመላክ ላይ..."; document.getElementById('submitBtn').disabled = true;
       const newId = `WS-${Date.now().toString().slice(-6)}`;
       const newProduct = { title: document.getElementById('prodTitle').value, price: document.getElementById('sellerPrice').value, category: document.getElementById('prodCategory').value, condition: document.getElementById('prodCondition').value, desc: document.getElementById('prodDesc').value, status: (Number(currentUser.id) === ADMIN_ID) ? 'approved' : 'pending', isSold: false, likes: 0, isPinned: false, sellerId: currentUser.id, sellerName: myShop.name, sellerPhone: myShop.phone, sellerTg: myShop.tg, img: validImages[0], images: validImages };
-      
       try {
         await fetch(`${FIREBASE_PRODUCTS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newProduct) });
         await fetch(`${FIREBASE_SHOPS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ totalUploads: tUploads + 1 }) });
-        alert('እቃው ተልኳል!'); document.getElementById('sellForm').reset(); for(let i=0; i<3; i++) removeImage(i);
+        notifyUser('እቃው ተልኳል!'); document.getElementById('sellForm').reset(); for(let i=0; i<3; i++) removeImage(i);
         await loadAllData(); switchTab('home', document.getElementById('navHome'));
       } catch(e) {} finally { document.getElementById('submitBtn').innerText = "እቃውን ለጥፍ (Upload)"; document.getElementById('submitBtn').disabled = false; }
     }
-    
-    // 🔧 ረዳት ፋንክሽኖች (አዲስ): በስም ውስጥ ' " < > ሲኖር ገጹ እንዳይበላሽ
-    function escHtml(s) {
-      return String(s === undefined || s === null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-    // onclick="fn('...')" ውስጥ ለሚገባ ጽሑፍ
-    function escAttr(s) {
-      return escHtml(String(s === undefined || s === null ? '' : s)
-        .replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' '));
-    }
 
-    // 🌟 ADMIN DASHBOARD FUNCTIONS (FIXED) 🌟
     function renderAdminDashboard() {
       const sKeys = Object.keys(shops || {}); const oKeys = Object.keys(orders || {});
       const stOf = (o) => String((o && o.status) || '').toLowerCase();
-
       let tOrders = oKeys.length; let newO = 0, compO = 0, cancO = 0;
       oKeys.forEach(k => { const st = stOf(orders[k]); if(st === 'pending') newO++; else if(st === 'completed') compO++; else if(st === 'cancelled') cancO++; });
       let tSellers = sKeys.length; let gSellers = 0; let silSellers = 0;
       sKeys.forEach(k => { if(shops[k].tier === 'Gold') gSellers++; else if(shops[k].tier === 'Silver') silSellers++; });
-      
       document.getElementById('st-total-users').innerText = totalBotUsers; document.getElementById('st-total-orders').innerText = tOrders; document.getElementById('st-new-orders').innerText = newO; document.getElementById('st-completed-orders').innerText = compO; document.getElementById('st-cancelled-orders').innerText = cancO; document.getElementById('st-active-sellers').innerText = tSellers; document.getElementById('st-gold-sellers').innerText = gSellers; document.getElementById('st-silver-sellers').innerText = silSellers; document.getElementById('st-free-sellers').innerText = tSellers - (gSellers + silSellers);
 
-      // ⏳ Pending products
       const pendingList = document.getElementById('adminPendingList'); const pendProducts = products.filter(p => p.status === 'pending');
       pendingList.innerHTML = ''; if(pendProducts.length === 0) pendingList.innerHTML = '<p style="font-size:0.8rem;">የሚጠብቅ እቃ የለም።</p>';
       pendProducts.forEach(p => {
         const displayPrice = p.price || p.finalPrice || 0; const sellerShop = shops[p.sellerId]; const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ያልታወቀ ሻጭ');
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
-        pendingList.innerHTML += `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
-            <img src="${displayImg}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
-            <div style="flex:1;">
-              <strong>${escHtml(p.title)}</strong> (${escHtml(displayPrice)} ETB)<br><small>ሻጭ: ${escHtml(sName)}</small>
-              <div style="display:flex; gap:4px; margin-top:6px;">
-                <button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'approved')">አጽድቅ</button>
-                <button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'rejected')">ውድቅ</button>
-              </div>
-            </div>
-          </div>`;
+        pendingList.innerHTML += `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;"><img src="${displayImg}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;"><div style="flex:1;"><strong>${escHtml(p.title)}</strong> (${escHtml(displayPrice)} ETB)<br><small>ሻጭ: ${escHtml(sName)}</small><div style="display:flex; gap:4px; margin-top:6px;"><button class="btn-action btn-tg" style="flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'approved')">አጽድቅ</button><button class="btn-action" style="background:var(--danger); color:white; flex:1; padding:4px;" onclick="adminUpdateProd('${escAttr(p.id)}', 'rejected')">ውድቅ</button></div></div></div>`;
       });
 
-      // 👥 Sellers
       const sellersList = document.getElementById('adminSellersList'); sellersList.innerHTML = '';
       if (sKeys.length === 0) sellersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ሻጭ የለም።</p>';
       sKeys.forEach(k => {
         const s = shops[k]; const cTier = s.tier || 'Free';
         let badge = '', avatarStyle = "width:30px; height:30px; border-radius:50%; object-fit:cover;";
-        if(cTier === 'Gold') { badge = '<span class="pro-badge badge-gold">👑 GOLD</span>'; avatarStyle += "border: 2px solid var(--gold); box-shadow: 0 0 5px rgba(217,119,6,0.5);"; } 
-        else if(cTier === 'Silver') { badge = '<span class="pro-badge badge-silver">🥈 SILVER</span>'; avatarStyle += "border: 2px solid var(--silver); box-shadow: 0 0 5px rgba(156,163,175,0.5);"; } 
+        if(cTier === 'Gold') { badge = '<span class="pro-badge badge-gold">👑 GOLD</span>'; avatarStyle += "border: 2px solid var(--gold);"; }
+        else if(cTier === 'Silver') { badge = '<span class="pro-badge badge-silver">🥈 SILVER</span>'; avatarStyle += "border: 2px solid var(--silver);"; }
         else { badge = '<span style="font-size:0.6rem; color:var(--gray); border:1px solid var(--gray); padding:1px 4px; border-radius:4px;">FREE</span>'; avatarStyle += "border: 1px solid var(--border);"; }
-        
-        const actionBtn = `
-          <div style="display:flex; gap:4px; margin-top:6px;">
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${escAttr(k)}', 'Free')">Free</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Silver')">Silver</button>
-            <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Gold')">Gold</button>
-          </div>`;
-        sellersList.innerHTML += `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <div style="display:flex; align-items:center; gap:6px;"><img src="${s.avatar || 'https://via.placeholder.com/50'}" style="${avatarStyle}"><strong>${escHtml(s.name || 'ያልታወቀ ሻጭ')}</strong></div>${badge}
-            </div>
-            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:2px;">📞 ${escHtml(s.phone || '-')} | 💬 @${escHtml(s.tg || '-')}</div>
-            <div style="font-size:0.7rem; color:var(--text); margin-bottom:6px;">Uploads: <b>${s.totalUploads||0}</b> | Orders: <b>${s.totalOrdersReceived||0}</b></div>
-            ${actionBtn}
-          </div>`;
+        sellersList.innerHTML += `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><div style="display:flex; align-items:center; gap:6px;"><img src="${s.avatar || 'https://via.placeholder.com/50'}" style="${avatarStyle}"><strong>${escHtml(s.name || 'ያልታወቀ ሻጭ')}</strong></div>${badge}</div><div style="font-size:0.75rem; color:var(--gray); margin-bottom:2px;">📞 ${escHtml(s.phone || '-')} | 💬 @${escHtml(s.tg || '-')}</div><div style="font-size:0.7rem; color:var(--text); margin-bottom:6px;">Uploads: <b>${s.totalUploads||0}</b> | Orders: <b>${s.totalOrdersReceived||0}</b></div><div style="display:flex; gap:4px;"><button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#E5E7EB; color:black;" onclick="adminSetTier('${escAttr(k)}', 'Free')">Free</button><button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--silver); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Silver')">Silver</button><button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--gold); color:white;" onclick="adminSetTier('${escAttr(k)}', 'Gold')">Gold</button></div></div>`;
       });
-      
-      // 🛍️ Orders
+
       const adminOrdersList = document.getElementById('adminOrdersList'); adminOrdersList.innerHTML = '';
-      const allOrderKeys = [...oKeys].reverse(); 
-      if (allOrderKeys.length === 0) { adminOrdersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ትዕዛዝ የለም።</p>'; } 
+      const allOrderKeys = [...oKeys].reverse();
+      if (allOrderKeys.length === 0) { adminOrdersList.innerHTML = '<p style="font-size:0.8rem; text-align:center;">ምንም ትዕዛዝ የለም።</p>'; }
       else {
-          allOrderKeys.forEach(k => {
-              const o = orders[k]; const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '-', tg: '-' };
-              const st = stOf(o);
-              let statusColor = st === 'pending' ? 'var(--danger)' : st === 'completed' ? 'var(--secondary)' : 'var(--gray)';
-              const orderNote = 'ስለ ትዕዛዝ (Order) - ' + (o.productTitle || '');
-              adminOrdersList.innerHTML += `
-                <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
-                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                    <strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || 'ያልታወቀ እቃ')}</strong>
-                    <span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${escHtml(o.status || '-')}</span>
-                  </div>
-                  <div style="font-size:0.75rem; margin-bottom:4px; line-height:1.5;">
-                    <span style="color:var(--gray);">ገዢ:</span> <b>${escHtml(o.buyerName || 'ያልታወቀ ገዢ')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} <br>
-                    <span style="color:var(--gray);">ሻጭ:</span> <b>${escHtml(sellerInfo.name || 'ያልታወቀ ሻጭ')}</b> (📞 ${escHtml(sellerInfo.phone || '-')})
-                  </div>
-                  <div style="display:flex; gap:4px; margin-top:6px;">
-                    <button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(sellerInfo.tg)}', '${escAttr(orderNote)}')">💬 ሻጩን አናግር</button>
-                    <button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr(orderNote)}')">💬 ገዢውን አናግር</button>
-                  </div>
-                  <div style="display:flex; gap:4px; margin-top:4px;">
-                    <button class="btn-action" style="flex:1; padding:6px; font-size:0.75rem; background:var(--secondary); color:white;" onclick="adminUpdateOrderStatus('${escAttr(k)}', 'Completed')">✅ ተጠናቀቀ</button>
-                    <button class="btn-action" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gray); color:white;" onclick="adminUpdateOrderStatus('${escAttr(k)}', 'Cancelled')">❌ ሰርዝ</button>
-                  </div>
-                </div>`;
-          });
+        allOrderKeys.forEach(k => {
+          const o = orders[k]; const sellerInfo = shops[o.sellerId] || { name: 'ያልታወቀ ሻጭ', phone: '-', tg: '-' };
+          const st = stOf(o);
+          let statusColor = st === 'pending' ? 'var(--danger)' : st === 'completed' ? 'var(--secondary)' : 'var(--gray)';
+          const orderNote = 'ስለ ትዕዛዝ (Order) - ' + (o.productTitle || '');
+          adminOrdersList.innerHTML += `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;"><div style="display:flex; justify-content:space-between; margin-bottom:4px;"><strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || 'ያልታወቀ እቃ')}</strong><span style="font-size:0.7rem; color:white; background:${statusColor}; padding:2px 6px; border-radius:4px;">${escHtml(o.status || '-')}</span></div><div style="font-size:0.75rem; margin-bottom:4px; line-height:1.5;"><span style="color:var(--gray);">ገዢ:</span> <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} <br><span style="color:var(--gray);">ሻጭ:</span> <b>${escHtml(sellerInfo.name || '-')}</b> (📞 ${escHtml(sellerInfo.phone || '-')})</div><div style="display:flex; gap:4px; margin-top:6px;"><button class="btn-action btn-tg" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(sellerInfo.tg)}', '${escAttr(orderNote)}')">💬 ሻጩን አናግር</button><button class="btn-action btn-call" style="flex:1; padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr(orderNote)}')">💬 ገዢውን አናግር</button></div><div style="display:flex; gap:4px; margin-top:4px;"><button class="btn-action" style="flex:1; padding:6px; font-size:0.75rem; background:var(--secondary); color:white;" onclick="adminUpdateOrderStatus('${escAttr(k)}', 'Completed')">✅ ተጠናቀቀ</button><button class="btn-action" style="flex:1; padding:6px; font-size:0.75rem; background:var(--gray); color:white;" onclick="adminUpdateOrderStatus('${escAttr(k)}', 'Cancelled')">❌ ሰርዝ</button></div></div>`;
+        });
       }
-
-      renderAdminOffersList(); // 🌟 NEW: keep the admin Offers tab in sync
+      renderAdminOffersList();
     }
 
-    async function adminUpdateOrderStatus(orderId, newStatus) {
-      try {
-        const res = await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
-        if (!res.ok) throw new Error('save failed');
-      } catch(e) {
-        if(tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
-      }
-      await loadAllData();
-    }
-
-    async function adminUpdateProd(id, status) {
-      try {
-        const res = await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) });
-        if (!res.ok) throw new Error('save failed');
-      } catch(e) {
-        if(tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
-      }
-      await loadAllData();
-    }
-
-    async function adminSetTier(sellerId, newTier) { 
-      const applyTier = async function() {
-        try {
-          const res = await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) });
-          if (!res.ok) throw new Error('save failed');
-        } catch(e) {
-          if(tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
-        }
-        await loadAllData();
-      };
+    async function adminUpdateOrderStatus(orderId, newStatus) { try { await fetch(`${FIREBASE_ORDERS}/${orderId}.json`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) }); } catch(e) {} await loadAllData(); }
+    async function adminUpdateProd(id, status) { try { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ status: status }) }); } catch(e) {} await loadAllData(); }
+    async function adminSetTier(sellerId, newTier) {
+      const applyTier = async function() { try { await fetch(`${FIREBASE_SHOPS}/${sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ tier: newTier }) }); } catch(e) {} await loadAllData(); };
       const msg = `የዚህን ሻጭ ደረጃ ወደ ${newTier} መቀየር ይፈልጋሉ?`;
-      if (tg.showConfirm) { tg.showConfirm(msg, async function(c) { if(c) await applyTier(); }); } 
-      else { if(confirm(msg)) await applyTier(); }
+      if (tg.showConfirm) tg.showConfirm(msg, async c => { if(c) await applyTier(); }); else if(confirm(msg)) await applyTier();
     }
     async function togglePin(id, isPinned) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isPinned: !isPinned }) }); await loadAllData(); }
     async function toggleSold(id, isSold) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ isSold: !isSold }) }); await loadAllData(); }
     async function deleteProduct(id) { if (confirm("እቃውን ማጥፋት ይፈልጋሉ?")) { await fetch(`${FIREBASE_PRODUCTS}/${id}.json`, { method: 'DELETE' }); await loadAllData(); } }
 
-    // =====================================================================
-    // 🆕 በላክኸው ኮድ ውስጥ ያልነበሩ (ግን ሌሎች ፋንክሽኖች የሚጠሯቸው) ፋንክሽኖች
-    // በእውነተኛው ፋይልህ ውስጥ አስቀድመው ካሉ ይህንን ክፍል ሙሉ በሙሉ ሰርዘው
-    // =====================================================================
     function contactDirect(tgUser, text) {
       const user = String(tgUser || '').replace(/^@/, '').trim();
-      if (!user || user === '-' || user === 'undefined') { alert('ቴሌግራም ዩዘርኔም አልተገኘም'); return; }
+      if (!user || user === '-' || user === 'undefined') { notifyUser('ቴሌግራም ዩዘርኔም አልተገኘም'); return; }
       const url = `https://t.me/${user}?text=${encodeURIComponent(text || '')}`;
       if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
     async function placeOrder(id, buyerPhone) {
       const p = products.find(x => x.id === id); if (!p) return;
-      const order = {
-        productId: id, productTitle: p.title, price: p.price || p.finalPrice || 0,
-        sellerId: p.sellerId, buyerId: currentUser.id,
-        buyerName: currentUser.first_name || currentUser.username || 'ገዢ',
-        buyerTg: currentUser.username || '', buyerPhone: buyerPhone || '', status: 'Pending', date: new Date().toISOString() // 🌟 NEW: buyerPhone
-      };
+      const order = { productId: id, productTitle: p.title, price: p.price || p.finalPrice || 0, sellerId: p.sellerId, buyerId: currentUser.id, buyerName: currentUser.first_name || currentUser.username || 'ገዢ', buyerTg: currentUser.username || '', buyerPhone: buyerPhone || '', status: 'Pending', date: new Date().toISOString() };
       try {
         await fetch(`${FIREBASE_ORDERS}/OR-${Date.now()}.json`, { method: 'PUT', body: JSON.stringify(order) });
         const sh = shops[p.sellerId];
         if (sh) await fetch(`${FIREBASE_SHOPS}/${p.sellerId}.json`, { method: 'PATCH', body: JSON.stringify({ totalOrdersReceived: (sh.totalOrdersReceived || 0) + 1 }) });
-        if (tg.showAlert) tg.showAlert("ትዕዛዝዎ ተልኳል! ሻጩ ያናግርዎታል ✅"); else alert("ትዕዛዝዎ ተልኳል! ሻጩ ያናግርዎታል ✅");
+        notifyUser("ትዕዛዝዎ ተልኳል! ሻጩ ያናግርዎታል ✅");
         await loadAllData();
-      } catch(e) {
-        if (tg.showAlert) tg.showAlert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); else alert("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ");
-      }
+      } catch(e) { notifyUser("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ"); }
     }
 
     function renderMyListings() {
@@ -1145,18 +1396,7 @@
       const stText = { approved: '✅ ጸድቋል', pending: '⏳ በመጠባበቅ ላይ', rejected: '❌ ውድቅ ሆኗል' };
       box.innerHTML = mine.map(p => {
         const img = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/50');
-        return `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;">
-            <img src="${img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
-            <div style="flex:1;">
-              <strong>${escHtml(p.title)}</strong> (${escHtml(p.price || p.finalPrice || 0)} ETB)<br>
-              <small>${stText[p.status] || escHtml(p.status || '-')}${p.isSold ? ' | ❌ ተሽጧል' : ''}</small>
-              <div style="display:flex; gap:4px; margin-top:6px;">
-                <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#10B981; color:white;" onclick="toggleSold('${escAttr(p.id)}', ${!!p.isSold})">${p.isSold ? 'አልተሸጠም' : 'ተሽጧል'}</button>
-                <button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--danger); color:white;" onclick="deleteProduct('${escAttr(p.id)}')">🗑️ አጥፋ</button>
-              </div>
-            </div>
-          </div>`;
+        return `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; gap:10px;"><img src="${img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;"><div style="flex:1;"><strong>${escHtml(p.title)}</strong> (${escHtml(p.price || p.finalPrice || 0)} ETB)<br><small>${stText[p.status] || escHtml(p.status || '-')}${p.isSold ? ' | ❌ ተሽጧል' : ''}</small><div style="display:flex; gap:4px; margin-top:6px;"><button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:#10B981; color:white;" onclick="toggleSold('${escAttr(p.id)}', ${!!p.isSold})">${p.isSold ? 'አልተሸጠም' : 'ተሽጧል'}</button><button class="btn-action" style="flex:1; padding:4px; font-size:0.7rem; background:var(--danger); color:white;" onclick="deleteProduct('${escAttr(p.id)}')">🗑️ አጥፋ</button></div></div></div>`;
       }).join('');
     }
 
@@ -1167,47 +1407,19 @@
       if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; text-align:center; color:var(--gray);">ምንም ትዕዛዝ የለም።</p>'; return; }
       box.innerHTML = mine.map(k => {
         const o = orders[k];
-        return `
-          <div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;">
-            <strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || '-')}</strong>
-            <div style="font-size:0.75rem; line-height:1.5; margin:4px 0;">ገዢ: <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} | ${escHtml(o.status || '-')}</div>
-            <button class="btn-action btn-tg" style="padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr('ስለ ትዕዛዝ (Order) - ' + (o.productTitle || ''))}')">💬 ገዢውን አናግር</button>
-          </div>`;
+        return `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;"><strong style="font-size:0.85rem;">🛒 ${escHtml(o.productTitle || '-')}</strong><div style="font-size:0.75rem; line-height:1.5; margin:4px 0;">ገዢ: <b>${escHtml(o.buyerName || '-')}</b> (@${escHtml(o.buyerTg || '-')}) | 📞 ${escHtml(o.buyerPhone || '-')} | ${escHtml(o.status || '-')}</div><button class="btn-action btn-tg" style="padding:6px; font-size:0.75rem;" onclick="contactDirect('${escAttr(o.buyerTg)}', '${escAttr('ስለ ትዕዛዝ (Order) - ' + (o.productTitle || ''))}')">💬 ገዢውን አናግር</button></div>`;
       }).join('');
     }
 
-    // ቻናል ላክ: ለመለጠፍ የ Bot Token ስለሚያስፈልግ አሁን የ Telegram share መስኮት ይከፍታል
     function postToChannel(id) {
       const p = products.find(x => x.id === id); if (!p) return;
-      // 🌟 NEW: Telegram's share-link window can only carry a link+text, not a photo, and our product
-      // photos are base64 (not public URLs) so a bot API call couldn't attach them either without a
-      // server-side bot token. As the best available workaround, also show the photo in a popup so it
-      // can be saved and posted alongside the link manually.
       const displayImg = (p.images && p.images[0]) ? p.images[0] : p.img;
       if (displayImg) openShareImageModal(displayImg);
       shareProduct(id, p.title);
     }
-
-    // 🌟 NEW: Share-image helper popup (see postToChannel above)
     function openShareImageModal(imgSrc) { document.getElementById('shareImagePreview').src = imgSrc || ''; document.getElementById('shareImageModal').style.display = 'block'; }
     function closeShareImageModal() { document.getElementById('shareImageModal').style.display = 'none'; }
 
-    // =====================================================================
-    // 🌟 NEW: Onboarding / Welcome Screen logic
-    // =====================================================================
-    function initOnboarding() {
-      let seen = false;
-      try { seen = localStorage.getItem('ws_onboarding_seen'); } catch(e) {}
-      if (seen) { document.getElementById('onboardingScreen').style.display = 'none'; }
-    }
-    function startApp() {
-      try { localStorage.setItem('ws_onboarding_seen', '1'); } catch(e) {}
-      document.getElementById('onboardingScreen').style.display = 'none';
-    }
-
-    // =====================================================================
-    // 🌟 NEW: Special Offers Carousel (admin adds/removes; round, side-scroll)
-    // =====================================================================
     function renderOffers() {
       const box = document.getElementById('offersCarousel'); if (!box) return;
       const isAdmin = (Number(currentUser.id) === ADMIN_ID);
@@ -1215,7 +1427,6 @@
       let html = '';
       keys.forEach(k => {
         const o = offers[k];
-        // 🌟 NEW: build the style (background image + pointer cursor) and the tap handler together
         let styleParts = [];
         if (o.img) styleParts.push(`background-image:url('${escAttr(o.img)}')`);
         if (o.link) styleParts.push('cursor:pointer');
@@ -1223,16 +1434,14 @@
         const onclickAttr = o.link ? ` onclick="openOfferLink('${escAttr(o.link)}')"` : '';
         html += `<div class="offer-circle"${styleAttr}${onclickAttr}><div class="offer-discount">${escHtml(o.discount)}</div><div class="offer-title">${escHtml(o.title)}</div></div>`;
       });
-      if (isAdmin) { html += `<div class="offer-add-circle" onclick="openAddOfferModal()">➕</div>`; }
+      if (isAdmin) html += `<div class="offer-add-circle" onclick="openAddOfferModal()">➕</div>`;
       if (!html) { box.style.display = 'none'; box.innerHTML = ''; } else { box.style.display = 'flex'; box.innerHTML = html; }
     }
-
-    // 🌟 NEW: tapping an offer card goes to the product it's linked to (or opens the raw link if it's not one of ours)
     function extractProductIdFromOfferLink(link) {
       if (!link) return null;
       let m = link.match(/startapp=p_([^&]+)/) || link.match(/[?&]p_([^&]+)/) || link.match(/\/p_([^/?&]+)/);
       if (m) return decodeURIComponent(m[1]);
-      return link.trim(); // fall back to treating the whole value as a product ID
+      return link.trim();
     }
     function openOfferLink(link) {
       if (!link) return;
@@ -1242,17 +1451,13 @@
       if (tg.openTelegramLink && /^https?:\/\/(t\.me|telegram\.me)\//.test(link)) tg.openTelegramLink(link);
       else window.open(link, '_blank');
     }
-
     function openAddOfferModal() {
-      document.getElementById('addOfferForm').reset();
-      uploadedOfferImageBase64 = ""; // 🌟 NEW: reset image state for a fresh offer
+      document.getElementById('addOfferForm').reset(); uploadedOfferImageBase64 = "";
       document.getElementById('offerImgPreview').src = ""; document.getElementById('offerImgPreview').style.display = 'none';
       document.getElementById('offerImgPlus').style.display = 'block';
       document.getElementById('addOfferModal').style.display = 'block';
     }
     function closeAddOfferModal() { document.getElementById('addOfferModal').style.display = 'none'; }
-
-    // 🌟 NEW: handle the offer thumbnail image upload (resized client-side, like the other image uploads in this file)
     function handleOfferImageUpload(e) {
       const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
       reader.onload = function(event) {
@@ -1267,67 +1472,819 @@
         }; img.src = event.target.result;
       }; reader.readAsDataURL(file);
     }
-
     async function saveNewOffer(e) {
-      e.preventDefault();
-      const btn = document.getElementById('saveOfferBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
-      const newOffer = { discount: document.getElementById('offerDiscountText').value, title: document.getElementById('offerTitleText').value, img: uploadedOfferImageBase64 || "", link: document.getElementById('offerLinkText').value.trim(), createdAt: new Date().toISOString() }; // 🌟 NEW: img + link
-      const newId = `OF-${Date.now()}`;
-      try {
-        await fetch(`${FIREBASE_OFFERS}/${newId}.json`, { method: 'PUT', body: JSON.stringify(newOffer) });
-        closeAddOfferModal(); await loadAllData();
-      } catch(err) { alert("ስህተት ተፈጥሯል"); } finally { btn.innerText = "ጨምር"; btn.disabled = false; }
+      e.preventDefault(); const btn = document.getElementById('saveOfferBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
+      const newOffer = { discount: document.getElementById('offerDiscountText').value, title: document.getElementById('offerTitleText').value, img: uploadedOfferImageBase64 || "", link: document.getElementById('offerLinkText').value.trim(), createdAt: new Date().toISOString() };
+      try { await fetch(`${FIREBASE_OFFERS}/OF-${Date.now()}.json`, { method: 'PUT', body: JSON.stringify(newOffer) }); closeAddOfferModal(); await loadAllData(); }
+      catch(err) { notifyUser("ስህተት ተፈጥሯል"); } finally { btn.innerText = "ጨምር"; btn.disabled = false; }
     }
-
-    async function deleteOffer(id) {
-      if (!confirm("ይህን ቅናሽ ማጥፋት ይፈልጋሉ?")) return;
-      try { await fetch(`${FIREBASE_OFFERS}/${id}.json`, { method: 'DELETE' }); } catch(e) {}
-      await loadAllData();
-    }
-
+    async function deleteOffer(id) { if (!confirm("ይህን ቅናሽ ማጥፋት ይፈልጋሉ?")) return; try { await fetch(`${FIREBASE_OFFERS}/${id}.json`, { method: 'DELETE' }); } catch(e) {} await loadAllData(); }
     function renderAdminOffersList() {
       const box = document.getElementById('adminOffersList'); if (!box) return;
       const keys = Object.keys(offers || {});
       if (keys.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; text-align:center; color:var(--gray);">እስካሁን ምንም ቅናሽ አልተጨመረም።</p>'; return; }
       box.innerHTML = keys.map(k => {
-        const o = offers[k];
-        const bgStyle = o.img ? ` style="background-image:url('${escAttr(o.img)}')"` : '';
-        return `<div class="offer-admin-item">
-          <div class="offer-admin-circle-preview"${bgStyle}>${o.img ? '' : escHtml(o.discount)}</div>
-          <div style="flex:1;"><strong style="font-size:0.85rem;">${escHtml(o.title)}</strong><br><small style="color:var(--gray);">${o.link ? '🔗 ወደ እቃ ተያይዟል' : 'ምንም ሊንክ የለውም'}</small></div>
-          <button class="btn-action" style="width:auto; padding:6px 10px; font-size:0.75rem; background:var(--danger); color:white;" onclick="deleteOffer('${escAttr(k)}')">🗑️</button>
-        </div>`;
+        const o = offers[k]; const bgStyle = o.img ? ` style="background-image:url('${escAttr(o.img)}')"` : '';
+        return `<div class="offer-admin-item"><div class="offer-admin-circle-preview"${bgStyle}>${o.img ? '' : escHtml(o.discount)}</div><div style="flex:1;"><strong style="font-size:0.85rem;">${escHtml(o.title)}</strong><br><small style="color:var(--gray);">${o.link ? '🔗 ወደ እቃ ተያይዟል' : 'ምንም ሊንክ የለውም'}</small></div><button class="btn-action" style="width:auto; padding:6px 10px; font-size:0.75rem; background:var(--danger); color:white;" onclick="deleteOffer('${escAttr(k)}')">🗑️</button></div>`;
       }).join('');
     }
-
-    // =====================================================================
-    // 🌟 NEW: Order phone-number popup (shown when tapping "🛒 አሁን አዝዝ")
-    // The product-details popup itself is unchanged; only this one extra step was added.
-    // =====================================================================
-    function openOrderPhoneModal(id) {
-      pendingOrderProductId = id;
-      document.getElementById('orderPhoneForm').reset();
-      document.getElementById('orderPhoneModal').style.display = 'block';
-    }
+    function openOrderPhoneModal(id) { pendingOrderProductId = id; document.getElementById('orderPhoneForm').reset(); document.getElementById('orderPhoneModal').style.display = 'block'; }
     function closeOrderPhoneModal() { document.getElementById('orderPhoneModal').style.display = 'none'; pendingOrderProductId = null; }
-
     async function submitOrderWithPhone(e) {
-      e.preventDefault();
-      if (!pendingOrderProductId) return;
-      const phone = document.getElementById('orderPhoneInput').value.trim();
-      if (!phone) return;
+      e.preventDefault(); if (!pendingOrderProductId) return;
+      const phone = document.getElementById('orderPhoneInput').value.trim(); if (!phone) return;
       const btn = document.getElementById('confirmOrderBtn'); btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
       const idToOrder = pendingOrderProductId;
       await placeOrder(idToOrder, phone);
-      btn.innerText = "🛒 ትዕዛዝ አረጋግጥ"; btn.disabled = false;
-      closeOrderPhoneModal();
-      closeModal();
+      btn.innerText = "🛒 ትዕዛዝ አረጋግጥ"; btn.disabled = false; closeOrderPhoneModal(); closeModal();
     }
 
-    // 🚀 መተግበሪያውን ጀምር (በኮዱ ውስጥ ይህ ጥሪ አልነበረም)
-    initOnboarding(); // 🌟 NEW: decide whether to show the welcome screen
-    initApp();
+    // =========================================================================
+    // PART 2: BIKAT EDUCATION LOGIC (Firebase-powered)
+    // =========================================================================
+    const PRACTICE_SIZE = 25;
+    const BONUS_POINTS_THRESHOLD = 50;
+    const BONUS_INVITE_THRESHOLD = 5;
 
+    let eduDataLoaded = false;
+    let bikatStudents = {};
+    let bikatQuestions = [];
+    let bikatPayments = {};
+    let myStudent = null;
+
+    let eduNav = { level: null, stream: null, subject: null, chapter: null, practice: 1 };
+    let eduActiveQuiz = null; // { questions, index, score, earned, answeredCurrent, subject, chapter, practice }
+    let eduPendingPayment = null;
+    let eduReceiptBase64 = "";
+
+    function eduSwitchTab(viewId, btn) {
+      document.querySelectorAll('#mode-edu .view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('#navBarEdu .nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`view-${viewId}`).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (viewId === 'edu-rank') eduRenderLeaderboard();
+      if (viewId === 'edu-profile') eduRenderProfile();
+      if (viewId === 'edu-vip') eduRenderMyPayments();
+      if (viewId === 'edu-admin' && Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
+    }
+
+    function eduSwitchAdminTab(tabId, btn) {
+      document.querySelectorAll('#view-edu-admin .p-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#view-edu-admin .p-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function eduLoadAllData(referrerId = null) {
+      document.getElementById('eduLoading').style.display = 'block';
+      try {
+        const [resS, resQ, resP] = await Promise.all([
+          fetch(`${BIKAT_STUDENTS}.json`),
+          fetch(`${BIKAT_QUESTIONS}.json`),
+          fetch(`${BIKAT_PAYMENTS}.json`)
+        ]);
+        bikatStudents = (await resS.json()) || {};
+        const rawQ = (await resQ.json()) || {};
+        bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
+        bikatPayments = (await resP.json()) || {};
+
+        // Register student if first time
+        if (!bikatStudents[currentUser.id]) {
+          myStudent = {
+            user_id: currentUser.id,
+            username: currentUser.username || "",
+            full_name: currentUser.first_name || currentUser.username || "ተማሪ",
+            education_level: "Not Set",
+            total_points: 0,
+            invited_count: 0,
+            is_vip: 0,
+            bonus_subject: null,
+            answered_questions: {},
+            joined_at: new Date().toISOString()
+          };
+          await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(myStudent) });
+          bikatStudents[currentUser.id] = myStudent;
+
+          // Credit referrer if valid
+          if (referrerId && String(referrerId) !== String(currentUser.id) && bikatStudents[referrerId]) {
+            const refUser = bikatStudents[referrerId];
+            await fetch(`${BIKAT_STUDENTS}/${referrerId}.json`, {
+              method: 'PATCH',
+              body: JSON.stringify({
+                total_points: (refUser.total_points || 0) + 2,
+                invited_count: (refUser.invited_count || 0) + 1
+              })
+            });
+          }
+        } else {
+          myStudent = bikatStudents[currentUser.id];
+        }
+        eduDataLoaded = true;
+      } catch(e) {}
+      document.getElementById('eduLoading').style.display = 'none';
+
+      if (Number(currentUser.id) === ADMIN_ID) {
+        document.getElementById('navEduAdmin').style.display = 'flex';
+      }
+
+      eduRenderHero();
+      eduCheckPausedQuiz();
+      eduRenderInitialQuizView();
+      eduRenderLeaderboard();
+      eduRenderMyPayments();
+      eduRenderProfile();
+      if (Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
+    }
+
+    function eduRenderHero() {
+      if (!myStudent) return;
+      document.getElementById('eduWelcomeName').innerText = `👋 ሰላም ${myStudent.full_name || 'ተማሪ'}!`;
+      document.getElementById('eduLevelDisplay').innerText = `📚 ክፍል: ${myStudent.education_level === 'Not Set' ? 'ገና አልተመረጠም' : myStudent.education_level}`;
+      const vipChip = document.getElementById('eduVipChip');
+      if (myStudent.is_vip == 1) {
+        vipChip.innerText = '💎 VIP አባል'; vipChip.className = 'edu-chip vip';
+      } else {
+        vipChip.innerText = '👤 Free Tier'; vipChip.className = 'edu-chip';
+      }
+      document.getElementById('eduPointsChip').innerText = `🏆 ${myStudent.total_points || 0} / ${BONUS_POINTS_THRESHOLD} ነጥብ`;
+      document.getElementById('eduInviteChip').innerText = `👥 ${myStudent.invited_count || 0} / ${BONUS_INVITE_THRESHOLD} ግብዣ`;
+      const bLine = document.getElementById('eduBonusLine');
+      if (myStudent.bonus_subject) {
+        bLine.style.display = 'block';
+        bLine.innerText = `🎁 ነፃ ያለገደብ ትምህርት: ${myStudent.bonus_subject}`;
+      } else {
+        bLine.style.display = 'none';
+      }
+      const refInput = document.getElementById('eduRefLinkInput');
+      if (refInput) refInput.value = `${BOT_APP_LINK}?startapp=ref_${currentUser.id}`;
+    }
+
+    function eduHasSubjectAccess(subject, allowClaim = false) {
+      if (!myStudent) return false;
+      if (Number(currentUser.id) === ADMIN_ID || myStudent.is_vip == 1) return true;
+      const hasApprovedNote = Object.values(bikatPayments).some(p => String(p.user_id) === String(currentUser.id) && p.status === 'approved');
+      if (hasApprovedNote) return true;
+
+      const qualifies = (myStudent.total_points || 0) >= BONUS_POINTS_THRESHOLD || (myStudent.invited_count || 0) >= BONUS_INVITE_THRESHOLD;
+      if (!qualifies) return false;
+
+      if (myStudent.bonus_subject === subject) return true;
+      if (!myStudent.bonus_subject && allowClaim && subject) {
+        myStudent.bonus_subject = subject;
+        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ bonus_subject: subject }) }).catch(() => {});
+        eduRenderHero();
+        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
+        return true;
+      }
+      return false;
+    }
+
+    function eduParseLevelStream(edStr) {
+      if (!edStr || edStr === 'Not Set') return null;
+      if (edStr.includes('Natural')) return { level: 'Grade 12', stream: 'Natural' };
+      if (edStr.includes('Social')) return { level: 'Grade 12', stream: 'Social' };
+      if (edStr.includes('Freshman')) return { level: 'Freshman', stream: 'None' };
+      return { level: 'Remedial', stream: 'None' };
+    }
+
+    function eduRenderInitialQuizView() {
+      const parsed = eduParseLevelStream(myStudent?.education_level);
+      if (!parsed) {
+        eduShowLevelPicker();
+      } else {
+        eduNav.level = parsed.level;
+        eduNav.stream = parsed.stream;
+        eduShowSubjects();
+      }
+    }
+
+    function eduShowLevelPicker() {
+      const stage = document.getElementById('eduQuizStage');
+      const cur = myStudent?.education_level || '';
+      stage.innerHTML = `
+        <div class="section-card">
+          <h3 style="font-size:0.95rem; margin-bottom:10px; color:var(--edu-accent);">📚 የትምህርት ደረጃ እና ስትሪም ይምረጡ</h3>
+          <div class="edu-level-grid">
+            <div class="edu-level-card ${cur.includes('Natural') ? 'selected' : ''}" onclick="eduSetLevel('Grade 12', 'Natural')">🔬<br>Grade 12 Natural</div>
+            <div class="edu-level-card ${cur.includes('Social') ? 'selected' : ''}" onclick="eduSetLevel('Grade 12', 'Social')">🌍<br>Grade 12 Social</div>
+            <div class="edu-level-card ${cur === 'Remedial' ? 'selected' : ''}" onclick="eduSetLevel('Remedial', 'None')">📖<br>Remedial</div>
+            <div class="edu-level-card ${cur === 'Freshman' ? 'selected' : ''}" onclick="eduSetLevel('Freshman', 'None')">🎓<br>Freshman</div>
+          </div>
+        </div>`;
+    }
+
+    async function eduSetLevel(level, stream) {
+      const displayLevel = stream !== 'None' ? `${level} (${stream})` : level;
+      myStudent.education_level = displayLevel;
+      eduNav = { level, stream, subject: null, chapter: null, practice: 1 };
+      eduRenderHero();
+      eduShowSubjects();
+      try {
+        await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PATCH', body: JSON.stringify({ education_level: displayLevel }) });
+      } catch(e) {}
+    }
+
+    function eduGetFilteredQuestions(level, stream, subject = null, chapter = null) {
+      return bikatQuestions.filter(q => {
+        if (q.level !== level) return false;
+        if (stream !== 'None' && q.stream !== stream) return false;
+        if (subject && q.subject !== subject) return false;
+        if (chapter && q.chapter !== chapter) return false;
+        return true;
+      });
+    }
+
+    function eduShowSubjects() {
+      const stage = document.getElementById('eduQuizStage');
+      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream);
+      const subjects = [...new Set(qs.map(q => q.subject))];
+      const title = eduNav.stream !== 'None' ? `${eduNav.level} - ${eduNav.stream}` : eduNav.level;
+
+      if (subjects.length === 0) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center;">
+            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px;">⚠️ ለ <b>${escHtml(title)}</b> እስካሁን ጥያቄ አልገባም።</p>
+            <button class="btn-action btn-edu" onclick="eduShowLevelPicker()">🔄 ሌላ ክፍል ምረጥ</button>
+          </div>`;
+        return;
+      }
+
+      let html = `<h3 style="font-size:0.95rem; margin-bottom:10px;">📘 የትምህርት ዓይነት ይምረጡ (${escHtml(title)})</h3>`;
+      subjects.forEach(sub => {
+        const subQs = qs.filter(q => q.subject === sub);
+        const hasPaid = subQs.some(q => q.question_type === 'paid');
+        const icon = !hasPaid ? '' : (eduHasSubjectAccess(sub) ? '🔓' : '🔒');
+        html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)} <small style="color:var(--gray);">(${subQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
+      });
+      stage.innerHTML = html;
+    }
+
+    function eduSelectSubject(subject) {
+      eduNav.subject = subject;
+      const stage = document.getElementById('eduQuizStage');
+      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject);
+      const chapters = [...new Set(qs.map(q => q.chapter))];
+      const hasAccess = eduHasSubjectAccess(subject);
+
+      let html = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduShowSubjects()">🔙 ትምህርቶች</button>
+          <strong style="font-size:0.9rem; color:var(--edu-accent);">📘 ${escHtml(subject)}</strong>
+        </div>`;
+
+      chapters.forEach(chap => {
+        const chQs = qs.filter(q => q.chapter === chap);
+        const hasPaid = chQs.some(q => q.question_type === 'paid');
+        const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+        html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${chQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
+      });
+      stage.innerHTML = html;
+    }
+
+    function eduSelectChapter(chapter) {
+      eduNav.chapter = chapter;
+      const stage = document.getElementById('eduQuizStage');
+      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, chapter);
+      if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+
+      if (qs.length === 0) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center;">
+            <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ምዕራፍ የተቆለፈ (VIP) ነው!</h3>
+            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
+              ይህንን ምዕራፍ ለመስራት የ VIP አባል (30 ብር) ይሁኑ፣ ወይም ${BONUS_INVITE_THRESHOLD} ጓደኞችን በመጋበዝ / ${BONUS_POINTS_THRESHOLD} ነጥብ በማሟላት ለዚህ 1 ትምህርት ነፃ መዳረሻ ያግኙ።
+            </p>
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 VIP ሁን</button>
+              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 ሰው ጋብዝ</button>
+            </div>
+            <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(eduNav.subject)}')">🔙 ተመለስ</button>
+          </div>`;
+        return;
+      }
+
+      const numPractices = Math.ceil(qs.length / PRACTICE_SIZE);
+      let html = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(eduNav.subject)}')">🔙 ምዕራፎች</button>
+          <strong style="font-size:0.88rem; color:var(--edu-accent);">📑 ${escHtml(chapter)}</strong>
+        </div>
+        <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">ጠቅላላ <b>${qs.length}</b> ጥያቄዎች አሉ። ልምምድ ይምረጡ👇</p>`;
+
+      for (let i = 1; i <= numPractices; i++) {
+        const start = (i - 1) * PRACTICE_SIZE + 1;
+        const end = Math.min(i * PRACTICE_SIZE, qs.length);
+        html += `<button class="edu-list-btn" onclick="eduStartPractice(${i})"><span>📝 ልምምድ ${i} (ጥያቄ ${start}-${end})</span><span style="color:var(--edu-accent);">🚀 ጀምር</span></button>`;
+      }
+      stage.innerHTML = html;
+    }
+
+    function eduStartPractice(practiceNum) {
+      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter);
+      if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+      qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+
+      const startIdx = (practiceNum - 1) * PRACTICE_SIZE;
+      const slice = qs.slice(startIdx, startIdx + PRACTICE_SIZE);
+      if (slice.length === 0) return;
+
+      eduActiveQuiz = {
+        questions: slice,
+        index: 0,
+        score: 0,
+        earned: 0,
+        answeredCurrent: false,
+        subject: eduNav.subject,
+        chapter: eduNav.chapter,
+        practice: practiceNum
+      };
+      document.getElementById('eduResumeBanner').style.display = 'none';
+      eduRenderCurrentQuestion();
+    }
+
+    function eduRenderCurrentQuestion() {
+      const stage = document.getElementById('eduQuizStage');
+      if (!eduActiveQuiz) return eduRenderInitialQuizView();
+
+      if (eduActiveQuiz.index >= eduActiveQuiz.questions.length) {
+        const { score, earned, questions } = eduActiveQuiz;
+        localStorage.removeItem('bikat_paused_quiz');
+        eduActiveQuiz = null;
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center; padding:24px 16px;">
+            <div style="font-size:2.5rem; margin-bottom:8px;">🎉</div>
+            <h2 style="color:var(--edu-accent); margin-bottom:10px;">ፈተናውን አጠናቀዋል!</h2>
+            <p style="font-size:0.95rem; margin-bottom:6px;">🎯 ትክክለኛ መልስ: <b>${score} / ${questions.length}</b></p>
+            <p style="font-size:0.9rem; color:var(--primary); margin-bottom:16px;">⭐ አዲስ ያገኙት ነጥብ: <b>+${earned} ነጥብ</b></p>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-action btn-edu" onclick="eduShowSubjects()">🔄 ሌላ ፈተና</button>
+              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🏆 Leaderboard</button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const q = eduActiveQuiz.questions[eduActiveQuiz.index];
+      const total = eduActiveQuiz.questions.length;
+      const pct = Math.round(((eduActiveQuiz.index + 1) / total) * 100);
+      const cid = q.custom_id || q.id;
+
+      stage.innerHTML = `
+        <div class="edu-back-row">
+          <span style="font-size:0.78rem; font-weight:bold; color:var(--edu-accent);">ጥያቄ ${eduActiveQuiz.index + 1} ከ ${total} | 🆔 ${escHtml(cid)}</span>
+          <button class="btn-back-sm" onclick="eduPauseQuiz()">⏸ ቆም በል</button>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+        <div class="quiz-question-box">
+          <div>${escHtml(q.question)}</div>
+          ${q.source ? `<div style="margin-top:8px; font-size:0.72rem; color:var(--gray);">📌 ምንጭ: ${escHtml(q.source)}</div>` : ''}
+        </div>
+        <div id="eduOptionsBox">
+          ${['A','B','C','D'].map(letter => `
+            <button class="quiz-opt-btn" id="optBtn_${letter}" onclick="eduAnswer('${letter}')">
+              <span class="opt-letter">${letter}</span>
+              <span>${escHtml(q['option_' + letter.toLowerCase()])}</span>
+            </button>`).join('')}
+        </div>
+        <div id="eduFeedbackBox"></div>`;
+    }
+
+    async function eduAnswer(selected) {
+      if (!eduActiveQuiz || eduActiveQuiz.answeredCurrent) return;
+      eduActiveQuiz.answeredCurrent = true;
+
+      const q = eduActiveQuiz.questions[eduActiveQuiz.index];
+      const correct = (q.correct_answer || 'A').toUpperCase().trim();
+      const isRight = selected === correct;
+
+      ['A','B','C','D'].forEach(l => {
+        const btn = document.getElementById(`optBtn_${l}`);
+        btn.disabled = true;
+        if (l === correct) btn.classList.add('correct');
+        else if (l === selected && !isRight) btn.classList.add('wrong');
+      });
+
+      let feedbackMsg = '';
+      if (isRight) {
+        eduActiveQuiz.score += 1;
+        const ansMap = myStudent.answered_questions || {};
+        if (!ansMap[q.id]) {
+          ansMap[q.id] = true;
+          myStudent.answered_questions = ansMap;
+          myStudent.total_points = (myStudent.total_points || 0) + 2;
+          eduActiveQuiz.earned += 2;
+          feedbackMsg = '✅ <b>ትክክል መልሰዋል! (+2 ነጥብ አግኝተዋል)</b>';
+          eduRenderHero();
+          fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ total_points: myStudent.total_points })
+          }).catch(() => {});
+          fetch(`${BIKAT_STUDENTS}/${currentUser.id}/answered_questions/${q.id}.json`, {
+            method: 'PUT', body: 'true'
+          }).catch(() => {});
+        } else {
+          feedbackMsg = '✅ <b>ትክክል መልሰዋል!</b> <small>(ቀድሞ ስለመለሱት ተጨማሪ ነጥብ አይሰጥም)</small>';
+        }
+      } else {
+        feedbackMsg = `❌ <b>ተሳስተዋል!</b> ትክክለኛው መልስ <b>${correct}</b> ነው።`;
+      }
+
+      const expText = q.explanation ? escHtml(q.explanation) : 'ማብራሪያ አልተካተተም።';
+      const isLast = eduActiveQuiz.index + 1 >= eduActiveQuiz.questions.length;
+
+      document.getElementById('eduFeedbackBox').innerHTML = `
+        <div class="quiz-explanation">
+          <div>${feedbackMsg}</div>
+          <div style="margin-top:6px;"><b>💡 ማብራሪያ:</b><br>${expText}</div>
+        </div>
+        <button class="btn-action btn-edu" onclick="eduNextQuestion()">${isLast ? '📊 አጠቃላይ ውጤት እይ' : '➡️ ቀጣይ ጥያቄ (Next)'}</button>`;
+    }
+
+    function eduNextQuestion() {
+      if (!eduActiveQuiz) return;
+      eduActiveQuiz.index += 1;
+      eduActiveQuiz.answeredCurrent = false;
+      eduRenderCurrentQuestion();
+    }
+
+    function eduPauseQuiz() {
+      if (!eduActiveQuiz) return;
+      try { localStorage.setItem('bikat_paused_quiz', JSON.stringify(eduActiveQuiz)); } catch(e) {}
+      eduActiveQuiz = null;
+      eduCheckPausedQuiz();
+      eduSelectChapter(eduNav.chapter);
+    }
+
+    function eduCheckPausedQuiz() {
+      try {
+        const raw = localStorage.getItem('bikat_paused_quiz');
+        if (raw) {
+          const saved = JSON.parse(raw);
+          document.getElementById('eduResumeInfo').innerText = `${saved.subject} • ${saved.chapter} (ጥያቄ ${saved.index + 1}/${saved.questions.length})`;
+          document.getElementById('eduResumeBanner').style.display = 'block';
+          return;
+        }
+      } catch(e) {}
+      document.getElementById('eduResumeBanner').style.display = 'none';
+    }
+
+    function eduResumeQuiz() {
+      try {
+        const raw = localStorage.getItem('bikat_paused_quiz');
+        if (!raw) return;
+        eduActiveQuiz = JSON.parse(raw);
+        eduActiveQuiz.answeredCurrent = false;
+        eduNav.subject = eduActiveQuiz.subject;
+        eduNav.chapter = eduActiveQuiz.chapter;
+        document.getElementById('eduResumeBanner').style.display = 'none';
+        eduRenderCurrentQuestion();
+      } catch(e) {}
+    }
+
+    // =========================================================================
+    // BIKAT PAYMENTS (VIP 30 ETB & SHORT NOTES 300 ETB)
+    // =========================================================================
+    function eduOpenPaymentModal(type, level, stream, amount) {
+      eduPendingPayment = { type, level, stream, amount };
+      eduReceiptBase64 = "";
+      document.getElementById('eduPaymentForm').reset();
+      document.getElementById('eduPayImgPreview').src = "";
+      document.getElementById('eduPayImgPreview').style.display = 'none';
+      document.getElementById('eduPayImgPlus').style.display = 'block';
+
+      document.getElementById('eduPayModalTitle').innerText = type === 'vip' ? '💎 የVIP ክፍያ (30 ብር)' : `📖 Short Note: ${level} (${amount})`;
+      document.getElementById('eduPayModalInfo').innerHTML = `
+        💵 <b>መጠን:</b> ${escHtml(amount)} (${escHtml(stream)})<br>
+        🏦 <b>CBE:</b> <code>1000649943188</code> (በሶራ ታጁ)<br>
+        📱 <b>Telebirr:</b> <code>0948944979</code> (በሶራ ታጁ)`;
+      document.getElementById('eduPaymentModal').style.display = 'block';
+    }
+    function eduClosePaymentModal() { document.getElementById('eduPaymentModal').style.display = 'none'; }
+
+    function eduHandleReceiptUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas'); const maxDim = 500;
+          let w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          eduReceiptBase64 = canvas.toDataURL('image/jpeg', 0.65);
+          document.getElementById('eduPayImgPreview').src = eduReceiptBase64;
+          document.getElementById('eduPayImgPreview').style.display = 'block';
+          document.getElementById('eduPayImgPlus').style.display = 'none';
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function eduSubmitPayment(e) {
+      e.preventDefault();
+      if (!eduPendingPayment || !eduReceiptBase64) { notifyUser("እባክዎ የደረሰኙን ፎቶ ይምረጡ"); return; }
+      const btn = document.getElementById('eduPaySubmitBtn');
+      btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
+      const reqId = `PAY-${Date.now()}`;
+      const payload = {
+        id: reqId,
+        user_id: currentUser.id,
+        user_name: currentUser.first_name || currentUser.username || 'ተማሪ',
+        user_tg: currentUser.username || '',
+        type: eduPendingPayment.type,
+        level: eduPendingPayment.level,
+        stream: eduPendingPayment.stream,
+        amount: eduPendingPayment.amount,
+        receipt_img: eduReceiptBase64,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+      try {
+        await fetch(`${BIKAT_PAYMENTS}/${reqId}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+        bikatPayments[reqId] = payload;
+        eduClosePaymentModal();
+        eduRenderMyPayments();
+        notifyUser("⏳ የክፍያ ደረሰኝዎ ደርሶናል! በአድሚን ሲረጋገጥ ወዲያውኑ ይከፈትልዎታል። ✅");
+      } catch(err) { notifyUser("ስህተት ተፈጥሯል፣ እንደገና ይሞክሩ።"); }
+      finally { btn.innerText = "📤 ደረሰኙን ላክ"; btn.disabled = false; }
+    }
+
+    function eduRenderMyPayments() {
+      const box = document.getElementById('eduMyPaymentsList'); if (!box) return;
+      const mine = Object.values(bikatPayments).filter(p => String(p.user_id) === String(currentUser.id)).reverse();
+      if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.78rem; color:var(--gray);">እስካሁን የላኩት የክፍያ ጥያቄ የለም።</p>'; return; }
+      const stMap = { pending: '⏳ በመጠባበቅ ላይ', approved: '✅ ጸድቋል', rejected: '❌ ውድቅ ሆኗል' };
+      box.innerHTML = mine.map(p => `
+        <div style="background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.8rem;">
+          <b>${p.type === 'vip' ? '💎 VIP' : '📖 Note: ' + escHtml(p.level)}</b> (${escHtml(p.amount)})<br>
+          <span style="color:var(--gray);">${stMap[p.status] || p.status}</span>
+        </div>`).join('');
+    }
+
+    // =========================================================================
+    // BIKAT LEADERBOARD, REFERRALS & PROFILE
+    // =========================================================================
+    function eduCopyRefLink() {
+      const inp = document.getElementById('eduRefLinkInput');
+      inp.select();
+      try { navigator.clipboard.writeText(inp.value); notifyUser("ሊንኩ ኮፒ ተደርጓል! 📋"); }
+      catch(e) { document.execCommand('copy'); notifyUser("ሊንኩ ኮፒ ተደርጓል! 📋"); }
+    }
+    function eduShareRefLink() {
+      const link = `${BOT_APP_LINK}?startapp=ref_${currentUser.id}`;
+      const text = "🔥 ምርጥ የGrade 12፣ Remedial እና Freshman የፈተና ጥያቄዎችና ሾርት ኖቶች የሚገኙበት BIKAT App! አሁኑኑ ይቀላቀሉ👇";
+      const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
+      if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
+    }
+
+    function eduRenderLeaderboard() {
+      const box = document.getElementById('eduLeaderboardList'); if (!box) return;
+      const list = Object.values(bikatStudents).sort((a, b) => (b.total_points || 0) - (a.total_points || 0)).slice(0, 10);
+      if (list.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">እስካሁን ምንም ተማሪ አልተመዘገበም።</p>'; return; }
+      box.innerHTML = list.map((s, i) => {
+        const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `${i + 1}.`));
+        return `<div class="rank-row"><span><b>${medal}</b> ${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '💎' : ''}</span><strong style="color:var(--edu-accent);">${s.total_points || 0} ነጥብ</strong></div>`;
+      }).join('');
+    }
+
+    function eduRenderProfile() {
+      const box = document.getElementById('eduProfileCard'); if (!box || !myStudent) return;
+      const ansCount = myStudent.answered_questions ? Object.keys(myStudent.answered_questions).length : 0;
+      const remPts = Math.max(0, BONUS_POINTS_THRESHOLD - (myStudent.total_points || 0));
+      const remInv = Math.max(0, BONUS_INVITE_THRESHOLD - (myStudent.invited_count || 0));
+      box.innerHTML = `
+        <h3 style="color:var(--edu-accent); margin-bottom:10px;">👤 የተማሪ ፕሮፋይል</h3>
+        <div style="font-size:0.84rem; line-height:1.8;">
+          🏷 <b>ስም:</b> ${escHtml(myStudent.full_name)}<br>
+          🆔 <b>ID:</b> <code>${myStudent.user_id}</code><br>
+          📚 <b>የተመረጠ ክፍል:</b> ${escHtml(myStudent.education_level)}<br>
+          ⭐ <b>አባልነት:</b> ${myStudent.is_vip == 1 ? '💎 VIP (Full Access)' : '👤 Free Tier'}<br>
+          🎁 <b>ነፃ 1-ትምህርት:</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
+          ✅ <b>በትክክል የተመለሱ:</b> ${ansCount} ጥያቄ<br>
+          🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">(ቀሪ: ${remPts})</small><br>
+          👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ቀሪ: ${remInv})</small>
+        </div>`;
+    }
+
+    // =========================================================================
+    // BIKAT ADMIN PANEL (ADD SINGLE/BULK, PAYMENTS, DELETE, STUDENTS)
+    // =========================================================================
+    function eduAdminToggleStream() {
+      const lev = document.getElementById('eaLevel').value;
+      document.getElementById('eaStreamGroup').style.display = (lev === 'Grade 12') ? 'block' : 'none';
+    }
+
+    function eduGenerateNextCustomId(level, subject) {
+      const lev = level.toUpperCase();
+      const prefix = lev.includes('12') ? 'G12' : (lev.includes('REM') ? 'REM' : (lev.includes('FRESH') ? 'FRE' : lev.slice(0, 3)));
+      const subClean = subject.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const subCode = (subClean.length >= 3 ? subClean.slice(0, 3) : subClean.padEnd(3, 'X'));
+      const base = `${prefix}${subCode}`;
+      let maxNum = 0;
+      bikatQuestions.forEach(q => {
+        if (q.custom_id && q.custom_id.startsWith(base)) {
+          const n = parseInt(q.custom_id.slice(base.length), 10);
+          if (!isNaN(n)) maxNum = Math.max(maxNum, n);
+        }
+      });
+      return `${base}${maxNum + 1}`;
+    }
+
+    function eduParseBulkQuestions(rawText) {
+      const blocks = rawText.trim().split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      const parsed = [];
+      blocks.forEach(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length >= 8) {
+          const question = lines.slice(0, -7).join('\n');
+          const [option_a, option_b, option_c, option_d] = lines.slice(-7, -3);
+          let ans = lines[lines.length - 3].toUpperCase().trim();
+          if (ans.length > 1) ans = ans[0];
+          const exp = lines[lines.length - 2] === '0' ? '' : lines[lines.length - 2];
+          const src = lines[lines.length - 1];
+          parsed.push({ question, option_a, option_b, option_c, option_d, correct_answer: ans, explanation: exp, source: src });
+        }
+      });
+      return parsed;
+    }
+
+    async function eduAdminAddQuestions(e) {
+      e.preventDefault();
+      const level = document.getElementById('eaLevel').value;
+      const stream = level === 'Grade 12' ? document.getElementById('eaStream').value : 'None';
+      const subject = document.getElementById('eaSubject').value.trim();
+      const chapter = document.getElementById('eaChapter').value.trim();
+      const qType = document.getElementById('eaType').value;
+      const rawText = document.getElementById('eaBulkText').value;
+
+      const parsed = eduParseBulkQuestions(rawText);
+      if (parsed.length === 0) {
+        notifyUser("⚠️ የመስመር ቁጥር አልሞላም! እያንዳንዱ ጥያቄ 8 መስመር (ጥያቄ፣ A, B, C, D, መልስ, ማብራሪያ, ምንጭ) መሆን አለበት።");
+        return;
+      }
+
+      const btn = document.getElementById('eaSubmitBtn');
+      btn.innerText = "በማስቀመጥ ላይ..."; btn.disabled = true;
+      const savedIds = [];
+      try {
+        for (const item of parsed) {
+          const cid = eduGenerateNextCustomId(level, subject);
+          const qId = `Q_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+          const qObj = { custom_id: cid, level, stream, subject, chapter, question_type: qType, ...item, created_at: new Date().toISOString() };
+          await fetch(`${BIKAT_QUESTIONS}/${qId}.json`, { method: 'PUT', body: JSON.stringify(qObj) });
+          bikatQuestions.push({ id: qId, ...qObj });
+          savedIds.push(cid);
+        }
+        document.getElementById('eaBulkText').value = '';
+        notifyUser(`✅ ${savedIds.length} ጥያቄ ገብቷል! (${savedIds.join(', ')})`);
+        eduRenderAdmin();
+      } catch(err) { notifyUser("ስህተት ተፈጥሯል!"); }
+      finally { btn.innerText = "➕ ጥያቄዎቹን አስገባ (Save)"; btn.disabled = false; }
+    }
+
+    function eduRenderAdmin() {
+      const studentsArr = Object.values(bikatStudents);
+      const paymentsArr = Object.values(bikatPayments).reverse();
+      document.getElementById('eduStStudents').innerText = studentsArr.length;
+      document.getElementById('eduStVip').innerText = studentsArr.filter(s => s.is_vip == 1).length;
+      document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
+      document.getElementById('eduStPendingPay').innerText = paymentsArr.filter(p => p.status === 'pending').length;
+
+      // Populate datalists for quick reuse
+      const subSet = [...new Set(bikatQuestions.map(q => q.subject))];
+      const chapSet = [...new Set(bikatQuestions.map(q => q.chapter))];
+      document.getElementById('eaSubjectList').innerHTML = subSet.map(s => `<option value="${escAttr(s)}">`).join('');
+      document.getElementById('eaChapterList').innerHTML = chapSet.map(c => `<option value="${escAttr(c)}">`).join('');
+
+      // Payments
+      const payBox = document.getElementById('eduAdminPaymentsList');
+      if (paymentsArr.length === 0) { payBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">ምንም የክፍያ ጥያቄ የለም።</p>'; }
+      else {
+        payBox.innerHTML = paymentsArr.map(p => `
+          <div style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.82rem;">
+              <b>${p.type === 'vip' ? '💎 VIP (30 ብር)' : '📖 Note: ' + escHtml(p.level)}</b>
+              <span style="font-weight:bold; color:${p.status === 'approved' ? 'green' : (p.status === 'rejected' ? 'red' : 'orange')};">${p.status}</span>
+            </div>
+            <div style="font-size:0.75rem; color:var(--gray); margin-bottom:6px;">👤 ${escHtml(p.user_name)} (@${escHtml(p.user_tg || '-')}) | ID: ${p.user_id}</div>
+            ${p.receipt_img ? `<img src="${p.receipt_img}" style="width:100%; max-height:200px; object-fit:contain; border-radius:8px; margin-bottom:8px; background:#f3f4f6;">` : ''}
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action btn-tg" style="flex:1; padding:6px;" onclick="eduAdminApprovePay('${escAttr(p.id)}', 'approved')">✅ አጽድቅ</button>
+              <button class="btn-action" style="flex:1; padding:6px; background:var(--danger); color:white;" onclick="eduAdminApprovePay('${escAttr(p.id)}', 'rejected')">❌ ውድቅ</button>
+              <button class="btn-action btn-call" style="flex:1; padding:6px;" onclick="contactDirect('${escAttr(p.user_tg)}', 'ሰላም ${escAttr(p.user_name)}! የBIKAT ክፍያዎ ጸድቋል።')">💬 ቻት</button>
+            </div>
+          </div>`).join('');
+      }
+
+      // Stats & Chapter Bulk Delete
+      const statsMap = {};
+      bikatQuestions.forEach(q => {
+        const key = `${q.level}|${q.stream}|${q.subject}|${q.chapter}`;
+        statsMap[key] = (statsMap[key] || 0) + 1;
+      });
+      const statsBox = document.getElementById('eduAdminStatsList');
+      const keys = Object.keys(statsMap);
+      if (keys.length === 0) { statsBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">ምንም ጥያቄ የለም።</p>'; }
+      else {
+        statsBox.innerHTML = keys.map(k => {
+          const [lev, str, sub, ch] = k.split('|');
+          return `<div style="display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.78rem;">
+            <div><b>${escHtml(lev)}</b> • ${escHtml(sub)}<br><small style="color:var(--gray);">${escHtml(ch)} (${statsMap[k]} ጥያቄ)</small></div>
+            <button style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑 አጥፋ</button>
+          </div>`;
+        }).join('');
+      }
+
+      // Students list
+      const stuBox = document.getElementById('eduAdminStudentsList');
+      stuBox.innerHTML = studentsArr.sort((a,b) => (b.total_points||0)-(a.total_points||0)).slice(0, 40).map(s => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.78rem;">
+          <div><b>${escHtml(s.full_name)}</b> (${s.total_points||0} ነጥብ)<br><small style="color:var(--gray);">ID: ${s.user_id} | ${s.is_vip == 1 ? '💎 VIP' : '👤 Free'}</small></div>
+          <button style="background:${s.is_vip == 1 ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${s.is_vip == 1 ? 0 : 1})">${s.is_vip == 1 ? 'Remove VIP' : 'Make VIP'}</button>
+        </div>`).join('');
+    }
+
+    async function eduAdminApprovePay(payId, status) {
+      const p = bikatPayments[payId]; if (!p) return;
+      try {
+        await fetch(`${BIKAT_PAYMENTS}/${payId}.json`, { method: 'PATCH', body: JSON.stringify({ status }) });
+        if (status === 'approved' && p.type === 'vip') {
+          await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: 1 }) });
+        }
+        notifyUser(status === 'approved' ? '✅ ክፍያው ጸድቋል!' : '❌ ክፍያው ውድቅ ሆኗል።');
+        await eduLoadAllData();
+      } catch(e) { notifyUser("ስህተት ተፈጥሯል"); }
+    }
+
+    async function eduAdminDeleteById() {
+      const target = document.getElementById('eaDeleteIdInput').value.trim().toUpperCase();
+      if (!target) return;
+      const found = bikatQuestions.find(q => (q.custom_id || '').toUpperCase() === target || q.id.toUpperCase() === target);
+      if (!found) { notifyUser(`❌ ጥያቄ ${target} አልተገኘም!`); return; }
+      if (!confirm(`ጥያቄ ${target} ይጥፋ?`)) return;
+      await fetch(`${BIKAT_QUESTIONS}/${found.id}.json`, { method: 'DELETE' });
+      document.getElementById('eaDeleteIdInput').value = '';
+      notifyUser(`✅ ጥያቄ ${target} ጠፍቷል!`);
+      await eduLoadAllData();
+    }
+
+    async function eduAdminDeleteChapter(lev, str, sub, ch) {
+      if (!confirm(`የ ${sub} - ${ch} ጥያቄዎች በሙሉ ይጥፉ?`)) return;
+      const toDel = bikatQuestions.filter(q => q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
+      for (const q of toDel) {
+        await fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, { method: 'DELETE' });
+      }
+      notifyUser(`✅ ${toDel.length} ጥያቄዎች ጠፍተዋል!`);
+      await eduLoadAllData();
+    }
+
+    async function eduAdminToggleVip(uid, newVal) {
+      await fetch(`${BIKAT_STUDENTS}/${uid}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: newVal }) });
+      await eduLoadAllData();
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    async function initSuperApp() {
+      if (Number(currentUser.id) === ADMIN_ID) {
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('navEduAdmin').style.display = 'flex';
+      }
+      trackUser();
+
+      const startParam = getStartParam();
+      if (startParam && startParam.startsWith('p_')) {
+        // Direct product link -> skip hub, open Shop & product popup
+        document.getElementById('hubScreen').style.display = 'none';
+        switchAppMode('shop');
+        await loadAllData();
+        const pId = startParam.substring(2);
+        if (products.some(p => p.id === pId)) openModal(pId);
+      } else if (startParam && startParam.startsWith('ref_')) {
+        // BIKAT referral link -> skip hub, open Education & credit referrer
+        const refId = startParam.substring(4);
+        document.getElementById('hubScreen').style.display = 'none';
+        switchAppMode('edu');
+        await eduLoadAllData(refId);
+        loadAllData();
+      } else if (startParam === 'edu') {
+        document.getElementById('hubScreen').style.display = 'none';
+        switchAppMode('edu');
+        await eduLoadAllData();
+        loadAllData();
+      } else {
+        // Show Hub Screen so user picks Shop or Education, while loading shop data in background
+        loadAllData();
+      }
+    }
+
+    initSuperApp();
   </script>
 </body>
 </html>
