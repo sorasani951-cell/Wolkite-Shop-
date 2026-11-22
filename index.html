@@ -635,6 +635,30 @@
     .lb-row-info { flex: 1; min-width: 0; }
     .lb-row-name { font-size: 0.86rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lb-row-pts { font-size: 0.78rem; font-weight: 800; color: var(--edu-accent); white-space: nowrap; }
+    /* Subject Mode Choice (Questions vs Exams) & Weekly Exam Banner */
+    .edu-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .edu-choice-card {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 18px;
+      padding: 20px 12px; text-align: center; cursor: pointer;
+      box-shadow: var(--shadow-sm); transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .edu-choice-card:active { transform: scale(0.97); }
+    .edu-choice-card.q-choice { border-top: 4px solid var(--edu-accent); }
+    .edu-choice-card.e-choice { border-top: 4px solid var(--warning); }
+    .edu-choice-icon {
+      width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 2px;
+    }
+    .edu-choice-card.q-choice .edu-choice-icon { background: var(--edu-bg); }
+    .edu-choice-card.e-choice .edu-choice-icon { background: var(--gold-bg); }
+    .edu-choice-title { font-size: 0.92rem; font-weight: 800; color: var(--text); }
+    .edu-choice-sub { font-size: 0.72rem; color: var(--gray); line-height: 1.3; }
+    .weekly-exam-card {
+      background: var(--card-bg); border: 1.5px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-md); padding: 15px; margin-top: 14px;
+      box-shadow: var(--shadow-sm);
+    }
   </style>
 </head>
 <body>
@@ -1070,15 +1094,25 @@
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-students', this)">👥 ተማሪዎች</div>
           </div>
 
-          <!-- ADD QUESTIONS (CONTINUOUS MODE + CONTINUE EXISTING CHAPTER + MULTI-QUESTION) -->
+          <!-- ADD QUESTIONS (CHAPTERS + SUBJECT EXAMS + WEEKLY EXAMS) -->
           <div id="ea-add" class="p-content active">
             <form id="eduAddQuizForm" onsubmit="eduAdminAddQuestions(event)">
+              <div class="form-group">
+                <label>የይዘት ዓይነት (Content Type)</label>
+                <select id="eaContentCat" onchange="eduAdminOnCategoryChange()">
+                  <option value="chapter">📚 መደበኛ ጥያቄ (Chapter Question)</option>
+                  <option value="subject_exam">📝 የትምህርት ፈተና (Subject Exam: Mid / Final)</option>
+                  <option value="weekly_exam">🔥 ሳምንታዊ / አዲስ ፈተና (Weekly / General Exam)</option>
+                </select>
+              </div>
+
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div class="form-group">
                   <label>ደረጃ (Level)</label>
                   <select id="eaLevel" onchange="eduAdminRefreshSubjectSelect()">
                     <option value="Remedial">Remedial</option>
                     <option value="Freshman">Freshman</option>
+                    <option value="All" id="eaLevelAllOpt" style="display:none;">All (ሁሉም)</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -1086,21 +1120,22 @@
                   <select id="eaStream" onchange="eduAdminRefreshSubjectSelect()">
                     <option value="Natural">Natural</option>
                     <option value="Social">Social</option>
+                    <option value="All" id="eaStreamAllOpt" style="display:none;">All (ሁሉም)</option>
                   </select>
                 </div>
               </div>
 
-              <!-- Existing or New Subject -->
-              <div class="form-group">
+              <!-- Existing or New Subject (hidden for Weekly Exam) -->
+              <div class="form-group" id="eaSubjectGroup">
                 <label>ትምህርት (ነባር ምረጥ ወይም አዲስ ፍጠር)</label>
                 <select id="eaSubjectSelect" onchange="eduAdminOnSubjectChange()" style="margin-bottom:6px;"></select>
                 <input type="text" id="eaSubjectNew" placeholder="አዲሱን የትምህርት ስም ይጻፉ (ምሳሌ: Biology)" style="display:none;">
                 <datalist id="eaSubjectList"></datalist>
               </div>
 
-              <!-- Existing or New Chapter (shows question count!) -->
+              <!-- Existing or New Chapter / Exam Name (shows question count!) -->
               <div class="form-group">
-                <label>ምዕራፍ (ነባር ምዕራፍ ላይ መቀጠል ወይም አዲስ)</label>
+                <label id="eaChapterLabel">ምዕራፍ (ነባር ምዕራፍ ላይ መቀጠል ወይም አዲስ)</label>
                 <select id="eaChapterSelect" onchange="eduAdminOnChapterChange()" style="margin-bottom:6px;"></select>
                 <input type="text" id="eaChapterNew" placeholder="አዲሱን ምዕራፍ ስም ይጻፉ (ምሳሌ: Chapter 1)" style="display:none;">
               </div>
@@ -2182,6 +2217,49 @@
       }
     }
 
+    function eduGetWeeklyExams(filterLevel = null, filterStream = null) {
+      const weeklyQs = bikatQuestions.filter(q => {
+        if (q.content_category !== 'weekly_exam') return false;
+        if (filterLevel && q.level && q.level !== 'All' && q.level !== filterLevel) return false;
+        if (filterStream && q.stream && q.stream !== 'All' && q.stream !== 'None' && q.stream !== filterStream) return false;
+        return true;
+      });
+      const map = {};
+      weeklyQs.forEach(q => {
+        const key = `${q.level || 'All'}|${q.stream || 'All'}|${q.chapter}`;
+        if (!map[key]) map[key] = { level: q.level || 'All', stream: q.stream || 'All', title: q.chapter, questions: [] };
+        map[key].questions.push(q);
+      });
+      return Object.values(map);
+    }
+
+    function eduBuildWeeklyExamsHtml(filterLevel = null, filterStream = null) {
+      const exams = eduGetWeeklyExams(filterLevel, filterStream);
+      let inner = '';
+      if (exams.length === 0) {
+        inner = `<p style="font-size:0.78rem; color:var(--gray); text-align:center; padding:6px 0;">አዲስ ሳምንታዊ ፈተና ሲጫን እዚህ ይታያል።</p>`;
+      } else {
+        inner = exams.map(ex => {
+          const hasPaid = ex.questions.some(q => q.question_type === 'paid');
+          const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
+          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${ex.stream && ex.stream !== 'All' && ex.stream !== 'None' ? ' ' + ex.stream : ''}`;
+          return `<button class="edu-list-btn" style="margin-bottom:8px;" onclick="eduOpenWeeklyExam('${escAttr(ex.level)}', '${escAttr(ex.stream)}', '${escAttr(ex.title)}')">
+            <span>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.questions.length} ጥያቄ • ${escHtml(tag)})</small></span>
+            <span>${icon} ➔</span>
+          </button>`;
+        }).join('');
+      }
+      return `
+        <div class="weekly-exam-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-size:0.92rem; color:var(--gold); margin:0;">📝 ሳምንታዊ / አዲስ ፈተናዎች (Exams)</h3>
+            <span style="font-size:0.68rem; background:var(--gold-bg); color:var(--gold); padding:3px 8px; border-radius:999px; font-weight:700;">${exams.length} ፈተና</span>
+          </div>
+          ${inner}
+        </div>`;
+    }
+
     function eduShowLevelPicker() {
       const stage = document.getElementById('eduQuizStage');
       const cur = myStudent?.education_level || '';
@@ -2200,13 +2278,14 @@
               return `<div class="edu-level-card ${cur === full ? 'selected' : ''}" onclick="eduSetLevel('${l.level}', '${l.stream}')">${l.icon}<br>${l.label}</div>`;
             }).join('')}
           </div>
-        </div>`;
+        </div>
+        ${eduBuildWeeklyExamsHtml()}`;
     }
 
     async function eduSetLevel(level, stream) {
       const displayLevel = `${level} (${stream})`;
       myStudent.education_level = displayLevel;
-      eduNav = { level, stream, subject: null, chapter: null, practice: 1 };
+      eduNav = { level, stream, subject: null, chapter: null, practice: 1, mode: 'chapter' };
       eduRenderHero();
       eduShowSubjects();
       try {
@@ -2214,10 +2293,12 @@
       } catch(e) {}
     }
 
-    function eduGetFilteredQuestions(level, stream, subject = null, chapter = null) {
+    function eduGetFilteredQuestions(level, stream, subject = null, chapter = null, category = 'chapter') {
       return bikatQuestions.filter(q => {
-        if (q.level !== level) return false;
-        if (stream && q.stream && q.stream !== 'None' && q.stream !== stream) return false;
+        const qCat = q.content_category || 'chapter';
+        if (category && qCat !== category) return false;
+        if (level && level !== 'All' && q.level !== level) return false;
+        if (stream && stream !== 'All' && q.stream && q.stream !== 'None' && q.stream !== 'All' && q.stream !== stream) return false;
         if (subject && q.subject !== subject) return false;
         if (chapter && q.chapter !== chapter) return false;
         return true;
@@ -2226,53 +2307,237 @@
 
     function eduShowSubjects() {
       const stage = document.getElementById('eduQuizStage');
-      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream);
+      const qs = bikatQuestions.filter(q => {
+        const qCat = q.content_category || 'chapter';
+        if (qCat === 'weekly_exam') return false;
+        if (q.level !== eduNav.level) return false;
+        if (eduNav.stream && q.stream && q.stream !== 'None' && q.stream !== eduNav.stream) return false;
+        return true;
+      });
       const subjects = [...new Set(qs.map(q => q.subject))];
       const title = `${eduNav.level} - ${eduNav.stream}`;
+      const weeklyExams = eduGetWeeklyExams(eduNav.level, eduNav.stream);
 
+      let html = '';
       if (subjects.length === 0) {
-        stage.innerHTML = `
+        html = `
           <div class="section-card" style="text-align:center;">
             <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px;">⚠️ ለ <b>${escHtml(title)}</b> እስካሁን ጥያቄ አልገባም።</p>
             <button class="btn-action btn-edu" onclick="eduShowLevelPicker()">🔄 ሌላ ክፍል ምረጥ</button>
           </div>`;
-        return;
+      } else {
+        html = `<h3 style="font-size:0.95rem; margin-bottom:10px;">📘 የትምህርት ዓይነት ይምረጡ (${escHtml(title)})</h3>`;
+        subjects.forEach(sub => {
+          html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)}</span><span>➔</span></button>`;
+        });
       }
-
-      let html = `<h3 style="font-size:0.95rem; margin-bottom:10px;">📘 የትምህርት ዓይነት ይምረጡ (${escHtml(title)})</h3>`;
-      subjects.forEach(sub => {
-        html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)}</span><span>➔</span></button>`;
-      });
+      if (weeklyExams.length > 0) {
+        html += eduBuildWeeklyExamsHtml(eduNav.level, eduNav.stream);
+      }
       stage.innerHTML = html;
     }
 
+    // Subject tapped -> 2 choices: Questions (Chapters) vs Exams (Mid/Final 2017, 2018...)
     function eduSelectSubject(subject) {
       eduNav.subject = subject;
       const stage = document.getElementById('eduQuizStage');
-      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject);
+      const chapterQs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'chapter');
+      const examQs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
+      const chapCount = new Set(chapterQs.map(q => q.chapter)).size;
+      const examCount = new Set(examQs.map(q => q.chapter)).size;
+
+      stage.innerHTML = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduShowSubjects()">🔙 ትምህርቶች</button>
+          <strong style="font-size:0.92rem; color:var(--edu-accent);">📘 ${escHtml(subject)}</strong>
+        </div>
+        <p style="font-size:0.8rem; color:var(--gray); margin-bottom:12px;">የሚፈልጉትን አማራጭ ይምረጡ👇</p>
+        <div class="edu-choice-grid">
+          <div class="edu-choice-card q-choice" onclick="eduShowSubjectChapters('${escAttr(subject)}')">
+            <div class="edu-choice-icon">📚</div>
+            <div class="edu-choice-title">Questions</div>
+            <div class="edu-choice-sub">ምዕራፎች እና ልምምዶች<br><b>${chapCount} ምዕራፍ</b></div>
+          </div>
+          <div class="edu-choice-card e-choice" onclick="eduShowSubjectExams('${escAttr(subject)}')">
+            <div class="edu-choice-icon">📝</div>
+            <div class="edu-choice-title">Exams</div>
+            <div class="edu-choice-sub">Mid & Final ፈተናዎች<br><b>${examCount} ፈተና</b></div>
+          </div>
+        </div>`;
+    }
+
+    function eduShowSubjectChapters(subject) {
+      eduNav.subject = subject;
+      eduNav.mode = 'chapter';
+      const stage = document.getElementById('eduQuizStage');
+      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'chapter');
       const chapters = [...new Set(qs.map(q => q.chapter))];
       const hasAccess = eduHasSubjectAccess(subject);
 
       let html = `
         <div class="edu-back-row">
-          <button class="btn-back-sm" onclick="eduShowSubjects()">🔙 ትምህርቶች</button>
-          <strong style="font-size:0.9rem; color:var(--edu-accent);">📘 ${escHtml(subject)}</strong>
+          <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(subject)}')">🔙 ተመለስ</button>
+          <strong style="font-size:0.9rem; color:var(--edu-accent);">📚 ${escHtml(subject)} • Questions</strong>
         </div>`;
 
-      chapters.forEach(chap => {
-        const chQs = qs.filter(q => q.chapter === chap);
-        const hasPaid = chQs.some(q => q.question_type === 'paid');
-        const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
-        html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${chQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
-      });
+      if (chapters.length === 0) {
+        html += `<div class="section-card" style="text-align:center;"><p style="font-size:0.84rem; color:var(--gray);">ለዚህ ትምህርት እስካሁን የምዕራፍ ጥያቄ አልገባም።</p></div>`;
+      } else {
+        chapters.forEach(chap => {
+          const chQs = qs.filter(q => q.chapter === chap);
+          const hasPaid = chQs.some(q => q.question_type === 'paid');
+          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${chQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
+        });
+      }
       stage.innerHTML = html;
+    }
+
+    function eduShowSubjectExams(subject) {
+      eduNav.subject = subject;
+      eduNav.mode = 'subject_exam';
+      const stage = document.getElementById('eduQuizStage');
+      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
+      const exams = [...new Set(qs.map(q => q.chapter))];
+      const hasAccess = eduHasSubjectAccess(subject);
+
+      let html = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(subject)}')">🔙 ተመለስ</button>
+          <strong style="font-size:0.9rem; color:var(--gold);">📝 ${escHtml(subject)} • Exams</strong>
+        </div>`;
+
+      if (exams.length === 0) {
+        html += `<div class="section-card" style="text-align:center;"><p style="font-size:0.84rem; color:var(--gray);">ለዚህ ትምህርት እስካሁን Mid / Final ፈተና አልገባም።</p></div>`;
+      } else {
+        exams.forEach(exName => {
+          const exQs = qs.filter(q => q.chapter === exName);
+          const hasPaid = exQs.some(q => q.question_type === 'paid');
+          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          html += `<button class="edu-list-btn" onclick="eduSelectSubjectExam('${escAttr(exName)}')"><span>📝 ${escHtml(exName)} <small style="color:var(--gray);">(${exQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
+        });
+      }
+      stage.innerHTML = html;
+    }
+
+    function eduSelectSubjectExam(examName) {
+      eduNav.chapter = examName;
+      eduNav.mode = 'subject_exam';
+      const stage = document.getElementById('eduQuizStage');
+      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, examName, 'subject_exam');
+      if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+
+      if (qs.length === 0) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center;">
+            <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ፈተና የተቆለፈ (VIP) ነው!</h3>
+            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
+              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ1 ወር) — <b>30 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
+              • ለሁሉም ትምህርቶች (Full VIP) — <b>100 ብር</b>
+            </p>
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 VIP ክፈት</button>
+              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 ሰው ጋብዝ</button>
+            </div>
+            <button class="btn-back-sm" onclick="eduShowSubjectExams('${escAttr(eduNav.subject)}')">🔙 ተመለስ</button>
+          </div>`;
+        return;
+      }
+
+      const firstQId = qs[0] ? qs[0].id : '';
+      stage.innerHTML = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduShowSubjectExams('${escAttr(eduNav.subject)}')">🔙 ፈተናዎች</button>
+          <strong style="font-size:0.86rem; color:var(--gold); flex:1; text-align:center; padding:0 6px;">📝 ${escHtml(examName)}</strong>
+          ${firstQId ? `<button class="btn-back-sm" style="background:#8B5CF6; color:white;" onclick="eduShareChapter('${escAttr(firstQId)}', '${escAttr(eduNav.subject)}', '${escAttr(examName)}')">🔗 አጋራ</button>` : ''}
+        </div>
+        <div class="section-card" style="text-align:center;">
+          <div style="font-size:2rem; margin-bottom:6px;">📝</div>
+          <h3 style="margin-bottom:6px;">${escHtml(eduNav.subject)} — ${escHtml(examName)}</h3>
+          <p style="font-size:0.82rem; color:var(--gray); margin-bottom:16px;">ጠቅላላ <b>${qs.length}</b> የፈተና ጥያቄዎች ተዘጋጅተዋል።</p>
+          <button class="btn-action btn-edu" onclick="eduStartExamRun('subject_exam')">🚀 ፈተናውን ጀምር (Start Exam)</button>
+        </div>`;
+    }
+
+    function eduOpenWeeklyExam(level, stream, title) {
+      eduNav = { level, stream, subject: 'Weekly Exam', chapter: title, practice: 1, mode: 'weekly_exam' };
+      const stage = document.getElementById('eduQuizStage');
+      const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
+      let qs = bikatQuestions.filter(q =>
+        q.content_category === 'weekly_exam' &&
+        (q.level || 'All') === level &&
+        (q.stream || 'All') === stream &&
+        q.chapter === title
+      );
+      if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+
+      if (qs.length === 0) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center;">
+            <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ሳምንታዊ ፈተና ለVIP አባላት ነው!</h3>
+            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">Full VIP (100 ብር) በመክፈት ሁሉንም ፈተናዎች ያለ ገደብ ይስሩ።</p>
+            <button class="btn-action btn-edu" style="margin-bottom:8px;" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Full VIP ክፈት</button>
+            <button class="btn-back-sm" onclick="eduRenderInitialQuizView()">🔙 ተመለስ</button>
+          </div>`;
+        return;
+      }
+
+      const firstQId = qs[0] ? qs[0].id : '';
+      stage.innerHTML = `
+        <div class="edu-back-row">
+          <button class="btn-back-sm" onclick="eduRenderInitialQuizView()">🔙 ተመለስ</button>
+          <strong style="font-size:0.86rem; color:var(--gold); flex:1; text-align:center; padding:0 6px;">🔥 ${escHtml(title)}</strong>
+          ${firstQId ? `<button class="btn-back-sm" style="background:#8B5CF6; color:white;" onclick="eduShareChapter('${escAttr(firstQId)}', 'Weekly Exam', '${escAttr(title)}')">🔗 አጋራ</button>` : ''}
+        </div>
+        <div class="section-card" style="text-align:center;">
+          <div style="font-size:2.1rem; margin-bottom:6px;">🔥</div>
+          <h3 style="margin-bottom:6px;">${escHtml(title)}</h3>
+          <p style="font-size:0.82rem; color:var(--gray); margin-bottom:16px;">ጠቅላላ <b>${qs.length}</b> ጥያቄዎች አሉት።</p>
+          <button class="btn-action btn-edu" onclick="eduStartExamRun('weekly_exam')">🚀 ፈተናውን ጀምር (Start Exam)</button>
+        </div>`;
+    }
+
+    function eduStartExamRun(mode) {
+      let qs = [];
+      if (mode === 'subject_exam') {
+        const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+        qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter, 'subject_exam');
+        if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+      } else {
+        const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
+        qs = bikatQuestions.filter(q =>
+          q.content_category === 'weekly_exam' &&
+          (q.level || 'All') === eduNav.level &&
+          (q.stream || 'All') === eduNav.stream &&
+          q.chapter === eduNav.chapter
+        );
+        if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
+      }
+      qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+      if (qs.length === 0) return;
+
+      eduActiveQuiz = {
+        questions: qs,
+        index: 0,
+        score: 0,
+        earned: 0,
+        answeredCurrent: false,
+        subject: eduNav.subject,
+        chapter: eduNav.chapter,
+        practice: 1,
+        mode
+      };
+      document.getElementById('eduResumeBanner').style.display = 'none';
+      eduRenderCurrentQuestion();
     }
 
     function eduSelectChapter(chapter) {
       eduNav.chapter = chapter;
+      eduNav.mode = 'chapter';
       const stage = document.getElementById('eduQuizStage');
       const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
-      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, chapter);
+      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, chapter, 'chapter');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0) {
@@ -2288,7 +2553,7 @@
               <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 ሰው ጋብዝ</button>
             </div>
             <a class="btn-action" style="background:#374151; color:white; margin-bottom:8px;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
-            <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(eduNav.subject)}')">🔙 ተመለስ</button>
+            <button class="btn-back-sm" onclick="eduShowSubjectChapters('${escAttr(eduNav.subject)}')">🔙 ተመለስ</button>
           </div>`;
         return;
       }
@@ -2298,7 +2563,7 @@
       const firstQId = qs[0] ? qs[0].id : '';
       let html = `
         <div class="edu-back-row">
-          <button class="btn-back-sm" onclick="eduSelectSubject('${escAttr(eduNav.subject)}')">🔙 ምዕራፎች</button>
+          <button class="btn-back-sm" onclick="eduShowSubjectChapters('${escAttr(eduNav.subject)}')">🔙 ምዕራፎች</button>
           <strong style="font-size:0.86rem; color:var(--edu-accent); flex:1; text-align:center; padding:0 6px;">📑 ${escHtml(chapter)}</strong>
           ${firstQId ? `<button class="btn-back-sm" style="background:#8B5CF6; color:white;" onclick="eduShareChapter('${escAttr(firstQId)}', '${escAttr(eduNav.subject)}', '${escAttr(chapter)}')">🔗 አጋራ</button>` : ''}
         </div>
@@ -2314,7 +2579,7 @@
 
     function eduStartPractice(practiceNum) {
       const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
-      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter);
+      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter, 'chapter');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
       qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
 
@@ -2331,13 +2596,14 @@
         answeredCurrent: false,
         subject: eduNav.subject,
         chapter: eduNav.chapter,
-        practice: practiceNum
+        practice: practiceNum,
+        mode: 'chapter'
       };
       document.getElementById('eduResumeBanner').style.display = 'none';
       eduRenderCurrentQuestion();
     }
 
-    function eduRenderCurrentQuestion() {
+        function eduRenderCurrentQuestion() {
       const stage = document.getElementById('eduQuizStage');
       if (!eduActiveQuiz) return eduRenderInitialQuizView();
 
@@ -2454,10 +2720,13 @@
 
     function eduPauseQuiz() {
       if (!eduActiveQuiz) return;
+      const prevMode = eduActiveQuiz.mode || 'chapter';
       try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
       eduActiveQuiz = null;
       eduCheckPausedQuiz();
-      eduSelectChapter(eduNav.chapter);
+      if (prevMode === 'weekly_exam') eduRenderInitialQuizView();
+      else if (prevMode === 'subject_exam') eduShowSubjectExams(eduNav.subject);
+      else eduSelectChapter(eduNav.chapter);
     }
 
     function eduCheckPausedQuiz() {
@@ -2780,10 +3049,53 @@
     // =========================================================================
     // BIKAT ADMIN PANEL (CONTINUOUS + EXISTING CHAPTERS + NOTIFICATIONS + VIP)
     // =========================================================================
+    function eduAdminOnCategoryChange() {
+      const cat = document.getElementById('eaContentCat').value;
+      const subGroup = document.getElementById('eaSubjectGroup');
+      const chLabel = document.getElementById('eaChapterLabel');
+      const chNewInp = document.getElementById('eaChapterNew');
+      const levAllOpt = document.getElementById('eaLevelAllOpt');
+      const strAllOpt = document.getElementById('eaStreamAllOpt');
+      const levSel = document.getElementById('eaLevel');
+      const strSel = document.getElementById('eaStream');
+
+      if (cat === 'weekly_exam') {
+        subGroup.style.display = 'none';
+        levAllOpt.style.display = 'block';
+        strAllOpt.style.display = 'block';
+        chLabel.innerText = 'የሳምንታዊ ፈተና ስም (ነባር ላይ ቀጥል ወይም አዲስ)';
+        chNewInp.placeholder = 'ምሳሌ: ሳምንታዊ ፈተና #1, Mid Challenge 2018';
+      } else {
+        subGroup.style.display = 'block';
+        levAllOpt.style.display = 'none';
+        strAllOpt.style.display = 'none';
+        if (levSel.value === 'All') levSel.value = 'Remedial';
+        if (strSel.value === 'All') strSel.value = 'Natural';
+        if (cat === 'subject_exam') {
+          chLabel.innerText = 'የፈተናው ስም (Mid / Final 2017, 2018, 2019...)';
+          chNewInp.placeholder = 'ምሳሌ: Mid 2017, Final 2018, Final 2019';
+        } else {
+          chLabel.innerText = 'ምዕራፍ (ነባር ምዕራፍ ላይ መቀጠል ወይም አዲስ)';
+          chNewInp.placeholder = 'አዲሱን ምዕራፍ ስም ይጻፉ (ምሳሌ: Chapter 1)';
+        }
+      }
+      eduAdminRefreshSubjectSelect();
+    }
+
     function eduAdminRefreshSubjectSelect(keepSubject = null, keepChapter = null) {
+      const cat = document.getElementById('eaContentCat').value;
       const level = document.getElementById('eaLevel').value;
       const stream = document.getElementById('eaStream').value;
-      const qs = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None'));
+
+      if (cat === 'weekly_exam') {
+        eduAdminRefreshChapterSelect(keepChapter);
+        return;
+      }
+
+      const qs = bikatQuestions.filter(q =>
+        (q.content_category || 'chapter') !== 'weekly_exam' &&
+        q.level === level && (q.stream === stream || q.stream === 'None')
+      );
       const subs = [...new Set(qs.map(q => q.subject))];
 
       const sel = document.getElementById('eaSubjectSelect');
@@ -2813,25 +3125,49 @@
     }
 
     function eduAdminRefreshChapterSelect(keepChapter = null) {
+      const cat = document.getElementById('eaContentCat').value;
       const level = document.getElementById('eaLevel').value;
       const stream = document.getElementById('eaStream').value;
-      const subSel = document.getElementById('eaSubjectSelect').value;
       const chSel = document.getElementById('eaChapterSelect');
+      const newLabel = cat === 'chapter' ? '➕ አዲስ ምዕራፍ ፍጠር (New Chapter)' : '➕ አዲስ ፈተና ፍጠር (New Exam)';
 
+      if (cat === 'weekly_exam') {
+        const qs = bikatQuestions.filter(q =>
+          q.content_category === 'weekly_exam' &&
+          (q.level || 'All') === level &&
+          (q.stream || 'All') === stream
+        );
+        const exCounts = {};
+        qs.forEach(q => { exCounts[q.chapter] = (exCounts[q.chapter] || 0) + 1; });
+        const exams = Object.keys(exCounts);
+        let html = exams.map(c => `<option value="${escAttr(c)}">🔥 ${escHtml(c)} (${exCounts[c]} ጥያቄ — እዚሁ ቀጥል)</option>`).join('');
+        html += `<option value="__NEW__">${newLabel}</option>`;
+        chSel.innerHTML = html;
+        if (keepChapter && exams.includes(keepChapter)) chSel.value = keepChapter;
+        else if (exams.length === 0) chSel.value = '__NEW__';
+        eduAdminOnChapterChange();
+        return;
+      }
+
+      const subSel = document.getElementById('eaSubjectSelect').value;
       if (subSel === '__NEW__') {
-        chSel.innerHTML = `<option value="__NEW__">➕ አዲስ ምዕራፍ ፍጠር (New Chapter)</option>`;
+        chSel.innerHTML = `<option value="__NEW__">${newLabel}</option>`;
         chSel.value = '__NEW__';
         eduAdminOnChapterChange();
         return;
       }
 
-      const qs = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel);
+      const qs = bikatQuestions.filter(q =>
+        (q.content_category || 'chapter') === cat &&
+        q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel
+      );
       const chCounts = {};
       qs.forEach(q => { chCounts[q.chapter] = (chCounts[q.chapter] || 0) + 1; });
       const chaps = Object.keys(chCounts);
+      const itemIcon = cat === 'subject_exam' ? '📝' : '📑';
 
-      let html = chaps.map(c => `<option value="${escAttr(c)}">📑 ${escHtml(c)} (${chCounts[c]} ጥያቄ — እዚሁ ቀጥል)</option>`).join('');
-      html += `<option value="__NEW__">➕ አዲስ ምዕራፍ ፍጠር (New Chapter)</option>`;
+      let html = chaps.map(c => `<option value="${escAttr(c)}">${itemIcon} ${escHtml(c)} (${chCounts[c]} ጥያቄ — እዚሁ ቀጥል)</option>`).join('');
+      html += `<option value="__NEW__">${newLabel}</option>`;
       chSel.innerHTML = html;
 
       if (keepChapter && chaps.includes(keepChapter)) {
@@ -2843,27 +3179,33 @@
     }
 
     function eduAdminOnChapterChange() {
+      const cat = document.getElementById('eaContentCat').value;
       const level = document.getElementById('eaLevel').value;
       const stream = document.getElementById('eaStream').value;
-      const subSel = document.getElementById('eaSubjectSelect').value;
+      const subSel = cat === 'weekly_exam' ? 'Weekly Exam' : document.getElementById('eaSubjectSelect').value;
       const chSel = document.getElementById('eaChapterSelect').value;
       const newChInp = document.getElementById('eaChapterNew');
 
       if (chSel === '__NEW__') {
         newChInp.style.display = 'block';
         newChInp.required = true;
-        document.getElementById('eaChapterLiveCount').innerText = '📊 አዲስ ምዕራፍ (0 ጥያቄ)';
+        document.getElementById('eaChapterLiveCount').innerText = cat === 'chapter' ? '📊 አዲስ ምዕራፍ (0 ጥያቄ)' : '📊 አዲስ ፈተና (0 ጥያቄ)';
       } else {
         newChInp.style.display = 'none';
         newChInp.required = false;
-        const cnt = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel && q.chapter === chSel).length;
+        const cnt = bikatQuestions.filter(q =>
+          (q.content_category || 'chapter') === cat &&
+          (q.level || 'All') === level &&
+          ((q.stream || 'All') === stream || q.stream === 'None') &&
+          q.subject === subSel && q.chapter === chSel
+        ).length;
         document.getElementById('eaChapterLiveCount').innerText = `📊 በ ${subSel} → ${chSel} ያሉ ጥያቄዎች: ${cnt}`;
       }
     }
 
     function eduGenerateNextCustomId(level, subject) {
       const lev = level.toUpperCase();
-      const prefix = lev.includes('12') ? 'G12' : (lev.includes('REM') ? 'REM' : (lev.includes('FRESH') ? 'FRE' : lev.slice(0, 3)));
+      const prefix = lev.includes('12') ? 'G12' : (lev.includes('REM') ? 'REM' : (lev.includes('FRESH') ? 'FRE' : (lev === 'ALL' ? 'EXM' : lev.slice(0, 3))));
       const subClean = subject.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       const subCode = (subClean.length >= 3 ? subClean.slice(0, 3) : subClean.padEnd(3, 'X'));
       const base = `${prefix}${subCode}`;
@@ -2897,16 +3239,17 @@
 
     async function eduAdminAddQuestions(e) {
       e.preventDefault();
+      const cat = document.getElementById('eaContentCat').value;
       const level = document.getElementById('eaLevel').value;
       const stream = document.getElementById('eaStream').value;
       const subSel = document.getElementById('eaSubjectSelect').value;
-      const subject = subSel === '__NEW__' ? document.getElementById('eaSubjectNew').value.trim() : subSel;
+      const subject = cat === 'weekly_exam' ? 'Weekly Exam' : (subSel === '__NEW__' ? document.getElementById('eaSubjectNew').value.trim() : subSel);
       const chSel = document.getElementById('eaChapterSelect').value;
       const chapter = chSel === '__NEW__' ? document.getElementById('eaChapterNew').value.trim() : chSel;
       const qType = document.getElementById('eaType').value;
       const rawText = document.getElementById('eaBulkText').value;
 
-      if (!subject || !chapter) { notifyUser("እባክዎ ትምህርት እና ምዕራፍ ያስገቡ!"); return; }
+      if (!subject || !chapter) { notifyUser("እባክዎ ትምህርት እና ምዕራፍ/ፈተና ስም ያስገቡ!"); return; }
 
       const parsed = eduParseBulkQuestions(rawText);
       if (parsed.length === 0) {
@@ -2921,21 +3264,24 @@
         for (const item of parsed) {
           const cid = eduGenerateNextCustomId(level, subject);
           const qId = `Q_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-          const qObj = { custom_id: cid, level, stream, subject, chapter, question_type: qType, ...item, created_at: new Date().toISOString() };
+          const qObj = { custom_id: cid, content_category: cat, level, stream, subject, chapter, question_type: qType, ...item, created_at: new Date().toISOString() };
           await fetch(`${BIKAT_QUESTIONS}/${qId}.json`, { method: 'PUT', body: JSON.stringify(qObj) });
           bikatQuestions.push({ id: qId, ...qObj });
           savedIds.push(cid);
         }
-        // Clear ONLY the textarea so Admin can immediately paste the next question(s) in the same chapter!
         document.getElementById('eaBulkText').value = '';
         document.getElementById('eaSubjectNew').value = '';
         document.getElementById('eaChapterNew').value = '';
 
-        // Keep same subject & chapter selected and update counts!
         eduAdminRefreshSubjectSelect(subject, chapter);
 
-        lastAddedBatch = { level, stream, subject, chapter, count: savedIds.length };
-        const totalInChap = bikatQuestions.filter(q => q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subject && q.chapter === chapter).length;
+        lastAddedBatch = { cat, level, stream, subject, chapter, count: savedIds.length };
+        const totalInChap = bikatQuestions.filter(q =>
+          (q.content_category || 'chapter') === cat &&
+          (q.level || 'All') === level &&
+          ((q.stream || 'All') === stream || q.stream === 'None') &&
+          q.subject === subject && q.chapter === chapter
+        ).length;
         document.getElementById('eaLastSavedMsg').innerHTML = `✅ <b>${savedIds.length} ጥያቄ ገብቷል!</b> (${savedIds.join(', ')})<br>📊 በ ${escHtml(subject)} → ${escHtml(chapter)} ጠቅላላ: <b>${totalInChap}</b> ጥያቄ። ቀጣዩን እዚሁ መቀጠል ትችላለህ!`;
         document.getElementById('eaLastSavedBox').style.display = 'block';
 
@@ -2946,13 +3292,14 @@
 
     async function eduQuickNotifyNewQuestions() {
       if (!lastAddedBatch) return;
-      const { level, stream, subject, chapter, count } = lastAddedBatch;
-      const text = `🔥 አዲስ ጥያቄዎች ተጭነዋል!\n\n📚 ክፍል: ${level} (${stream})\n📘 ትምህርት: ${subject}\n📑 ምዕራፍ: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
+      const { cat, level, stream, subject, chapter, count } = lastAddedBatch;
+      const header = cat === 'chapter' ? '🔥 አዲስ ጥያቄዎች ተጭነዋል!' : '📝 አዲስ ፈተና (Exam) ተጭኗል!';
+      const text = `${header}\n\n📚 ክፍል: ${level} (${stream})\n📘 ትምህርት: ${subject}\n📑 ${cat === 'chapter' ? 'ምዕራፍ' : 'ፈተና'}: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
       await eduPublishAnnouncementText(text);
       document.getElementById('eaLastSavedBox').style.display = 'none';
     }
 
-    async function eduAdminSendAnnouncement(e) {
+        async function eduAdminSendAnnouncement(e) {
       e.preventDefault();
       const text = document.getElementById('eaNotifInput').value.trim();
       if (!text) return;
@@ -3029,10 +3376,11 @@
         }).join('');
       }
 
-      // Stats, Chapter Free/Paid Toggle & Chapter Bulk Delete
+      // Stats, Free/Paid Toggle & Bulk Delete (Chapters + Subject Exams + Weekly Exams)
       const statsMap = {};
       bikatQuestions.forEach(q => {
-        const key = `${q.level}|${q.stream}|${q.subject}|${q.chapter}`;
+        const cat = q.content_category || 'chapter';
+        const key = `${cat}|${q.level}|${q.stream}|${q.subject}|${q.chapter}`;
         if (!statsMap[key]) statsMap[key] = { total: 0, paid: 0 };
         statsMap[key].total += 1;
         if ((q.question_type || 'free') === 'paid') statsMap[key].paid += 1;
@@ -3042,21 +3390,22 @@
       if (keys.length === 0) { statsBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">ምንም ጥያቄ የለም።</p>'; }
       else {
         statsBox.innerHTML = keys.map(k => {
-          const [lev, str, sub, ch] = k.split('|');
+          const [cat, lev, str, sub, ch] = k.split('|');
           const info = statsMap[k];
           const isAllPaid = info.paid === info.total;
           const statusBadge = isAllPaid ? '🔒 Paid' : (info.paid > 0 ? `🔓/🔒 (${info.paid} Paid)` : '🆓 Free');
           const nextType = isAllPaid ? 'free' : 'paid';
           const toggleLabel = isAllPaid ? '🆓 ወደ Free' : '🔒 ወደ Paid';
           const toggleBg = isAllPaid ? '#10B981' : '#F59E0B';
+          const catBadge = cat === 'weekly_exam' ? '🔥 Weekly' : (cat === 'subject_exam' ? '📝 Exam' : '📚 Chap');
           return `<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
             <div style="flex:1; min-width:0;">
-              <b>${escHtml(lev)} (${escHtml(str)})</b> • ${escHtml(sub)}<br>
+              <b>${catBadge}</b> • ${escHtml(lev)} (${escHtml(str)}) • ${escHtml(sub)}<br>
               <small style="color:var(--gray);">${escHtml(ch)} (${info.total} ጥያቄ • ${statusBadge})</small>
             </div>
             <div style="display:flex; gap:4px; flex-shrink:0;">
-              <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
-              <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
+              <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
+              <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
             </div>
           </div>`;
         }).join('');
@@ -3108,10 +3457,10 @@
       await eduLoadAllData();
     }
 
-    async function eduAdminToggleChapterType(lev, str, sub, ch, newType) {
+    async function eduAdminToggleChapterType(cat, lev, str, sub, ch, newType) {
       const label = newType === 'paid' ? '🔒 Paid (VIP)' : '🆓 Free (ነፃ)';
       if (!confirm(`የ ${sub} - ${ch} ጥያቄዎች በሙሉ ወደ ${label} ይቀየሩ?`)) return;
-      const toUpdate = bikatQuestions.filter(q => q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
+      const toUpdate = bikatQuestions.filter(q => (q.content_category || 'chapter') === cat && q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
       for (const q of toUpdate) {
         await fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, {
           method: 'PATCH',
@@ -3122,9 +3471,9 @@
       await eduLoadAllData();
     }
 
-    async function eduAdminDeleteChapter(lev, str, sub, ch) {
+    async function eduAdminDeleteChapter(cat, lev, str, sub, ch) {
       if (!confirm(`የ ${sub} - ${ch} ጥያቄዎች በሙሉ ይጥፉ?`)) return;
-      const toDel = bikatQuestions.filter(q => q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
+      const toDel = bikatQuestions.filter(q => (q.content_category || 'chapter') === cat && q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
       for (const q of toDel) {
         await fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, { method: 'DELETE' });
       }
@@ -3170,8 +3519,16 @@
         await eduLoadAllData();
         const foundQ = bikatQuestions.find(q => q.id === targetQId || q.custom_id === targetQId);
         if (foundQ) {
-          eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1 };
-          eduSelectChapter(foundQ.chapter);
+          const qCat = foundQ.content_category || 'chapter';
+          if (qCat === 'weekly_exam') {
+            eduOpenWeeklyExam(foundQ.level || 'All', foundQ.stream || 'All', foundQ.chapter);
+          } else if (qCat === 'subject_exam') {
+            eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'subject_exam' };
+            eduSelectSubjectExam(foundQ.chapter);
+          } else {
+            eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'chapter' };
+            eduSelectChapter(foundQ.chapter);
+          }
         }
         loadAllData();
       } else if (startParam === 'edu') {
