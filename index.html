@@ -264,33 +264,65 @@
     .btn-edu { background: linear-gradient(135deg, var(--edu-accent), #6366F1); color: white; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28); }
 
     /* =========================================
-       FLOATING GLASSMORPHIC BOTTOM NAVIGATION
+       FLOATING GLASSMORPHIC BOTTOM NAVIGATION (SVG + SLIDING INDICATOR + SELL FAB)
        ========================================= */
     .nav-bar {
       position: fixed; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       left: 12px; right: 12px; max-width: 576px; margin: 0 auto;
-      height: 64px; background: var(--nav-glass);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      height: 66px; background: var(--nav-glass);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       display: none; justify-content: space-around; align-items: center;
-      border: 1px solid var(--border); border-radius: 22px;
-      z-index: 99999; padding: 4px 6px;
+      border: 1px solid var(--border); border-radius: 24px;
+      z-index: 99999; padding: 5px 8px;
       box-shadow: var(--shadow-lg);
     }
     .nav-bar.active { display: flex; }
+    .nav-indicator {
+      position: absolute; top: 6px; bottom: 6px; left: 0;
+      border-radius: 17px; background: rgba(16, 185, 129, 0.14);
+      transition: transform 0.3s cubic-bezier(0.34, 1.38, 0.64, 1), width 0.28s ease, opacity 0.2s ease;
+      pointer-events: none; z-index: 0; opacity: 0;
+    }
+    body[data-theme="dark"] .nav-indicator { background: rgba(16, 185, 129, 0.20); }
+    body[data-theme="cream"] .nav-indicator { background: rgba(198, 139, 89, 0.18); }
+    .nav-bar.edu-nav .nav-indicator { background: var(--edu-bg); }
     .nav-btn {
+      position: relative; z-index: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-size: 0.66rem; font-weight: 600; color: var(--gray); background: none;
-      border: none; cursor: pointer; gap: 2px; flex: 1; height: 52px; border-radius: 16px;
-      transition: all 0.2s ease;
+      font-size: 0.66rem; font-weight: 600; color: var(--gray); background: transparent;
+      border: none; cursor: pointer; gap: 3px; flex: 1; height: 54px; border-radius: 17px;
+      transition: color 0.2s ease, transform 0.15s ease;
     }
-    .nav-btn.active {
-      color: var(--primary); font-weight: 800; background: rgba(16, 185, 129, 0.12);
+    .nav-btn:active { transform: scale(0.94); }
+    .nav-btn.active { color: var(--primary); font-weight: 800; }
+    body[data-theme="dark"] .nav-btn.active { color: var(--secondary); }
+    .nav-bar.edu-nav .nav-btn.active { color: var(--edu-accent); }
+    .nav-svg {
+      width: 22px; height: 22px; stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), stroke-width 0.2s ease;
     }
-    body[data-theme="dark"] .nav-btn.active { color: var(--secondary); background: rgba(16, 185, 129, 0.16); }
-    .nav-bar.edu-nav .nav-btn.active {
-      color: var(--edu-accent); background: var(--edu-bg);
+    .nav-btn.active .nav-svg { transform: translateY(-1px) scale(1.08); stroke-width: 2.3; }
+
+    /* Raised Floating Action Button (FAB) for Sell */
+    .nav-btn.nav-fab-btn {
+      overflow: visible; gap: 2px;
     }
-    .nav-icon { font-size: 1.2rem; line-height: 1; margin-bottom: 2px; }
+    .nav-fab-circle {
+      width: 50px; height: 50px; border-radius: 50%; margin-top: -26px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.40);
+      border: 4px solid var(--bg);
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+    }
+    .nav-fab-circle .nav-svg { width: 24px; height: 24px; stroke: white; stroke-width: 2.6; }
+    .nav-btn.nav-fab-btn:active .nav-fab-circle { transform: scale(0.92); }
+    .nav-btn.nav-fab-btn.active .nav-fab-circle {
+      transform: translateY(-2px) scale(1.06);
+      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.55), 0 0 0 3px rgba(16, 185, 129, 0.22);
+    }
+    .nav-btn.nav-fab-btn.active .nav-fab-circle .nav-svg { transform: rotate(45deg); }
 
     /* =========================================
        CARDS, TABS, STATS & FORMS
@@ -1275,18 +1307,49 @@
        BOTTOM NAVIGATION BARS (SHOP & EDUCATION)
        ========================================================= -->
   <div class="nav-bar active" id="navBarShop">
-    <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span>Home</span></button>
-    <button class="nav-btn" id="navShops" onclick="switchTab('shops', this)"><span class="nav-icon">🏬</span><span>ሻጮች</span></button>
-    <button class="nav-btn" onclick="switchTab('sell', this)"><span class="nav-icon">➕</span><span>Sell</span></button>
-    <button class="nav-btn" id="navProfile" onclick="switchTab('profile', this)"><span class="nav-icon">🏪</span><span>My Shop</span></button>
+    <div class="nav-indicator" id="shopNavIndicator"></div>
+    <button class="nav-btn active" id="navHome" onclick="switchTab('home', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9.5"/><path d="M9 21v-6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" id="navShops" onclick="switchTab('shops', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/></svg>
+      <span>ሻጮች</span>
+    </button>
+    <button class="nav-btn nav-fab-btn" id="navSell" onclick="switchTab('sell', this)">
+      <div class="nav-fab-circle">
+        <svg class="nav-svg" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      </div>
+      <span>Sell</span>
+    </button>
+    <button class="nav-btn" id="navProfile" onclick="switchTab('profile', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>My Shop</span>
+    </button>
   </div>
 
   <div class="nav-bar edu-nav" id="navBarEdu">
-    <button class="nav-btn active" id="navEduQuiz" onclick="eduSwitchTab('edu-quiz', this)"><span class="nav-icon">📝</span><span>ፈተና</span></button>
-    <button class="nav-btn" id="navEduVip" onclick="eduSwitchTab('edu-vip', this)"><span class="nav-icon">💎</span><span>VIP & Notes</span></button>
-    <button class="nav-btn" id="navEduRank" onclick="eduSwitchTab('edu-rank', this)"><span class="nav-icon">🏆</span><span>ደረጃ</span></button>
-    <button class="nav-btn" id="navEduProfile" onclick="eduSwitchTab('edu-profile', this)"><span class="nav-icon">👤</span><span>ፕሮፋይል</span></button>
-    <button class="nav-btn" id="navEduAdmin" style="display:none;" onclick="eduSwitchTab('edu-admin', this)"><span class="nav-icon">🛠</span><span>Admin</span></button>
+    <div class="nav-indicator" id="eduNavIndicator"></div>
+    <button class="nav-btn active" id="navEduQuiz" onclick="eduSwitchTab('edu-quiz', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
+      <span>ፈተና</span>
+    </button>
+    <button class="nav-btn" id="navEduVip" onclick="eduSwitchTab('edu-vip', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M2 9h20"/><path d="M12 22L8 9l4-6 4 6-4 13z"/></svg>
+      <span>VIP & Notes</span>
+    </button>
+    <button class="nav-btn" id="navEduRank" onclick="eduSwitchTab('edu-rank', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+      <span>ደረጃ</span>
+    </button>
+    <button class="nav-btn" id="navEduProfile" onclick="eduSwitchTab('edu-profile', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>ፕሮፋይል</span>
+    </button>
+    <button class="nav-btn" id="navEduAdmin" style="display:none;" onclick="eduSwitchTab('edu-admin', this)">
+      <svg class="nav-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span>Admin</span>
+    </button>
   </div>
 
   <script>
@@ -1371,6 +1434,9 @@
         document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
         if (!eduDataLoaded) eduLoadAllData();
       }
+      requestAnimationFrame(() => {
+        updateNavIndicator(mode === 'shop' ? 'navBarShop' : 'navBarEdu');
+      });
       window.scrollTo(0, 0);
     }
 
@@ -1387,11 +1453,27 @@
     let uploadedOfferImageBase64 = "";
     let currentShopsCategory = 'All';
 
+    function updateNavIndicator(barId) {
+      const bar = document.getElementById(barId);
+      if (!bar || !bar.classList.contains('active')) return;
+      const indicator = bar.querySelector('.nav-indicator');
+      const activeBtn = bar.querySelector('.nav-btn.active');
+      if (!indicator) return;
+      if (!activeBtn || activeBtn.classList.contains('nav-fab-btn') || activeBtn.offsetWidth === 0) {
+        indicator.style.opacity = '0';
+        return;
+      }
+      indicator.style.width = `${activeBtn.offsetWidth}px`;
+      indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+      indicator.style.opacity = '1';
+    }
+
     function switchTab(viewName, btn) {
       document.querySelectorAll('#mode-shop .view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('#navBarShop .nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`view-${viewName}`).classList.add('active');
       if(btn) btn.classList.add('active');
+      requestAnimationFrame(() => updateNavIndicator('navBarShop'));
     }
 
     async function trackUser() {
@@ -1916,6 +1998,7 @@
       document.querySelectorAll('#navBarEdu .nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`view-${viewId}`).classList.add('active');
       if (btn) btn.classList.add('active');
+      requestAnimationFrame(() => updateNavIndicator('navBarEdu'));
       if (viewId === 'edu-rank') eduRenderLeaderboard();
       if (viewId === 'edu-profile') eduRenderProfile();
       if (viewId === 'edu-vip') eduRenderMyPayments();
@@ -3132,9 +3215,17 @@
       applyTheme(saved);
     }
 
+    window.addEventListener('resize', () => {
+      updateNavIndicator('navBarShop');
+      updateNavIndicator('navBarEdu');
+    });
+
     initTheme();
     initSuperApp();
+    requestAnimationFrame(() => {
+      updateNavIndicator('navBarShop');
+      updateNavIndicator('navBarEdu');
+    });
   </script>
 </body>
 </html>
-
