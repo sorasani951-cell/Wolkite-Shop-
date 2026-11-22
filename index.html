@@ -668,10 +668,10 @@
       <div id="view-edu-vip" class="view">
         <!-- Single Subject VIP (30 ETB / 2 Months) -->
         <div class="section-card" style="border-color:var(--edu-accent);">
-          <h3 style="color:var(--edu-accent); margin-bottom:6px;">📘 የ1 ትምህርት VIP (30 ብር / ለ2 ወር)</h3>
+          <h3 style="color:var(--edu-accent); margin-bottom:6px;">📘 የ1 ትምህርት VIP (30 ብር / ለ1 ወር)</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            🔓 በመረጡት 1 ስትሪም ውስጥ ለ <b>1 የትምህርት ዓይነት (Subject)</b> ብቻ ለ2 ወር ያለ ገደብ መዳረሻ!<br>
-            💡 <i>ወይም 50 ነጥብ በመሙላት / 5 ጓደኛ በመጋበዝ 1 ትምህርት ለ2 ወር በነፃ መክፈት ይችላሉ።</i>
+            🔓 በመረጡት 1 ስትሪም ውስጥ ለ <b>1 የትምህርት ዓይነት (Subject)</b> ብቻ ለ1 ወር ያለ ገደብ መዳረሻ!<br>
+            💡 <i>ወይም 50 ነጥብ በመሙላት / 5 ጓደኛ በመጋበዝ 1 ትምህርት ለ1 ወር በነፃ መክፈት ይችላሉ።</i>
           </p>
           <div class="form-group" style="margin-top:8px;">
             <label>የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology, Physics)</label>
@@ -715,7 +715,7 @@
         <div class="section-card">
           <h3 style="color:var(--edu-accent); margin-bottom:6px;">🎁 ጓደኞችን በመጋበዝ ነፃ መዳረሻ ያግኙ!</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ለ<b>2 ወር</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
+            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ለ<b>1 ወር</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
           </p>
           <div class="copy-box">
             <input type="text" id="eduRefLinkInput" readonly>
@@ -1617,10 +1617,10 @@
     // PART 2: BIKAT EDUCATION LOGIC (Firebase-powered)
     // =========================================================================
     const BIKAT_ANNOUNCEMENTS = `${DB_BASE}/bikat/announcements`;
-    const PRACTICE_SIZE = 25;
+    function getPracticeSize(level) { return (level && level.toLowerCase().includes('rem')) ? 15 : 25; }
     const BONUS_POINTS_THRESHOLD = 50;
     const BONUS_INVITE_THRESHOLD = 5;
-    const TWO_MONTHS_MS = 60 * 24 * 60 * 60 * 1000; // 60 days
+    const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days (1 month)
 
     let eduDataLoaded = false;
     let bikatStudents = {};
@@ -1763,7 +1763,7 @@
       const bLine = document.getElementById('eduBonusLine');
       if (activeSubVips.length > 0 && myStudent.is_vip != 1) {
         bLine.style.display = 'block';
-        bLine.innerText = `🔓 የተከፈቱ ትምህርቶች (ለ2 ወር): ${activeSubVips.join(', ')}`;
+        bLine.innerText = `🔓 የተከፈቱ ትምህርቶች (ለ1 ወር): ${activeSubVips.join(', ')}`;
       } else {
         bLine.style.display = 'none';
       }
@@ -1791,7 +1791,7 @@
         if (!myStudent.bonus_expires_at || myStudent.bonus_expires_at > now) return true;
       }
       if (!myStudent.bonus_subject && allowClaim && subject) {
-        const exp = now + TWO_MONTHS_MS;
+        const exp = now + ONE_MONTH_MS;
         myStudent.bonus_subject = subject;
         myStudent.bonus_expires_at = exp;
         fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
@@ -1799,7 +1799,7 @@
           body: JSON.stringify({ bonus_subject: subject, bonus_expires_at: exp })
         }).catch(() => {});
         eduRenderHero();
-        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ለ2 ወር ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
+        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ለ1 ወር ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
         return true;
       }
       return false;
@@ -1925,7 +1925,7 @@
           <div class="section-card" style="text-align:center;">
             <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ምዕራፍ የተቆለፈ (VIP) ነው!</h3>
             <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
-              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ2 ወር) — <b>30 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
+              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ1 ወር) — <b>30 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
               • ለሁሉም ትምህርቶች (Full VIP) — <b>100 ብር</b>
             </p>
             <div style="display:flex; gap:8px; margin-bottom:8px;">
@@ -1938,7 +1938,8 @@
         return;
       }
 
-      const numPractices = Math.ceil(qs.length / PRACTICE_SIZE);
+      const pracSize = getPracticeSize(eduNav.level);
+      const numPractices = Math.ceil(qs.length / pracSize);
       const firstQId = qs[0] ? qs[0].id : '';
       let html = `
         <div class="edu-back-row">
@@ -1949,8 +1950,8 @@
         <p style="font-size:0.8rem; color:var(--gray); margin-bottom:10px;">ጠቅላላ <b>${qs.length}</b> ጥያቄዎች አሉ። ልምምድ ይምረጡ👇</p>`;
 
       for (let i = 1; i <= numPractices; i++) {
-        const start = (i - 1) * PRACTICE_SIZE + 1;
-        const end = Math.min(i * PRACTICE_SIZE, qs.length);
+        const start = (i - 1) * pracSize + 1;
+        const end = Math.min(i * pracSize, qs.length);
         html += `<button class="edu-list-btn" onclick="eduStartPractice(${i})"><span>📝 ልምምድ ${i} (ጥያቄ ${start}-${end})</span><span style="color:var(--edu-accent);">🚀 ጀምር</span></button>`;
       }
       stage.innerHTML = html;
@@ -1962,8 +1963,9 @@
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
       qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
 
-      const startIdx = (practiceNum - 1) * PRACTICE_SIZE;
-      const slice = qs.slice(startIdx, startIdx + PRACTICE_SIZE);
+      const pracSize = getPracticeSize(eduNav.level);
+      const startIdx = (practiceNum - 1) * pracSize;
+      const slice = qs.slice(startIdx, startIdx + pracSize);
       if (slice.length === 0) return;
 
       eduActiveQuiz = {
@@ -2170,7 +2172,7 @@
       const subj = document.getElementById('eduVipSubjectInput').value.trim();
       if (!subj) { notifyUser("እባክዎ መጀመሪያ የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology)"); return; }
       const lev = myStudent?.education_level || 'Not Set';
-      eduOpenPaymentModal('subject_vip', lev, 'ለ2 ወር (1 ትምህርት)', '30 ብር', subj);
+      eduOpenPaymentModal('subject_vip', lev, 'ለ1 ወር (1 ትምህርት)', '30 ብር', subj);
     }
 
     function eduOpenPaymentModal(type, level, stream, amount, subject = '') {
@@ -2308,7 +2310,7 @@
           🆔 <b>ID:</b> <code>${myStudent.user_id}</code><br>
           📚 <b>የተመረጠ ክፍል:</b> ${escHtml(myStudent.education_level)}<br>
           ⭐ <b>አባልነት:</b> ${myStudent.is_vip == 1 ? '👑 Full VIP (All Subjects)' : '👤 Free Tier'}<br>
-          🎁 <b>ነፃ 1-ትምህርት (2 ወር):</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
+          🎁 <b>ነፃ 1-ትምህርት (1 ወር):</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
           ✅ <b>በትክክል የተመለሱ:</b> ${ansCount} ጥያቄ<br>
           🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">(ቀሪ: ${remPts})</small><br>
           👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ቀሪ: ${remInv})</small>
@@ -2567,11 +2569,13 @@
         }).join('');
       }
 
-      // Stats & Chapter Bulk Delete
+      // Stats, Chapter Free/Paid Toggle & Chapter Bulk Delete
       const statsMap = {};
       bikatQuestions.forEach(q => {
         const key = `${q.level}|${q.stream}|${q.subject}|${q.chapter}`;
-        statsMap[key] = (statsMap[key] || 0) + 1;
+        if (!statsMap[key]) statsMap[key] = { total: 0, paid: 0 };
+        statsMap[key].total += 1;
+        if ((q.question_type || 'free') === 'paid') statsMap[key].paid += 1;
       });
       const statsBox = document.getElementById('eduAdminStatsList');
       const keys = Object.keys(statsMap);
@@ -2579,9 +2583,21 @@
       else {
         statsBox.innerHTML = keys.map(k => {
           const [lev, str, sub, ch] = k.split('|');
-          return `<div style="display:flex; justify-content:space-between; align-items:center; background:#F9FAFB; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.78rem;">
-            <div><b>${escHtml(lev)} (${escHtml(str)})</b> • ${escHtml(sub)}<br><small style="color:var(--gray);">${escHtml(ch)} (${statsMap[k]} ጥያቄ)</small></div>
-            <button style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑 አጥፋ</button>
+          const info = statsMap[k];
+          const isAllPaid = info.paid === info.total;
+          const statusBadge = isAllPaid ? '🔒 Paid' : (info.paid > 0 ? `🔓/🔒 (${info.paid} Paid)` : '🆓 Free');
+          const nextType = isAllPaid ? 'free' : 'paid';
+          const toggleLabel = isAllPaid ? '🆓 ወደ Free' : '🔒 ወደ Paid';
+          const toggleBg = isAllPaid ? '#10B981' : '#F59E0B';
+          return `<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
+            <div style="flex:1; min-width:0;">
+              <b>${escHtml(lev)} (${escHtml(str)})</b> • ${escHtml(sub)}<br>
+              <small style="color:var(--gray);">${escHtml(ch)} (${info.total} ጥያቄ • ${statusBadge})</small>
+            </div>
+            <div style="display:flex; gap:4px; flex-shrink:0;">
+              <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
+              <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
+            </div>
           </div>`;
         }).join('');
       }
@@ -2609,7 +2625,7 @@
           if (p.type === 'full_vip' || p.type === 'vip') {
             await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: 1 }) });
           } else if (p.type === 'subject_vip' && p.subject) {
-            const exp = Date.now() + TWO_MONTHS_MS;
+            const exp = Date.now() + ONE_MONTH_MS;
             await fetch(`${BIKAT_STUDENTS}/${p.user_id}/subject_vips/${encodeURIComponent(p.subject)}.json`, {
               method: 'PUT', body: JSON.stringify(exp)
             });
@@ -2629,6 +2645,20 @@
       await fetch(`${BIKAT_QUESTIONS}/${found.id}.json`, { method: 'DELETE' });
       document.getElementById('eaDeleteIdInput').value = '';
       notifyUser(`✅ ጥያቄ ${target} ጠፍቷል!`);
+      await eduLoadAllData();
+    }
+
+    async function eduAdminToggleChapterType(lev, str, sub, ch, newType) {
+      const label = newType === 'paid' ? '🔒 Paid (VIP)' : '🆓 Free (ነፃ)';
+      if (!confirm(`የ ${sub} - ${ch} ጥያቄዎች በሙሉ ወደ ${label} ይቀየሩ?`)) return;
+      const toUpdate = bikatQuestions.filter(q => q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
+      for (const q of toUpdate) {
+        await fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({ question_type: newType })
+        });
+      }
+      notifyUser(`✅ ${toUpdate.length} ጥያቄዎች ወደ ${label} ተቀይረዋል!`);
       await eduLoadAllData();
     }
 
