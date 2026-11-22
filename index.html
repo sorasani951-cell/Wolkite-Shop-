@@ -1883,10 +1883,7 @@
 
       let html = `<h3 style="font-size:0.95rem; margin-bottom:10px;">📘 የትምህርት ዓይነት ይምረጡ (${escHtml(title)})</h3>`;
       subjects.forEach(sub => {
-        const subQs = qs.filter(q => q.subject === sub);
-        const hasPaid = subQs.some(q => q.question_type === 'paid');
-        const icon = !hasPaid ? '' : (eduHasSubjectAccess(sub) ? '🔓' : '🔒');
-        html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)} <small style="color:var(--gray);">(${subQs.length} ጥያቄ)</small></span><span>${icon} ➔</span></button>`;
+        html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)}</span><span>➔</span></button>`;
       });
       stage.innerHTML = html;
     }
