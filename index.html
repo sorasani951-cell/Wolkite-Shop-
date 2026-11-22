@@ -334,6 +334,101 @@
       display: flex; gap: 6px; margin-top: 8px;
     }
     .copy-box input { flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.75rem; background: #F9FAFB; }
+    /* =========================================
+       PODIUM LEADERBOARD UI (Daily/Weekly/Monthly/All Time)
+       ========================================= */
+    .lb-wrapper {
+      background: linear-gradient(180deg, var(--edu-grad-1) 0%, var(--edu-accent) 62%, var(--card-bg) 62%);
+      border-radius: 18px; overflow: hidden; border: 1px solid var(--border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08); margin-bottom: 14px;
+    }
+    .lb-top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 14px 8px; color: white;
+    }
+    .lb-top-bar h3 { font-size: 1rem; margin: 0; }
+    .lb-tabs {
+      display: flex; gap: 6px; padding: 4px 12px 14px; overflow-x: auto; scrollbar-width: none;
+      justify-content: center;
+    }
+    .lb-tab {
+      background: rgba(255,255,255,0.16); color: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.28); padding: 6px 12px; border-radius: 20px;
+      font-size: 0.74rem; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s;
+    }
+    .lb-tab.active {
+      background: white; color: var(--edu-accent); border-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .lb-podium {
+      display: flex; align-items: flex-end; justify-content: center; gap: 8px;
+      padding: 12px 12px 0; min-height: 205px;
+    }
+    .lb-podium-slot {
+      flex: 1; max-width: 112px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .lb-avatar-wrap { position: relative; margin-bottom: 6px; }
+    .lb-crown {
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      font-size: 1.25rem; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
+    .lb-avatar {
+      width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.05rem; color: white; border: 3px solid rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.22); box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+    }
+    .lb-podium-slot.rank-1 .lb-avatar {
+      width: 64px; height: 64px; font-size: 1.25rem; border-color: #FBBF24;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+    }
+    .lb-podium-slot.rank-2 .lb-avatar { border-color: #E5E7EB; background: linear-gradient(135deg, #64748B, #475569); }
+    .lb-podium-slot.rank-3 .lb-avatar { border-color: #FDBA74; background: linear-gradient(135deg, #C2410C, #9A3412); }
+    .lb-rank-dot {
+      position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 20px; border-radius: 50%; font-size: 0.68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; color: #111827; background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+    .lb-podium-slot.rank-1 .lb-rank-dot { background: #FBBF24; color: #451A03; }
+    .lb-podium-name {
+      font-size: 0.76rem; font-weight: 700; color: white; max-width: 96px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px;
+    }
+    .lb-podium-pts { font-size: 0.7rem; color: rgba(255,255,255,0.88); font-weight: 600; margin-bottom: 6px; }
+    .lb-block {
+      width: 100%; border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 900; color: rgba(255,255,255,0.88);
+      background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08));
+      border-top: 2px solid rgba(255,255,255,0.35);
+    }
+    .lb-podium-slot.rank-1 .lb-block { height: 78px; background: linear-gradient(180deg, rgba(251,191,36,0.45), rgba(251,191,36,0.12)); }
+    .lb-podium-slot.rank-2 .lb-block { height: 56px; }
+    .lb-podium-slot.rank-3 .lb-block { height: 42px; }
+    .lb-list-panel {
+      background: var(--card-bg); border-radius: 18px 18px 0 0; padding: 12px;
+      margin-top: -2px;
+    }
+    .lb-row {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .lb-row.is-me {
+      border: 2px solid var(--edu-accent); background: var(--edu-bg);
+    }
+    .lb-row-num {
+      font-size: 1.15rem; font-weight: 900; color: var(--gray); width: 26px; text-align: center; flex-shrink: 0;
+    }
+    .lb-row-avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--edu-accent); color: white;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .lb-row-info { flex: 1; min-width: 0; }
+    .lb-row-name {
+      font-size: 0.85rem; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lb-row-pts { font-size: 0.78rem; font-weight: 700; color: var(--edu-accent); white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -724,12 +819,19 @@
           <button class="btn-action btn-tg" style="margin-top:8px;" onclick="eduShareRefLink()">📤 ለጓደኞች ሼር አድርግ</button>
         </div>
 
-        <div class="section-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="font-size:0.95rem;">🏆 Top 10 Leaderboard</h3>
-            <button onclick="eduLoadAllData()" style="background:none; border:none; color:var(--edu-accent); font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+        <div class="lb-wrapper">
+          <div class="lb-top-bar">
+            <h3>🏆 Leaderboard</h3>
+            <button onclick="eduLoadAllData()" style="background:rgba(255,255,255,0.18); color:white; border:none; padding:5px 10px; border-radius:12px; font-size:0.74rem; font-weight:bold; cursor:pointer;">🔄 እደስ</button>
           </div>
-          <div id="eduLeaderboardList"></div>
+          <div class="lb-tabs" id="eduLbTabs">
+            <button class="lb-tab" onclick="eduSwitchLbPeriod('daily', this)">Daily</button>
+            <button class="lb-tab" onclick="eduSwitchLbPeriod('weekly', this)">Weekly</button>
+            <button class="lb-tab" onclick="eduSwitchLbPeriod('monthly', this)">Monthly</button>
+            <button class="lb-tab active" onclick="eduSwitchLbPeriod('all', this)">All Time</button>
+          </div>
+          <div id="eduLbPodium" class="lb-podium"></div>
+          <div id="eduLeaderboardList" class="lb-list-panel"></div>
         </div>
       </div>
 
@@ -1688,12 +1790,11 @@
 
           if (referrerId && String(referrerId) !== String(currentUser.id) && bikatStudents[referrerId]) {
             const refUser = bikatStudents[referrerId];
+            const refPatch = eduBuildPointsPatch(refUser, 2);
+            refPatch.invited_count = (refUser.invited_count || 0) + 1;
             await fetch(`${BIKAT_STUDENTS}/${referrerId}.json`, {
               method: 'PATCH',
-              body: JSON.stringify({
-                total_points: (refUser.total_points || 0) + 2,
-                invited_count: (refUser.invited_count || 0) + 1
-              })
+              body: JSON.stringify(refPatch)
             });
           }
         } else {
@@ -2057,13 +2158,14 @@
         if (!ansMap[q.id]) {
           ansMap[q.id] = true;
           myStudent.answered_questions = ansMap;
-          myStudent.total_points = (myStudent.total_points || 0) + 2;
+          const ptsPatch = eduBuildPointsPatch(myStudent, 2);
+          Object.assign(myStudent, ptsPatch);
           eduActiveQuiz.earned += 2;
           feedbackMsg = '✅ <b>ትክክል መልሰዋል! (+2 ነጥብ አግኝተዋል)</b>';
           eduRenderHero();
           fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
             method: 'PATCH',
-            body: JSON.stringify({ total_points: myStudent.total_points })
+            body: JSON.stringify(ptsPatch)
           }).catch(() => {});
           fetch(`${BIKAT_STUDENTS}/${currentUser.id}/answered_questions/${q.id}.json`, {
             method: 'PUT', body: 'true'
@@ -2285,13 +2387,117 @@
       if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
+    let eduLbPeriod = 'all'; // 'daily' | 'weekly' | 'monthly' | 'all'
+
+    function eduGetPeriodKeys() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      // ISO week number
+      const tmp = new Date(Date.UTC(y, now.getMonth(), now.getDate()));
+      const dayNum = tmp.getUTCDay() || 7;
+      tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+      return {
+        daily: `${y}-${m}-${d}`,
+        weekly: `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`,
+        monthly: `${y}-${m}`
+      };
+    }
+
+    function eduBuildPointsPatch(stu, delta) {
+      const keys = eduGetPeriodKeys();
+      const curDaily = (stu.daily_key === keys.daily) ? (stu.daily_points || 0) : 0;
+      const curWeekly = (stu.weekly_key === keys.weekly) ? (stu.weekly_points || 0) : 0;
+      const curMonthly = (stu.monthly_key === keys.monthly) ? (stu.monthly_points || 0) : 0;
+      return {
+        total_points: (stu.total_points || 0) + delta,
+        daily_points: curDaily + delta, daily_key: keys.daily,
+        weekly_points: curWeekly + delta, weekly_key: keys.weekly,
+        monthly_points: curMonthly + delta, monthly_key: keys.monthly
+      };
+    }
+
+    function eduGetStudentPeriodPoints(stu, period) {
+      if (period === 'all') return stu.total_points || 0;
+      const keys = eduGetPeriodKeys();
+      if (period === 'daily') return (stu.daily_key === keys.daily) ? (stu.daily_points || 0) : 0;
+      if (period === 'weekly') return (stu.weekly_key === keys.weekly) ? (stu.weekly_points || 0) : 0;
+      if (period === 'monthly') return (stu.monthly_key === keys.monthly) ? (stu.monthly_points || 0) : 0;
+      return stu.total_points || 0;
+    }
+
+    function eduSwitchLbPeriod(period, btn) {
+      eduLbPeriod = period;
+      document.querySelectorAll('#eduLbTabs .lb-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      eduRenderLeaderboard();
+    }
+
+    function eduGetInitials(name) {
+      const parts = String(name || 'ተ').trim().split(/\s+/);
+      return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
+    }
+
     function eduRenderLeaderboard() {
-      const box = document.getElementById('eduLeaderboardList'); if (!box) return;
-      const list = Object.values(bikatStudents).sort((a, b) => (b.total_points || 0) - (a.total_points || 0)).slice(0, 10);
-      if (list.length === 0) { box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray);">እስካሁን ምንም ተማሪ አልተመዘገበም።</p>'; return; }
-      box.innerHTML = list.map((s, i) => {
-        const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `${i + 1}.`));
-        return `<div class="rank-row"><span><b>${medal}</b> ${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '👑' : ''}</span><strong style="color:var(--edu-accent);">${s.total_points || 0} ነጥብ</strong></div>`;
+      const podiumBox = document.getElementById('eduLbPodium');
+      const listBox = document.getElementById('eduLeaderboardList');
+      if (!podiumBox || !listBox) return;
+
+      const ranked = Object.values(bikatStudents)
+        .map(s => ({ ...s, _pts: eduGetStudentPeriodPoints(s, eduLbPeriod) }))
+        .filter(s => eduLbPeriod === 'all' || s._pts > 0)
+        .sort((a, b) => b._pts - a._pts)
+        .slice(0, 15);
+
+      if (ranked.length === 0) {
+        podiumBox.innerHTML = `<div style="color:rgba(255,255,255,0.85); font-size:0.82rem; padding:30px 10px; text-align:center;">በዚህ ጊዜ ውስጥ እስካሁን ነጥብ ያገኘ ተማሪ የለም። ፈተና በመስራት 1ኛ ይሁኑ! 🚀</div>`;
+        listBox.innerHTML = '';
+        return;
+      }
+
+      // Top 3 Podium in order: 2nd (left), 1st (center), 3rd (right)
+      const topOrder = [
+        { rank: 2, stu: ranked[1] },
+        { rank: 1, stu: ranked[0] },
+        { rank: 3, stu: ranked[2] }
+      ];
+      podiumBox.innerHTML = topOrder.map(({ rank, stu }) => {
+        if (!stu) return `<div class="lb-podium-slot rank-${rank}" style="opacity:0.25;"><div class="lb-block">${rank}</div></div>`;
+        const crown = rank === 1 ? '<span class="lb-crown">👑</span>' : '';
+        return `
+          <div class="lb-podium-slot rank-${rank}">
+            <div class="lb-avatar-wrap">
+              ${crown}
+              <div class="lb-avatar">${escHtml(eduGetInitials(stu.full_name))}</div>
+              <span class="lb-rank-dot">${rank}</span>
+            </div>
+            <div class="lb-podium-name">${escHtml(stu.full_name || 'ተማሪ')}</div>
+            <div class="lb-podium-pts">⚡ ${stu._pts} pts</div>
+            <div class="lb-block">${rank}</div>
+          </div>`;
+      }).join('');
+
+      // Ranks 4 to 15
+      const rest = ranked.slice(3);
+      if (rest.length === 0) {
+        listBox.innerHTML = `<p style="font-size:0.78rem; color:var(--gray); text-align:center; padding:8px;">ተጨማሪ ተማሪዎች ሲቀላቀሉ እዚህ ይታያሉ።</p>`;
+        return;
+      }
+      listBox.innerHTML = rest.map((s, idx) => {
+        const rankNum = idx + 4;
+        const isMe = String(s.user_id) === String(currentUser.id);
+        return `
+          <div class="lb-row ${isMe ? 'is-me' : ''}">
+            <div class="lb-row-num">${rankNum}</div>
+            <div class="lb-row-avatar">${escHtml(eduGetInitials(s.full_name))}</div>
+            <div class="lb-row-info">
+              <div class="lb-row-name">${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '👑' : ''} ${isMe ? '<small style="color:var(--edu-accent);">(እኔ)</small>' : ''}</div>
+            </div>
+            <div class="lb-row-pts">⚡ ${s._pts} pts</div>
+          </div>`;
       }).join('');
     }
 
