@@ -729,25 +729,30 @@
       box-shadow: 0 3px 8px rgba(217, 119, 6, 0.35);
     }
 
-    /* Visual Step Guide Breadcrumb in Education */
+    /* Interactive Step Navigation Bar in Education */
     .edu-stepper {
       display: flex; align-items: center; justify-content: space-between; gap: 4px;
       background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 14px; padding: 8px 10px; margin-bottom: 12px;
-      font-size: 0.72rem; font-weight: 700; color: var(--gray);
+      border-radius: 14px; padding: 6px 8px; margin-bottom: 12px;
       box-shadow: var(--shadow-sm);
     }
     .edu-step-item {
-      flex: 1; text-align: center; padding: 5px 6px; border-radius: 9px;
-      transition: all 0.2s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1; text-align: center; padding: 8px 6px; border-radius: 10px;
+      border: none; background: transparent; color: var(--gray);
+      font-size: 0.74rem; font-weight: 700; cursor: pointer;
+      transition: all 0.16s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .edu-step-item:active {
+      transform: scale(0.95);
     }
     .edu-step-item.active {
       background: var(--edu-bg); color: var(--edu-accent); font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.2);
     }
     .edu-step-item.done {
-      color: var(--secondary);
+      color: var(--secondary); font-weight: 800;
     }
-    .edu-step-arrow { color: var(--border); font-weight: 800; flex-shrink: 0; }
+    .edu-step-arrow { color: var(--gray); opacity: 0.45; font-weight: 800; flex-shrink: 0; user-select: none; }
 
     /* Interactive Tutorial / Onboarding Modal */
     .guide-step-card {
@@ -1100,13 +1105,13 @@
           </div>
         </div>
 
-        <!-- Clear Visual Step Guide for New Students -->
+        <!-- Interactive Step Navigation Buttons for Students -->
         <div class="edu-stepper" id="eduStepBar">
-          <div class="edu-step-item active" id="eduStep1">1. Stream</div>
+          <button type="button" class="edu-step-item active" id="eduStep1" onclick="eduStepClick(1)">1. Stream</button>
           <span class="edu-step-arrow">›</span>
-          <div class="edu-step-item" id="eduStep2">2. Subject</div>
+          <button type="button" class="edu-step-item" id="eduStep2" onclick="eduStepClick(2)">2. Subject</button>
           <span class="edu-step-arrow">›</span>
-          <div class="edu-step-item" id="eduStep3">3. Quiz / Exam</div>
+          <button type="button" class="edu-step-item" id="eduStep3" onclick="eduStepClick(3)">3. Quiz / Exam</button>
         </div>
 
         <!-- Dynamic Quiz Navigation Container -->
@@ -2558,6 +2563,62 @@
         if (n < stepNum) el.classList.add('done');
         else if (n === stepNum) el.classList.add('active');
       });
+    }
+
+    function eduStepClick(stepNum) {
+      // Save any active quiz safely before navigating
+      if (eduActiveQuiz) {
+        eduStopCountdownTimer();
+        try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
+        eduActiveQuiz = null;
+        eduCheckPausedQuiz();
+      }
+
+      // Ensure eduNav.level & eduNav.stream are populated from student profile if set
+      if (!eduNav.level) {
+        const parsed = eduParseLevelStream(myStudent?.education_level);
+        if (parsed) {
+          eduNav.level = parsed.level;
+          eduNav.stream = parsed.stream;
+        }
+      }
+
+      if (stepNum === 1) {
+        eduShowLevelPicker();
+        return;
+      }
+
+      if (stepNum === 2) {
+        if (!eduNav.level) {
+          notifyUser("First select your Stream (Remedial or Freshman) 👇");
+          eduShowLevelPicker();
+          return;
+        }
+        eduShowSubjects();
+        return;
+      }
+
+      if (stepNum === 3) {
+        if (!eduNav.level) {
+          notifyUser("Step 1: Select your Stream first 👇");
+          eduShowLevelPicker();
+          return;
+        }
+        if (eduNav.subject) {
+          eduSelectSubject(eduNav.subject);
+          return;
+        }
+        // Check if user has a paused quiz to jump right back into
+        try {
+          const raw = localStorage.getItem('bikat_paused_quiz_' + currentUser.id);
+          if (raw) {
+            eduResumeQuiz();
+            return;
+          }
+        } catch(e) {}
+        notifyUser("Step 2: Choose a Subject first to open its Quizzes & Exams 👇");
+        eduShowSubjects();
+      }
     }
 
     function eduShowLevelPicker() {
