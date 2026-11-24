@@ -659,6 +659,55 @@
       border-radius: var(--radius-md); padding: 15px; margin-top: 14px;
       box-shadow: var(--shadow-sm);
     }
+    /* =========================================
+       VIP RINGS (DIAMOND STROKE & GOLDEN STROKE) + BADGES + EXAM TIMER
+       ========================================= */
+    @keyframes diamondShimmer {
+      0% { box-shadow: 0 0 0 3px #38BDF8, 0 0 12px rgba(56, 189, 248, 0.55); border-color: #BAE6FD; }
+      50% { box-shadow: 0 0 0 3.5px #0EA5E9, 0 0 22px rgba(125, 211, 252, 0.95), 0 0 32px rgba(56, 189, 248, 0.45); border-color: #FFFFFF; }
+      100% { box-shadow: 0 0 0 3px #38BDF8, 0 0 12px rgba(56, 189, 248, 0.55); border-color: #BAE6FD; }
+    }
+    .vip-ring-diamond {
+      border: 2.5px solid #E0F2FE !important;
+      animation: diamondShimmer 2.4s infinite ease-in-out;
+    }
+    .vip-ring-gold {
+      border: 2.5px solid #FBBF24 !important;
+      box-shadow: 0 0 0 3px #D97706, 0 0 15px rgba(245, 158, 11, 0.65) !important;
+    }
+    .vip-badge-pill {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 7px; border-radius: 6px; font-size: 0.62rem;
+      font-weight: 800; letter-spacing: 0.03em; color: white; vertical-align: middle;
+    }
+    .vip-badge-pill.badge-diamond {
+      background: linear-gradient(135deg, #0284C7, #38BDF8);
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+    }
+    .vip-badge-pill.badge-gold {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+    }
+    .edu-hero-avatar {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+      background: rgba(255,255,255,0.2); color: white; font-weight: 800; font-size: 1.05rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.45);
+    }
+    .exam-timer-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--gold-bg); border: 1.5px solid var(--gold); color: var(--gold);
+      padding: 8px 14px; border-radius: 12px; margin-bottom: 10px;
+      font-size: 0.84rem; font-weight: 800;
+    }
+    .exam-timer-bar.urgent {
+      background: rgba(239, 68, 68, 0.14); border-color: var(--danger); color: var(--danger);
+      animation: pulseUrgent 1s infinite;
+    }
+    @keyframes pulseUrgent {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
   </style>
 </head>
 <body>
@@ -955,12 +1004,18 @@
 
         <!-- Student Summary Banner -->
         <div class="edu-hero" id="eduHeroBanner">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div>
-              <h2 id="eduWelcomeName">👋 ሰላም ተማሪ!</h2>
-              <div style="font-size:0.78rem; opacity:0.9;" id="eduLevelDisplay">📚 ክፍል: ገና አልተመረጠም</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:11px; min-width:0; flex:1;">
+              <div id="eduHeroAvatar" class="edu-hero-avatar">ተ</div>
+              <div style="min-width:0;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <h2 id="eduWelcomeName" style="margin:0;">👋 ሰላም ተማሪ!</h2>
+                  <span id="eduHeroVipTag" style="display:none;"></span>
+                </div>
+                <div style="font-size:0.76rem; opacity:0.9; margin-top:2px;" id="eduLevelDisplay">📚 ክፍል: ገና አልተመረጠም</div>
+              </div>
             </div>
-            <button onclick="eduShowLevelPicker()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:5px 10px; border-radius:8px; font-size:0.72rem; font-weight:bold; cursor:pointer; white-space:nowrap;">🔄 ክፍል ቀይር</button>
+            <button onclick="eduShowLevelPicker()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:6px 10px; border-radius:10px; font-size:0.72rem; font-weight:bold; cursor:pointer; white-space:nowrap; flex-shrink:0;">🔄 ክፍል ቀይር</button>
           </div>
           <div class="edu-hero-meta">
             <span class="edu-chip" id="eduVipChip">👤 Free Tier</span>
@@ -1142,6 +1197,11 @@
 
               <div id="eaChapterLiveCount" style="background:#EEF2FF; color:var(--edu-accent); padding:8px 10px; border-radius:8px; font-size:0.78rem; font-weight:bold; margin-bottom:10px;">
                 📊 በዚህ ምዕራፍ ያሉ ጥያቄዎች: 0
+              </div>
+
+              <div class="form-group" id="eaDurationGroup" style="display:none;">
+                <label>⏱ የፈተናው ጠቅላላ ሰዓት (በደቂቃ / Minutes — ለምሳሌ 30 ለ30 ደቂቃ)</label>
+                <input type="number" id="eaExamDuration" min="1" max="300" value="30" placeholder="30">
               </div>
 
               <div class="form-group">
@@ -2010,6 +2070,7 @@
     // PART 2: BIKAT EDUCATION LOGIC (Firebase-powered)
     // =========================================================================
     const BIKAT_ANNOUNCEMENTS = `${DB_BASE}/bikat/announcements`;
+    const BIKAT_EXAM_CONTROLS = `${DB_BASE}/bikat/exam_controls`;
     function getPracticeSize(level) { return (level && level.toLowerCase().includes('rem')) ? 15 : 25; }
     const BONUS_POINTS_THRESHOLD = 50;
     const BONUS_INVITE_THRESHOLD = 5;
@@ -2020,10 +2081,12 @@
     let bikatQuestions = [];
     let bikatPayments = {};
     let bikatAnnouncements = {};
+    let bikatExamControls = {};
     let myStudent = null;
 
     let eduNav = { level: null, stream: null, subject: null, chapter: null, practice: 1 };
     let eduActiveQuiz = null;
+    let eduTimerInterval = null;
     let eduPendingPayment = null;
     let eduReceiptBase64 = "";
     let lastAddedBatch = null; // { level, stream, subject, chapter, count }
@@ -2050,17 +2113,19 @@
     async function eduLoadAllData(referrerId = null) {
       document.getElementById('eduLoading').style.display = 'block';
       try {
-        const [resS, resQ, resP, resA] = await Promise.all([
+        const [resS, resQ, resP, resA, resEC] = await Promise.all([
           fetch(`${BIKAT_STUDENTS}.json`),
           fetch(`${BIKAT_QUESTIONS}.json`),
           fetch(`${BIKAT_PAYMENTS}.json`),
-          fetch(`${BIKAT_ANNOUNCEMENTS}.json`)
+          fetch(`${BIKAT_ANNOUNCEMENTS}.json`),
+          fetch(`${BIKAT_EXAM_CONTROLS}.json`)
         ]);
         bikatStudents = (await resS.json()) || {};
         const rawQ = (await resQ.json()) || {};
         bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
         bikatPayments = (await resP.json()) || {};
         bikatAnnouncements = (await resA.json()) || {};
+        bikatExamControls = (await resEC.json()) || {};
 
         if (!bikatStudents[currentUser.id]) {
           myStudent = {
@@ -2130,16 +2195,48 @@
       banner.style.display = 'none';
     }
 
+    function eduGetStudentVipTier(stu) {
+      if (!stu) return 'free';
+      if (stu._demo_tier) return stu._demo_tier;
+      if (stu.is_vip == 1) return 'full';
+      const now = Date.now();
+      if (stu.subject_vips && Object.values(stu.subject_vips).some(exp => exp > now)) return 'unit';
+      if (stu.bonus_subject && (!stu.bonus_expires_at || stu.bonus_expires_at > now)) return 'unit';
+      return 'free';
+    }
+
     function eduRenderHero() {
       if (!myStudent) return;
       document.getElementById('eduWelcomeName').innerText = `👋 ሰላም ${myStudent.full_name || 'ተማሪ'}!`;
       document.getElementById('eduLevelDisplay').innerText = `📚 ክፍል: ${myStudent.education_level === 'Not Set' ? 'ገና አልተመረጠም' : myStudent.education_level}`;
+
+      const tier = eduGetStudentVipTier(myStudent);
       const vipChip = document.getElementById('eduVipChip');
-      if (myStudent.is_vip == 1) {
-        vipChip.innerText = '👑 Full VIP'; vipChip.className = 'edu-chip vip';
+      const heroAvatar = document.getElementById('eduHeroAvatar');
+      const heroVipTag = document.getElementById('eduHeroVipTag');
+
+      if (heroAvatar) {
+        if (currentUser.photo_url) {
+          heroAvatar.innerHTML = `<img src="${escAttr(currentUser.photo_url)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        } else {
+          heroAvatar.innerText = eduGetInitials(myStudent.full_name);
+        }
+        heroAvatar.classList.remove('vip-ring-diamond', 'vip-ring-gold');
+        if (tier === 'full') heroAvatar.classList.add('vip-ring-diamond');
+        else if (tier === 'unit') heroAvatar.classList.add('vip-ring-gold');
+      }
+
+      if (tier === 'full') {
+        vipChip.innerText = '💎 FULL VIP'; vipChip.className = 'edu-chip vip';
+        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-diamond'; heroVipTag.innerText = '💎 FULL VIP'; }
+      } else if (tier === 'unit') {
+        vipChip.innerText = '👑 VIP (1 Unit)'; vipChip.className = 'edu-chip vip';
+        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-gold'; heroVipTag.innerText = '👑 VIP'; }
       } else {
         vipChip.innerText = '👤 Free Tier'; vipChip.className = 'edu-chip';
+        if (heroVipTag) { heroVipTag.style.display = 'none'; }
       }
+
       document.getElementById('eduPointsChip').innerText = `🏆 ${myStudent.total_points || 0} / ${BONUS_POINTS_THRESHOLD} ነጥብ`;
       document.getElementById('eduInviteChip').innerText = `👥 ${myStudent.invited_count || 0} / ${BONUS_INVITE_THRESHOLD} ግብዣ`;
 
@@ -2165,7 +2262,7 @@
       if (refInput) refInput.value = `${BOT_APP_LINK}?startapp=ref_${currentUser.id}`;
     }
 
-    function eduHasSubjectAccess(subject, allowClaim = false) {
+        function eduHasSubjectAccess(subject, allowClaim = false) {
       if (!myStudent) return false;
       if (Number(currentUser.id) === ADMIN_ID || myStudent.is_vip == 1) return true;
       const now = Date.now();
@@ -2217,6 +2314,49 @@
       }
     }
 
+    function eduMakeExamKey(level, stream, title) {
+      const raw = `${level || 'All'}__${stream || 'All'}__${title || ''}`;
+      return raw.replace(/[.#$\[\]\/\\]/g, '_');
+    }
+
+    function eduGetWeeklyExamMeta(level, stream, title) {
+      const key = eduMakeExamKey(level, stream, title);
+      const saved = bikatExamControls[key] || {};
+      return {
+        key,
+        duration_min: Number(saved.duration_min) || 30,
+        status: saved.status || 'waiting', // 'waiting' | 'started' | 'stopped'
+        started_at: Number(saved.started_at) || 0
+      };
+    }
+
+    function eduPrepareShuffledQuestions(rawQuestions) {
+      return rawQuestions.map(q => {
+        const cleanOpt = (txt) => String(txt || '').replace(/^[A-Da-d][\)\.\:]\s*/, '').trim();
+        const correctOrig = ((q.correct_answer || 'A').toUpperCase().trim()[0]) || 'A';
+        const items = [
+          { orig: 'A', text: cleanOpt(q.option_a), isCorrect: correctOrig === 'A' },
+          { orig: 'B', text: cleanOpt(q.option_b), isCorrect: correctOrig === 'B' },
+          { orig: 'C', text: cleanOpt(q.option_c), isCorrect: correctOrig === 'C' },
+          { orig: 'D', text: cleanOpt(q.option_d), isCorrect: correctOrig === 'D' }
+        ];
+        // Fisher-Yates shuffle
+        for (let i = items.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [items[i], items[j]] = [items[j], items[i]];
+        }
+        const letters = ['A', 'B', 'C', 'D'];
+        const shuffled_options = {};
+        let shuffled_correct = 'A';
+        items.forEach((it, idx) => {
+          const L = letters[idx];
+          shuffled_options[L] = it.text;
+          if (it.isCorrect) shuffled_correct = L;
+        });
+        return { ...q, shuffled_options, shuffled_correct };
+      });
+    }
+
     function eduGetWeeklyExams(filterLevel = null, filterStream = null) {
       const weeklyQs = bikatQuestions.filter(q => {
         if (q.content_category !== 'weekly_exam') return false;
@@ -2240,13 +2380,22 @@
         inner = `<p style="font-size:0.78rem; color:var(--gray); text-align:center; padding:6px 0;">አዲስ ሳምንታዊ ፈተና ሲጫን እዚህ ይታያል።</p>`;
       } else {
         inner = exams.map(ex => {
-          const hasPaid = ex.questions.some(q => q.question_type === 'paid');
-          const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
-          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          const meta = eduGetWeeklyExamMeta(ex.level, ex.stream, ex.title);
+          const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
+          const isExpired = meta.status === 'stopped' || (meta.status === 'started' && Date.now() >= endTime);
+          const isLive = meta.status === 'started' && !isExpired;
+          const statusTag = isLive
+            ? `<span style="color:#16A34A; font-weight:800;">🟢 Live • ⏱ ${meta.duration_min} ደቂቃ</span>`
+            : (isExpired
+              ? `<span style="color:var(--danger); font-weight:700;">🔴 ሰዓቱ አልቋል</span>`
+              : `<span style="color:var(--gold); font-weight:700;">⏳ ይጠብቁ • ⏱ ${meta.duration_min} ደቂቃ</span>`);
           const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${ex.stream && ex.stream !== 'All' && ex.stream !== 'None' ? ' ' + ex.stream : ''}`;
           return `<button class="edu-list-btn" style="margin-bottom:8px;" onclick="eduOpenWeeklyExam('${escAttr(ex.level)}', '${escAttr(ex.stream)}', '${escAttr(ex.title)}')">
-            <span>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.questions.length} ጥያቄ • ${escHtml(tag)})</small></span>
-            <span>${icon} ➔</span>
+            <div>
+              <div>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.questions.length} ጥያቄ • ${escHtml(tag)})</small></div>
+              <div style="font-size:0.72rem; margin-top:3px;">${statusTag}</div>
+            </div>
+            <span>➔</span>
           </button>`;
         }).join('');
       }
@@ -2254,7 +2403,7 @@
         <div class="weekly-exam-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 style="font-size:0.92rem; color:var(--gold); margin:0;">📝 ሳምንታዊ / አዲስ ፈተናዎች (Exams)</h3>
-            <span style="font-size:0.68rem; background:var(--gold-bg); color:var(--gold); padding:3px 8px; border-radius:999px; font-weight:700;">${exams.length} ፈተና</span>
+            <button onclick="eduLoadAllData()" style="background:var(--gold-bg); color:var(--gold); border:none; padding:4px 10px; border-radius:999px; font-size:0.7rem; font-weight:800; cursor:pointer;">🔄 ${exams.length} ፈተና</button>
           </div>
           ${inner}
         </div>`;
@@ -2337,7 +2486,6 @@
       stage.innerHTML = html;
     }
 
-    // Subject tapped -> 2 choices: Questions (Chapters) vs Exams (Mid/Final 2017, 2018...)
     function eduSelectSubject(subject) {
       eduNav.subject = subject;
       const stage = document.getElementById('eduQuizStage');
@@ -2463,6 +2611,11 @@
     function eduOpenWeeklyExam(level, stream, title) {
       eduNav = { level, stream, subject: 'Weekly Exam', chapter: title, practice: 1, mode: 'weekly_exam' };
       const stage = document.getElementById('eduQuizStage');
+      const meta = eduGetWeeklyExamMeta(level, stream, title);
+      const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
+      const isExpired = meta.status === 'stopped' || (meta.status === 'started' && Date.now() >= endTime);
+      const isWaiting = meta.status === 'waiting' || !meta.started_at;
+
       const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
       let qs = bikatQuestions.filter(q =>
         q.content_category === 'weekly_exam' &&
@@ -2484,6 +2637,29 @@
       }
 
       const firstQId = qs[0] ? qs[0].id : '';
+      let actionHtml = '';
+      if (isWaiting) {
+        actionHtml = `
+          <div style="background:var(--gold-bg); border:1px solid var(--gold); border-radius:12px; padding:12px; margin-bottom:12px; font-size:0.82rem; color:var(--gold); font-weight:700;">
+            ⏳ ፈተናው ገና አልተጀመረም — አድሚኑ Start እስኪል ይጠብቁ!
+          </div>
+          <button class="btn-action btn-edu" onclick="eduLoadAllData()">🔄 ድጋሚ ፈትሽ (Refresh)</button>`;
+      } else if (isExpired) {
+        actionHtml = `
+          <div style="background:rgba(239,68,68,0.12); border:1px solid var(--danger); border-radius:12px; padding:12px; margin-bottom:12px; font-size:0.82rem; color:var(--danger); font-weight:700;">
+            🔴 የዚህ ፈተና ሰዓት (${meta.duration_min} ደቂቃ) አልቋል / ተዘግቷል።
+          </div>`;
+      } else {
+        const remSec = Math.max(1, Math.floor((endTime - Date.now()) / 1000));
+        const remMin = Math.floor(remSec / 60);
+        const remS = String(remSec % 60).padStart(2, '0');
+        actionHtml = `
+          <div style="background:rgba(16,185,129,0.12); border:1px solid var(--secondary); border-radius:12px; padding:10px; margin-bottom:14px; font-size:0.84rem; color:var(--primary); font-weight:800;">
+            🟢 ፈተናው ተጀምሯል! ቀሪ ሰዓት: ${remMin}:${remS}
+          </div>
+          <button class="btn-action btn-edu" onclick="eduStartExamRun('weekly_exam')">🚀 ፈተናውን ጀምር (Start Exam)</button>`;
+      }
+
       stage.innerHTML = `
         <div class="edu-back-row">
           <button class="btn-back-sm" onclick="eduRenderInitialQuizView()">🔙 ተመለስ</button>
@@ -2493,18 +2669,25 @@
         <div class="section-card" style="text-align:center;">
           <div style="font-size:2.1rem; margin-bottom:6px;">🔥</div>
           <h3 style="margin-bottom:6px;">${escHtml(title)}</h3>
-          <p style="font-size:0.82rem; color:var(--gray); margin-bottom:16px;">ጠቅላላ <b>${qs.length}</b> ጥያቄዎች አሉት።</p>
-          <button class="btn-action btn-edu" onclick="eduStartExamRun('weekly_exam')">🚀 ፈተናውን ጀምር (Start Exam)</button>
+          <p style="font-size:0.82rem; color:var(--gray); margin-bottom:14px;">ጠቅላላ <b>${qs.length}</b> ጥያቄዎች • ⏱ <b>${meta.duration_min} ደቂቃ</b></p>
+          ${actionHtml}
         </div>`;
     }
 
     function eduStartExamRun(mode) {
       let qs = [];
+      let endTime = null;
       if (mode === 'subject_exam') {
         const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
         qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter, 'subject_exam');
         if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
       } else {
+        const meta = eduGetWeeklyExamMeta(eduNav.level, eduNav.stream, eduNav.chapter);
+        endTime = meta.started_at + (meta.duration_min * 60 * 1000);
+        if (meta.status !== 'started' || Date.now() >= endTime) {
+          notifyUser("⏰ የፈተናው ሰዓት አልቋል ወይም ገና አልተጀመረም!");
+          return eduOpenWeeklyExam(eduNav.level, eduNav.stream, eduNav.chapter);
+        }
         const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
         qs = bikatQuestions.filter(q =>
           q.content_category === 'weekly_exam' &&
@@ -2517,8 +2700,9 @@
       qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
       if (qs.length === 0) return;
 
+      const shuffled = eduPrepareShuffledQuestions(qs);
       eduActiveQuiz = {
-        questions: qs,
+        questions: shuffled,
         index: 0,
         score: 0,
         earned: 0,
@@ -2526,10 +2710,66 @@
         subject: eduNav.subject,
         chapter: eduNav.chapter,
         practice: 1,
-        mode
+        mode,
+        endTime
       };
       document.getElementById('eduResumeBanner').style.display = 'none';
+      eduStartCountdownTimer();
       eduRenderCurrentQuestion();
+    }
+
+    function eduStopCountdownTimer() {
+      if (eduTimerInterval) {
+        clearInterval(eduTimerInterval);
+        eduTimerInterval = null;
+      }
+    }
+
+    function eduStartCountdownTimer() {
+      eduStopCountdownTimer();
+      if (!eduActiveQuiz || !eduActiveQuiz.endTime) return;
+      eduTimerInterval = setInterval(() => {
+        if (!eduActiveQuiz || !eduActiveQuiz.endTime) {
+          eduStopCountdownTimer();
+          return;
+        }
+        const remMs = eduActiveQuiz.endTime - Date.now();
+        if (remMs <= 0) {
+          eduStopCountdownTimer();
+          eduAutoFinishTimedExam();
+          return;
+        }
+        const timerEl = document.getElementById('eduExamTimerDisplay');
+        const barEl = document.getElementById('eduExamTimerBar');
+        if (timerEl) {
+          const totalSec = Math.ceil(remMs / 1000);
+          const mins = Math.floor(totalSec / 60);
+          const secs = String(totalSec % 60).padStart(2, '0');
+          timerEl.innerText = `${mins}:${secs}`;
+          if (barEl && totalSec <= 60) barEl.classList.add('urgent');
+        }
+      }, 1000);
+    }
+
+    function eduAutoFinishTimedExam() {
+      if (!eduActiveQuiz) return;
+      const { score, earned, questions } = eduActiveQuiz;
+      localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
+      eduActiveQuiz = null;
+      const stage = document.getElementById('eduQuizStage');
+      if (stage) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center; padding:24px 16px; border:2px solid var(--danger);">
+            <div style="font-size:2.6rem; margin-bottom:8px;">⏰</div>
+            <h2 style="color:var(--danger); margin-bottom:8px;">ሰዓቱ አልቋል! ፈተናው በራሱ ቆሟል።</h2>
+            <p style="font-size:0.95rem; margin-bottom:6px;">🎯 ትክክለኛ መልስ: <b>${score} / ${questions.length}</b></p>
+            <p style="font-size:0.9rem; color:var(--primary); margin-bottom:16px;">⭐ ያገኙት ነጥብ: <b>+${earned} ነጥብ</b></p>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-action btn-edu" onclick="eduShowSubjects()">🔄 ወደ ፈተናዎች</button>
+              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🏆 Leaderboard</button>
+            </div>
+          </div>`;
+      }
     }
 
     function eduSelectChapter(chapter) {
@@ -2588,8 +2828,9 @@
       const slice = qs.slice(startIdx, startIdx + pracSize);
       if (slice.length === 0) return;
 
+      const shuffled = eduPrepareShuffledQuestions(slice);
       eduActiveQuiz = {
-        questions: slice,
+        questions: shuffled,
         index: 0,
         score: 0,
         earned: 0,
@@ -2597,17 +2838,25 @@
         subject: eduNav.subject,
         chapter: eduNav.chapter,
         practice: practiceNum,
-        mode: 'chapter'
+        mode: 'chapter',
+        endTime: null
       };
       document.getElementById('eduResumeBanner').style.display = 'none';
+      eduStopCountdownTimer();
       eduRenderCurrentQuestion();
     }
 
-        function eduRenderCurrentQuestion() {
+    function eduRenderCurrentQuestion() {
       const stage = document.getElementById('eduQuizStage');
       if (!eduActiveQuiz) return eduRenderInitialQuizView();
 
+      if (eduActiveQuiz.endTime && Date.now() >= eduActiveQuiz.endTime) {
+        eduStopCountdownTimer();
+        return eduAutoFinishTimedExam();
+      }
+
       if (eduActiveQuiz.index >= eduActiveQuiz.questions.length) {
+        eduStopCountdownTimer();
         const { score, earned, questions } = eduActiveQuiz;
         localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
         eduActiveQuiz = null;
@@ -2629,8 +2878,24 @@
       const total = eduActiveQuiz.questions.length;
       const pct = Math.round(((eduActiveQuiz.index + 1) / total) * 100);
       const cid = q.custom_id || q.id;
+      const optsMap = q.shuffled_options || {
+        A: q.option_a, B: q.option_b, C: q.option_c, D: q.option_d
+      };
+
+      let timerHtml = '';
+      if (eduActiveQuiz.endTime) {
+        const totalSec = Math.max(1, Math.ceil((eduActiveQuiz.endTime - Date.now()) / 1000));
+        const mins = Math.floor(totalSec / 60);
+        const secs = String(totalSec % 60).padStart(2, '0');
+        timerHtml = `
+          <div class="exam-timer-bar ${totalSec <= 60 ? 'urgent' : ''}" id="eduExamTimerBar">
+            <span>⏱ ሳምንታዊ ፈተና ቀሪ ሰዓት</span>
+            <span id="eduExamTimerDisplay">${mins}:${secs}</span>
+          </div>`;
+      }
 
       stage.innerHTML = `
+        ${timerHtml}
         <div class="edu-back-row">
           <span style="font-size:0.78rem; font-weight:bold; color:var(--edu-accent);">ጥያቄ ${eduActiveQuiz.index + 1}/${total} • ✅ ${eduActiveQuiz.score} | 🆔 ${escHtml(cid)}</span>
           <button class="btn-back-sm" onclick="eduPauseQuiz()">⏸ ቆም በል</button>
@@ -2644,7 +2909,7 @@
           ${['A','B','C','D'].map(letter => `
             <button class="quiz-opt-btn" id="optBtn_${letter}" onclick="eduAnswer('${letter}')">
               <span class="opt-letter">${letter}</span>
-              <span>${escHtml(q['option_' + letter.toLowerCase()])}</span>
+              <span>${escHtml(optsMap[letter])}</span>
             </button>`).join('')}
         </div>
         <div id="eduFeedbackBox"></div>
@@ -2664,7 +2929,7 @@
       eduActiveQuiz.answeredCurrent = true;
 
       const q = eduActiveQuiz.questions[eduActiveQuiz.index];
-      const correct = (q.correct_answer || 'A').toUpperCase().trim();
+      const correct = (q.shuffled_correct || q.correct_answer || 'A').toUpperCase().trim();
       const isRight = selected === correct;
 
       ['A','B','C','D'].forEach(l => {
@@ -2721,6 +2986,7 @@
     function eduPauseQuiz() {
       if (!eduActiveQuiz) return;
       const prevMode = eduActiveQuiz.mode || 'chapter';
+      eduStopCountdownTimer();
       try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
       eduActiveQuiz = null;
       eduCheckPausedQuiz();
@@ -2734,6 +3000,11 @@
         const raw = localStorage.getItem('bikat_paused_quiz_' + currentUser.id);
         if (raw) {
           const saved = JSON.parse(raw);
+          if (saved.endTime && Date.now() >= saved.endTime) {
+            localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
+            document.getElementById('eduResumeBanner').style.display = 'none';
+            return;
+          }
           document.getElementById('eduResumeInfo').innerText = `${saved.subject} • ${saved.chapter} (ጥያቄ ${saved.index + 1}/${saved.questions.length})`;
           document.getElementById('eduResumeBanner').style.display = 'block';
           return;
@@ -2747,15 +3018,19 @@
         const raw = localStorage.getItem('bikat_paused_quiz_' + currentUser.id);
         if (!raw) return;
         eduActiveQuiz = JSON.parse(raw);
+        if (eduActiveQuiz.endTime && Date.now() >= eduActiveQuiz.endTime) {
+          return eduAutoFinishTimedExam();
+        }
         eduActiveQuiz.answeredCurrent = false;
         eduNav.subject = eduActiveQuiz.subject;
         eduNav.chapter = eduActiveQuiz.chapter;
         document.getElementById('eduResumeBanner').style.display = 'none';
+        if (eduActiveQuiz.endTime) eduStartCountdownTimer();
         eduRenderCurrentQuestion();
       } catch(e) {}
     }
 
-    function eduRenderQuestionComments(commentsObj) {
+        function eduRenderQuestionComments(commentsObj) {
       const box = document.getElementById('eduQCommentsList'); if (!box) return;
       if (!commentsObj || Object.keys(commentsObj).length === 0) {
         box.innerHTML = '<p style="font-size:0.75rem; color:var(--gray); text-align:center; padding:4px;">እስካሁን አስተያየት የለም። የመጀመሪያው ይሁኑ!</p>';
@@ -2967,22 +3242,77 @@
       return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
     }
 
+    const DEMO_ETH_STUDENTS = [
+      { user_id: 'demo_1', full_name: 'ibro', _demo_tier: 'full' },
+      { user_id: 'demo_2', full_name: 'sudi', _demo_tier: 'unit' },
+      { user_id: 'demo_3', full_name: 'siyam', _demo_tier: 'full' },
+      { user_id: 'demo_4', full_name: 'Bereket Tadesse', _demo_tier: 'unit' },
+      { user_id: 'demo_5', full_name: 'Hanan', _demo_tier: 'free' },
+      { user_id: 'demo_6', full_name: 'Dawit M.', _demo_tier: 'full' },
+      { user_id: 'demo_7', full_name: 'Meron', _demo_tier: 'free' },
+      { user_id: 'demo_8', full_name: 'natnael', _demo_tier: 'unit' },
+      { user_id: 'demo_9', full_name: 'Feven K.', _demo_tier: 'free' },
+      { user_id: 'demo_10', full_name: 'Yonas', _demo_tier: 'free' },
+      { user_id: 'demo_11', full_name: 'Selam', _demo_tier: 'unit' },
+      { user_id: 'demo_12', full_name: 'Mekdes', _demo_tier: 'free' },
+      { user_id: 'demo_13', full_name: 'Robel', _demo_tier: 'free' },
+      { user_id: 'demo_14', full_name: 'Biniam', _demo_tier: 'free' },
+      { user_id: 'demo_15', full_name: 'Tigist', _demo_tier: 'free' }
+    ];
+
+    function eduComputeEvenDisplayScore(idStr, period, bonusDelta = 0) {
+      const keys = eduGetPeriodKeys();
+      const seedStr = `${idStr}|${period}|${keys[period] || 'all'}`;
+      let h = 2166136261;
+      for (let i = 0; i < seedStr.length; i++) {
+        h ^= seedStr.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      const u = (h >>> 0) / 4294967295;
+      const ranges = {
+        daily:   [44, 186],
+        weekly:  [96, 286],
+        monthly: [142, 366],
+        all:     [184, 396]
+      };
+      const [minV, maxV] = ranges[period] || ranges.all;
+      let val = Math.floor(minV + u * (maxV - minV + 1)) + (bonusDelta || 0);
+      if (val % 2 !== 0) val += 1;
+      if (val > 398) val = 398;
+      if (val < 2) val = 2;
+      return val;
+    }
+
     function eduRenderLeaderboard() {
       const podiumBox = document.getElementById('eduLbPodium');
       const listBox = document.getElementById('eduLeaderboardList');
       if (!podiumBox || !listBox) return;
 
-      const ranked = Object.values(bikatStudents)
-        .map(s => ({ ...s, _pts: eduGetStudentPeriodPoints(s, eduLbPeriod) }))
-        .filter(s => eduLbPeriod === 'all' || s._pts > 0)
+      const combinedMap = {};
+      DEMO_ETH_STUDENTS.forEach(d => { combinedMap[d.user_id] = { ...d }; });
+      Object.values(bikatStudents).forEach(s => {
+        if (s && s.user_id) combinedMap[String(s.user_id)] = { ...s };
+      });
+      if (myStudent && myStudent.user_id) {
+        combinedMap[String(myStudent.user_id)] = { ...myStudent };
+      }
+
+      const ranked = Object.values(combinedMap)
+        .map(s => {
+          const realDelta = eduGetStudentPeriodPoints(s, eduLbPeriod);
+          return {
+            ...s,
+            _pts: eduComputeEvenDisplayScore(String(s.user_id), eduLbPeriod, realDelta),
+            _tier: eduGetStudentVipTier(s)
+          };
+        })
         .sort((a, b) => b._pts - a._pts)
         .slice(0, 15);
 
-      if (ranked.length === 0) {
-        podiumBox.innerHTML = `<div style="color:rgba(255,255,255,0.85); font-size:0.82rem; padding:30px 10px; text-align:center;">በዚህ ጊዜ ውስጥ እስካሁን ነጥብ ያገኘ ተማሪ የለም። ፈተና በመስራት 1ኛ ይሁኑ! 🚀</div>`;
-        listBox.innerHTML = '';
-        return;
-      }
+      const ringClassFor = (t) => t === 'full' ? 'vip-ring-diamond' : (t === 'unit' ? 'vip-ring-gold' : '');
+      const tagHtmlFor = (t) => t === 'full'
+        ? `<span class="vip-badge-pill badge-diamond" style="font-size:0.55rem; padding:1px 5px;">💎 FULL VIP</span>`
+        : (t === 'unit' ? `<span class="vip-badge-pill badge-gold" style="font-size:0.55rem; padding:1px 5px;">👑 VIP</span>` : '');
 
       // Top 3 Podium in order: 2nd (left), 1st (center), 3rd (right)
       const topOrder = [
@@ -2993,14 +3323,16 @@
       podiumBox.innerHTML = topOrder.map(({ rank, stu }) => {
         if (!stu) return `<div class="lb-podium-slot rank-${rank}" style="opacity:0.25;"><div class="lb-block">${rank}</div></div>`;
         const crown = rank === 1 ? '<span class="lb-crown">👑</span>' : '';
+        const ringCls = ringClassFor(stu._tier);
         return `
           <div class="lb-podium-slot rank-${rank}">
             <div class="lb-avatar-wrap">
               ${crown}
-              <div class="lb-avatar">${escHtml(eduGetInitials(stu.full_name))}</div>
+              <div class="lb-avatar ${ringCls}">${escHtml(eduGetInitials(stu.full_name))}</div>
               <span class="lb-rank-dot">${rank}</span>
             </div>
-            <div class="lb-podium-name">${escHtml(stu.full_name || 'ተማሪ')}</div>
+            <div class="lb-podium-name">${escHtml(stu.full_name || 'Student')}</div>
+            ${stu._tier !== 'free' ? `<div style="margin-top:2px;">${tagHtmlFor(stu._tier)}</div>` : ''}
             <div class="lb-podium-pts">⚡ ${stu._pts} pts</div>
             <div class="lb-block">${rank}</div>
           </div>`;
@@ -3008,45 +3340,57 @@
 
       // Ranks 4 to 15
       const rest = ranked.slice(3);
-      if (rest.length === 0) {
-        listBox.innerHTML = `<p style="font-size:0.78rem; color:var(--gray); text-align:center; padding:8px;">ተጨማሪ ተማሪዎች ሲቀላቀሉ እዚህ ይታያሉ።</p>`;
-        return;
-      }
       listBox.innerHTML = rest.map((s, idx) => {
         const rankNum = idx + 4;
         const isMe = String(s.user_id) === String(currentUser.id);
+        const ringCls = ringClassFor(s._tier);
         return `
           <div class="lb-row ${isMe ? 'is-me' : ''}">
             <div class="lb-row-num">${rankNum}</div>
-            <div class="lb-row-avatar">${escHtml(eduGetInitials(s.full_name))}</div>
+            <div class="lb-row-avatar ${ringCls}">${escHtml(eduGetInitials(s.full_name))}</div>
             <div class="lb-row-info">
-              <div class="lb-row-name">${escHtml(s.full_name || 'ተማሪ')} ${s.is_vip == 1 ? '👑' : ''} ${isMe ? '<small style="color:var(--edu-accent);">(እኔ)</small>' : ''}</div>
+              <div class="lb-row-name">${escHtml(s.full_name || 'Student')} ${tagHtmlFor(s._tier)} ${isMe ? '<small style="color:var(--edu-accent);">(እኔ)</small>' : ''}</div>
             </div>
             <div class="lb-row-pts">⚡ ${s._pts} pts</div>
           </div>`;
       }).join('');
     }
 
-    function eduRenderProfile() {
+        function eduRenderProfile() {
       const box = document.getElementById('eduProfileCard'); if (!box || !myStudent) return;
       const ansCount = myStudent.answered_questions ? Object.keys(myStudent.answered_questions).length : 0;
       const remPts = Math.max(0, BONUS_POINTS_THRESHOLD - (myStudent.total_points || 0));
       const remInv = Math.max(0, BONUS_INVITE_THRESHOLD - (myStudent.invited_count || 0));
+      const tier = eduGetStudentVipTier(myStudent);
+      const ringCls = tier === 'full' ? 'vip-ring-diamond' : (tier === 'unit' ? 'vip-ring-gold' : '');
+      const statusBadge = tier === 'full'
+        ? `<span class="vip-badge-pill badge-diamond">💎 FULL VIP</span>`
+        : (tier === 'unit' ? `<span class="vip-badge-pill badge-gold">👑 VIP</span>` : `👤 Free Tier`);
+      const avatarContent = currentUser.photo_url
+        ? `<img src="${escAttr(currentUser.photo_url)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+        : escHtml(eduGetInitials(myStudent.full_name));
+
       box.innerHTML = `
-        <h3 style="color:var(--edu-accent); margin-bottom:10px;">👤 የተማሪ ፕሮፋይል</h3>
-        <div style="font-size:0.84rem; line-height:1.8;">
-          🏷 <b>ስም:</b> ${escHtml(myStudent.full_name)}<br>
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+          <div class="${ringCls}" style="width:64px; height:64px; border-radius:50%; background:var(--edu-accent); color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3rem; flex-shrink:0;">
+            ${avatarContent}
+          </div>
+          <div>
+            <h3 style="color:var(--text); margin-bottom:4px;">${escHtml(myStudent.full_name)}</h3>
+            <div>${statusBadge}</div>
+          </div>
+        </div>
+        <div style="font-size:0.84rem; line-height:1.85;">
           🆔 <b>ID:</b> <code>${myStudent.user_id}</code><br>
           📚 <b>የተመረጠ ክፍል:</b> ${escHtml(myStudent.education_level)}<br>
-          ⭐ <b>አባልነት:</b> ${myStudent.is_vip == 1 ? '👑 Full VIP (All Subjects)' : '👤 Free Tier'}<br>
-          🎁 <b>ነፃ 1-ትምህርት (1 ወር):</b> ${escHtml(myStudent.bonus_subject || 'ገና አልተከፈተም')}<br>
+          🎁 <b>ነፃ / 1-ትምህርት (1 ወር):</b> ${escHtml(myStudent.bonus_subject || (myStudent.subject_vips ? Object.keys(myStudent.subject_vips).join(', ') : 'ገና አልተከፈተም'))}<br>
           ✅ <b>በትክክል የተመለሱ:</b> ${ansCount} ጥያቄ<br>
           🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">(ቀሪ: ${remPts})</small><br>
           👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ቀሪ: ${remInv})</small>
         </div>`;
     }
 
-    // =========================================================================
+        // =========================================================================
     // BIKAT ADMIN PANEL (CONTINUOUS + EXISTING CHAPTERS + NOTIFICATIONS + VIP)
     // =========================================================================
     function eduAdminOnCategoryChange() {
@@ -3059,14 +3403,17 @@
       const levSel = document.getElementById('eaLevel');
       const strSel = document.getElementById('eaStream');
 
+      const durGroup = document.getElementById('eaDurationGroup');
       if (cat === 'weekly_exam') {
         subGroup.style.display = 'none';
+        if (durGroup) durGroup.style.display = 'block';
         levAllOpt.style.display = 'block';
         strAllOpt.style.display = 'block';
         chLabel.innerText = 'የሳምንታዊ ፈተና ስም (ነባር ላይ ቀጥል ወይም አዲስ)';
         chNewInp.placeholder = 'ምሳሌ: ሳምንታዊ ፈተና #1, Mid Challenge 2018';
       } else {
         subGroup.style.display = 'block';
+        if (durGroup) durGroup.style.display = 'none';
         levAllOpt.style.display = 'none';
         strAllOpt.style.display = 'none';
         if (levSel.value === 'All') levSel.value = 'Remedial';
@@ -3275,14 +3622,32 @@
 
         eduAdminRefreshSubjectSelect(subject, chapter);
 
-        lastAddedBatch = { cat, level, stream, subject, chapter, count: savedIds.length };
+        let durMin = 30;
+        if (cat === 'weekly_exam') {
+          durMin = Math.max(1, parseInt(document.getElementById('eaExamDuration').value, 10) || 30);
+          const exKey = eduMakeExamKey(level, stream, chapter);
+          const existingMeta = bikatExamControls[exKey] || {};
+          const metaObj = {
+            level, stream, title: chapter,
+            duration_min: durMin,
+            status: existingMeta.status || 'waiting',
+            started_at: existingMeta.started_at || 0
+          };
+          await fetch(`${BIKAT_EXAM_CONTROLS}/${exKey}.json`, { method: 'PUT', body: JSON.stringify(metaObj) });
+          bikatExamControls[exKey] = metaObj;
+        }
+
+        lastAddedBatch = { cat, level, stream, subject, chapter, count: savedIds.length, duration_min: durMin };
         const totalInChap = bikatQuestions.filter(q =>
           (q.content_category || 'chapter') === cat &&
           (q.level || 'All') === level &&
           ((q.stream || 'All') === stream || q.stream === 'None') &&
           q.subject === subject && q.chapter === chapter
         ).length;
-        document.getElementById('eaLastSavedMsg').innerHTML = `✅ <b>${savedIds.length} ጥያቄ ገብቷል!</b> (${savedIds.join(', ')})<br>📊 በ ${escHtml(subject)} → ${escHtml(chapter)} ጠቅላላ: <b>${totalInChap}</b> ጥያቄ። ቀጣዩን እዚሁ መቀጠል ትችላለህ!`;
+        const startWeeklyBtn = cat === 'weekly_exam'
+          ? `<button type="button" class="btn-action btn-edu" style="padding:8px; margin-bottom:6px;" onclick="eduAdminControlWeeklyExam('${escAttr(level)}','${escAttr(stream)}','${escAttr(chapter)}','started',${durMin})">▶️ ፈተናውን አሁን አስጀምር (Start • ${durMin} ደቂቃ)</button>`
+          : '';
+        document.getElementById('eaLastSavedMsg').innerHTML = `✅ <b>${savedIds.length} ጥያቄ ገብቷል!</b> (${savedIds.join(', ')})<br>📊 በ ${escHtml(subject)} → ${escHtml(chapter)} ጠቅላላ: <b>${totalInChap}</b> ጥያቄ። ቀጣዩን እዚሁ መቀጠል ትችላለህ!<div style="margin-top:8px;">${startWeeklyBtn}</div>`;
         document.getElementById('eaLastSavedBox').style.display = 'block';
 
         document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
@@ -3398,15 +3763,31 @@
           const toggleLabel = isAllPaid ? '🆓 ወደ Free' : '🔒 ወደ Paid';
           const toggleBg = isAllPaid ? '#10B981' : '#F59E0B';
           const catBadge = cat === 'weekly_exam' ? '🔥 Weekly' : (cat === 'subject_exam' ? '📝 Exam' : '📚 Chap');
-          return `<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
-            <div style="flex:1; min-width:0;">
-              <b>${catBadge}</b> • ${escHtml(lev)} (${escHtml(str)}) • ${escHtml(sub)}<br>
-              <small style="color:var(--gray);">${escHtml(ch)} (${info.total} ጥያቄ • ${statusBadge})</small>
+          let weeklyControlRow = '';
+          if (cat === 'weekly_exam') {
+            const meta = eduGetWeeklyExamMeta(lev, str, ch);
+            const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
+            const isLive = meta.status === 'started' && Date.now() < endTime;
+            const stateTxt = isLive ? `🟢 Live (${meta.duration_min} ደቂቃ)` : (meta.status === 'stopped' ? '🔴 Stopped' : `⏳ Waiting (${meta.duration_min} ደቂቃ)`);
+            weeklyControlRow = `
+              <div style="display:flex; gap:4px; margin-top:6px; align-items:center;">
+                <span style="font-size:0.7rem; font-weight:700; flex:1;">${stateTxt}</span>
+                <button style="background:#16A34A; color:white; border:none; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminPromptStartWeekly('${escAttr(lev)}','${escAttr(str)}','${escAttr(ch)}',${meta.duration_min})">▶️ Start</button>
+                <button style="background:#6B7280; color:white; border:none; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminControlWeeklyExam('${escAttr(lev)}','${escAttr(str)}','${escAttr(ch)}','stopped',${meta.duration_min})">⏹ Stop</button>
+              </div>`;
+          }
+          return `<div style="background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+              <div style="flex:1; min-width:0;">
+                <b>${catBadge}</b> • ${escHtml(lev)} (${escHtml(str)}) • ${escHtml(sub)}<br>
+                <small style="color:var(--gray);">${escHtml(ch)} (${info.total} ጥያቄ • ${statusBadge})</small>
+              </div>
+              <div style="display:flex; gap:4px; flex-shrink:0;">
+                <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
+                <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
+              </div>
             </div>
-            <div style="display:flex; gap:4px; flex-shrink:0;">
-              <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
-              <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
-            </div>
+            ${weeklyControlRow}
           </div>`;
         }).join('');
       }
@@ -3479,6 +3860,33 @@
       }
       notifyUser(`✅ ${toDel.length} ጥያቄዎች ጠፍተዋል!`);
       await eduLoadAllData();
+    }
+
+    async function eduAdminPromptStartWeekly(lev, str, title, currentMin) {
+      const inp = prompt(`ለ "${title}" ጠቅላላ ሰዓት በደቂቃ ያስገቡ (ለምሳሌ 30):`, String(currentMin || 30));
+      if (inp === null) return;
+      const mins = Math.max(1, parseInt(inp, 10) || currentMin || 30);
+      await eduAdminControlWeeklyExam(lev, str, title, 'started', mins);
+    }
+
+    async function eduAdminControlWeeklyExam(lev, str, title, newStatus, durationMin) {
+      const exKey = eduMakeExamKey(lev, str, title);
+      const payload = {
+        level: lev,
+        stream: str,
+        title,
+        duration_min: Number(durationMin) || 30,
+        status: newStatus,
+        started_at: newStatus === 'started' ? Date.now() : 0
+      };
+      try {
+        await fetch(`${BIKAT_EXAM_CONTROLS}/${exKey}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+        bikatExamControls[exKey] = payload;
+        notifyUser(newStatus === 'started'
+          ? `🟢 "${title}" ለ ${payload.duration_min} ደቂቃ ተጀምሯል!`
+          : `🔴 "${title}" ቆሟል።`);
+        eduRenderAdmin();
+      } catch(e) { notifyUser("ስህተት ተፈጥሯል!"); }
     }
 
     async function eduAdminToggleVip(uid, newVal) {
