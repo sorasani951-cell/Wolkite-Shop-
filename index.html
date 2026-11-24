@@ -1106,8 +1106,14 @@
 
         <div class="lb-wrapper">
           <div class="lb-top-bar">
-            <h3>🏆 Leaderboard</h3>
-            <button onclick="eduLoadAllData()" style="background:rgba(255,255,255,0.18); color:white; border:none; padding:5px 10px; border-radius:12px; font-size:0.74rem; font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <h3>🏆 Leaderboard</h3>
+              <span id="eduLbCountBadge" style="background:rgba(255,255,255,0.18); padding:3px 9px; border-radius:999px; font-size:0.7rem; font-weight:700;">👥 360+</span>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button onclick="eduScrollToMyRank()" style="background:rgba(255,255,255,0.18); color:white; border:none; padding:5px 9px; border-radius:12px; font-size:0.72rem; font-weight:bold; cursor:pointer;">📍 ደረጃዬ</button>
+              <button onclick="eduLoadAllData()" style="background:rgba(255,255,255,0.18); color:white; border:none; padding:5px 9px; border-radius:12px; font-size:0.72rem; font-weight:bold; cursor:pointer;">🔄 እደስ</button>
+            </div>
           </div>
           <div class="lb-tabs" id="eduLbTabs">
             <button class="lb-tab" onclick="eduSwitchLbPeriod('daily', this)">Daily</button>
@@ -3242,25 +3248,43 @@
       return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
     }
 
-    const DEMO_ETH_STUDENTS = [
-      { user_id: 'demo_1', full_name: 'ibro', _demo_tier: 'full' },
-      { user_id: 'demo_2', full_name: 'sudi', _demo_tier: 'unit' },
-      { user_id: 'demo_3', full_name: 'siyam', _demo_tier: 'full' },
-      { user_id: 'demo_4', full_name: 'Bereket Tadesse', _demo_tier: 'unit' },
-      { user_id: 'demo_5', full_name: 'Hanan', _demo_tier: 'free' },
-      { user_id: 'demo_6', full_name: 'Dawit M.', _demo_tier: 'full' },
-      { user_id: 'demo_7', full_name: 'Meron', _demo_tier: 'free' },
-      { user_id: 'demo_8', full_name: 'natnael', _demo_tier: 'unit' },
-      { user_id: 'demo_9', full_name: 'Feven K.', _demo_tier: 'free' },
-      { user_id: 'demo_10', full_name: 'Yonas', _demo_tier: 'free' },
-      { user_id: 'demo_11', full_name: 'Selam', _demo_tier: 'unit' },
-      { user_id: 'demo_12', full_name: 'Mekdes', _demo_tier: 'free' },
-      { user_id: 'demo_13', full_name: 'Robel', _demo_tier: 'free' },
-      { user_id: 'demo_14', full_name: 'Biniam', _demo_tier: 'free' },
-      { user_id: 'demo_15', full_name: 'Tigist', _demo_tier: 'free' }
+    const ETH_FIRST_NAMES = [
+      'ibro', 'sudi', 'siyam', 'Bereket', 'Hanan', 'Dawit', 'Meron', 'natnael', 'Selam', 'Robel',
+      'Mekdes', 'Yonas', 'Biniam', 'Tigist', 'abdu', 'Eyob', 'Kalkidan', 'Mahlet', 'Solomon', 'Henok',
+      'Rediet', 'Samrawit', 'Abel', 'Bethelhem', 'Temesgen', 'Lidya', 'Nahom', 'Tsion', 'Kirubel', 'Helen',
+      'Firaol', 'Gemechu', 'Chaltu', 'Tolosa', 'Bontu', 'Bekele', 'Alemu', 'Tadesse', 'Girum', 'Miki',
+      'Kaleab', 'Surafel', 'Ermias', 'Beza', 'Hiwot', 'Selamawit', 'Eden', 'Sara', 'Ruth', 'Hanna',
+      'Meseret', 'Frehiwot', 'Kidist', 'Abebe', 'Kebede', 'Getachew', 'Muluken', 'Tesfaye', 'Worku', 'Zekarias',
+      'amina', 'fatuma', 'mohammed', 'ahmed', 'yusuf', 'bilal', 'hamza', 'mustafa', 'kedir', 'jemal',
+      'sumeya', 'rahma', 'khadija', 'seid', 'osman', 'nuradin', 'nesredin', 'munir', 'fuad', 'amir',
+      'daniel', 'samuel', 'michael', 'gabriel', 'elias', 'isaac', 'jacob', 'yonatan', 'natty', 'amanuel',
+      'brook', 'nebiyu', 'leul', 'dagim', 'fasil', 'tedros', 'haile', 'biruk', 'kaleb', 'yohannes'
+    ];
+    const ETH_LAST_NAMES = [
+      '', 'T.', 'M.', 'A.', 'K.', 'B.', 'G.', 'S.', 'D.', 'H.',
+      'Tadesse', 'Bekele', 'Alemu', 'Kebede', 'Girma', 'Haile', 'Tesfaye', 'Desta', 'Negash', 'Mekonnen',
+      'Assefa', 'Solomon', 'Yohannes', 'Gebre', 'Worku', 'Abebe', 'Mengistu', 'Fikadu', 'Demissie', 'Abera'
     ];
 
-    function eduComputeEvenDisplayScore(idStr, period, bonusDelta = 0) {
+    const DEMO_ETH_STUDENTS = (() => {
+      const list = [];
+      let idx = 1;
+      for (let i = 0; i < 360; i++) {
+        const fn = ETH_FIRST_NAMES[i % ETH_FIRST_NAMES.length];
+        const ln = ETH_LAST_NAMES[(i * 7 + Math.floor(i / ETH_FIRST_NAMES.length)) % ETH_LAST_NAMES.length];
+        const fullName = ln ? `${fn} ${ln}` : fn;
+        list.push({ user_id: `eth_stu_${idx++}`, full_name: fullName, _isDemo: true });
+      }
+      return list;
+    })();
+
+    function eduComputeCappedDemoScore(idStr, period, maxRealPts) {
+      // Strictly below the highest real student's score, and always an even integer >= 0
+      const capEven = maxRealPts >= 2
+        ? (maxRealPts % 2 === 0 ? maxRealPts - 2 : maxRealPts - 1)
+        : 0;
+      if (capEven <= 0) return 0;
+
       const keys = eduGetPeriodKeys();
       const seedStr = `${idStr}|${period}|${keys[period] || 'all'}`;
       let h = 2166136261;
@@ -3268,46 +3292,63 @@
         h ^= seedStr.charCodeAt(i);
         h = Math.imul(h, 16777619);
       }
-      const u = (h >>> 0) / 4294967295;
-      const ranges = {
-        daily:   [44, 186],
-        weekly:  [96, 286],
-        monthly: [142, 366],
-        all:     [184, 396]
-      };
-      const [minV, maxV] = ranges[period] || ranges.all;
-      let val = Math.floor(minV + u * (maxV - minV + 1)) + (bonusDelta || 0);
-      if (val % 2 !== 0) val += 1;
-      if (val > 398) val = 398;
-      if (val < 2) val = 2;
-      return val;
+      // Skew slightly downward so most sit naturally below the leaders
+      const u = ((h >>> 0) / 4294967295);
+      const skewed = Math.pow(u, 1.35);
+      const maxSteps = Math.floor(capEven / 2);
+      const step = Math.floor(skewed * (maxSteps + 1));
+      return Math.min(capEven, step * 2);
+    }
+
+    function eduScrollToMyRank() {
+      const myRow = document.querySelector('#eduLeaderboardList .lb-row.is-me');
+      if (myRow) {
+        myRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        const podium = document.getElementById('eduLbPodium');
+        if (podium) podium.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
 
     function eduRenderLeaderboard() {
       const podiumBox = document.getElementById('eduLbPodium');
       const listBox = document.getElementById('eduLeaderboardList');
+      const countBadge = document.getElementById('eduLbCountBadge');
       if (!podiumBox || !listBox) return;
 
-      const combinedMap = {};
-      DEMO_ETH_STUDENTS.forEach(d => { combinedMap[d.user_id] = { ...d }; });
+      // 1. Collect all real students with their exact real points & real VIP status
+      const realMap = {};
       Object.values(bikatStudents).forEach(s => {
-        if (s && s.user_id) combinedMap[String(s.user_id)] = { ...s };
+        if (s && s.user_id) realMap[String(s.user_id)] = { ...s, _isDemo: false };
       });
       if (myStudent && myStudent.user_id) {
-        combinedMap[String(myStudent.user_id)] = { ...myStudent };
+        realMap[String(myStudent.user_id)] = { ...myStudent, _isDemo: false };
       }
 
-      const ranked = Object.values(combinedMap)
-        .map(s => {
-          const realDelta = eduGetStudentPeriodPoints(s, eduLbPeriod);
-          return {
-            ...s,
-            _pts: eduComputeEvenDisplayScore(String(s.user_id), eduLbPeriod, realDelta),
-            _tier: eduGetStudentVipTier(s)
-          };
-        })
-        .sort((a, b) => b._pts - a._pts)
-        .slice(0, 15);
+      const realList = Object.values(realMap).map(s => ({
+        ...s,
+        _pts: eduGetStudentPeriodPoints(s, eduLbPeriod),
+        _tier: eduGetStudentVipTier(s),
+        _isDemo: false
+      }));
+
+      const maxRealPts = realList.reduce((mx, s) => Math.max(mx, s._pts || 0), 0);
+
+      // 2. Add 360 background Ethiopian students with honest scores strictly below maxRealPts and NO fake VIP
+      const demoList = DEMO_ETH_STUDENTS.map(d => ({
+        ...d,
+        _pts: eduComputeCappedDemoScore(d.user_id, eduLbPeriod, maxRealPts),
+        _tier: 'free',
+        _isDemo: true
+      }));
+
+      const ranked = [...realList, ...demoList].sort((a, b) => {
+        if (b._pts !== a._pts) return b._pts - a._pts;
+        if (a._isDemo !== b._isDemo) return a._isDemo ? 1 : -1; // Real users rank ahead on ties
+        return 0;
+      });
+
+      if (countBadge) countBadge.innerText = `👥 ${ranked.length} ተማሪዎች`;
 
       const ringClassFor = (t) => t === 'full' ? 'vip-ring-diamond' : (t === 'unit' ? 'vip-ring-gold' : '');
       const tagHtmlFor = (t) => t === 'full'
@@ -3338,11 +3379,11 @@
           </div>`;
       }).join('');
 
-      // Ranks 4 to 15
+      // Ranks 4 to 360+
       const rest = ranked.slice(3);
       listBox.innerHTML = rest.map((s, idx) => {
         const rankNum = idx + 4;
-        const isMe = String(s.user_id) === String(currentUser.id);
+        const isMe = !s._isDemo && String(s.user_id) === String(currentUser.id);
         const ringCls = ringClassFor(s._tier);
         return `
           <div class="lb-row ${isMe ? 'is-me' : ''}">
