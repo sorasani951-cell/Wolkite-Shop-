@@ -97,10 +97,15 @@
     }
     .edu-notif-cta {
       display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 8px; padding: 6px 12px; border-radius: 999px;
+      margin-top: 9px; padding: 8px 14px; border-radius: 999px;
+      border: none; cursor: pointer; touch-action: manipulation;
       background: linear-gradient(135deg, var(--edu-accent), #6366F1);
-      color: white; font-size: 0.74rem; font-weight: 800;
-      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+      color: white; font-size: 0.78rem; font-weight: 800;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.30);
+      transition: transform 0.14s ease, opacity 0.14s ease;
+    }
+    .edu-notif-cta:active {
+      transform: scale(0.95); opacity: 0.9;
     }
     body[data-theme="dark"] .mode-pill.active { background: #1E293B; color: var(--secondary); }
     body[data-theme="dark"] .mode-pill.edu-active { background: #1E293B; color: var(--edu-accent); }
@@ -1082,7 +1087,9 @@
           <button type="button" onclick="event.stopPropagation(); eduDismissNotif();" style="position:absolute; right:10px; top:8px; background:none; border:none; font-size:1.2rem; color:var(--gray); cursor:pointer; z-index:2;">&times;</button>
           <div style="font-size:0.78rem; font-weight:bold; color:var(--gold); margin-bottom:4px;">🔔 አዲስ ማስታወቂያ (Notification)</div>
           <div id="eduNotifText" style="font-size:0.82rem; color:var(--text); line-height:1.45; white-space:pre-wrap;"></div>
-          <div id="eduNotifCtaWrap" style="display:none;"><span class="edu-notif-cta" id="eduNotifCtaLabel">🚀 Open Quiz ➔</span></div>
+          <div id="eduNotifCtaWrap" style="display:none;">
+            <button type="button" class="edu-notif-cta" id="eduNotifCtaLabel" onclick="event.stopPropagation(); eduOpenLatestNotifTarget();">🚀 Open Quiz ➔</button>
+          </div>
           <div id="eduNotifDate" style="font-size:0.68rem; color:var(--gray); margin-top:6px;"></div>
         </div>
 
@@ -2407,20 +2414,50 @@
       const item = bikatAnnouncements[key];
       if (!item.target || !item.target.chapter) return;
 
+      // Safely pause any running quiz before jumping to the linked quiz/exam
+      if (eduActiveQuiz) {
+        eduStopCountdownTimer();
+        try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
+        eduActiveQuiz = null;
+        eduCheckPausedQuiz();
+      }
+
       const t = item.target;
       const cat = t.cat || 'chapter';
-      if (t.level && t.level !== 'All') eduNav.level = t.level;
-      if (t.stream && t.stream !== 'All' && t.stream !== 'None') eduNav.stream = t.stream;
-      if (t.subject) eduNav.subject = t.subject;
-      eduNav.chapter = t.chapter;
+      const targetChap = String(t.chapter || '').trim();
+      const targetSub = String(t.subject || '').trim();
+
+      // Match actual question in bikatQuestions so level/stream/subject/chapter always align 100%
+      const matchedQ = bikatQuestions.find(q => {
+        const qCat = q.content_category || 'chapter';
+        if (qCat !== cat) return false;
+        if (String(q.chapter || '').trim() !== targetChap) return false;
+        if (cat !== 'weekly_exam' && targetSub && String(q.subject || '').trim() !== targetSub) return false;
+        if (t.level && t.level !== 'All' && q.level && q.level !== 'All' && q.level !== t.level) return false;
+        return true;
+      });
+
+      const resolvedLevel = (matchedQ && matchedQ.level) ? matchedQ.level : (t.level || eduNav.level || 'All');
+      const resolvedStream = (matchedQ && matchedQ.stream) ? matchedQ.stream : (t.stream || eduNav.stream || 'All');
+      const resolvedSubject = (matchedQ && matchedQ.subject) ? matchedQ.subject : (targetSub || 'Weekly Exam');
+      const resolvedChapter = (matchedQ && matchedQ.chapter) ? matchedQ.chapter : targetChap;
+
+      if (resolvedLevel && resolvedLevel !== 'All') eduNav.level = resolvedLevel;
+      if (resolvedStream && resolvedStream !== 'All' && resolvedStream !== 'None') eduNav.stream = resolvedStream;
+      if (resolvedSubject) eduNav.subject = resolvedSubject;
+      eduNav.chapter = resolvedChapter;
+      eduSetStepper(3);
 
       if (cat === 'weekly_exam') {
-        eduOpenWeeklyExam(t.level || 'All', t.stream || 'All', t.chapter);
+        eduOpenWeeklyExam(resolvedLevel || 'All', resolvedStream || 'All', resolvedChapter);
       } else if (cat === 'subject_exam') {
-        eduSelectSubjectExam(t.chapter);
+        eduSelectSubjectExam(resolvedChapter);
       } else {
-        eduSelectChapter(t.chapter);
+        eduSelectChapter(resolvedChapter);
       }
+
+      const stage = document.getElementById('eduQuizStage');
+      if (stage) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async function eduSubmitFeedback(e, inputId, btnId, sourceLabel, statusId) {
