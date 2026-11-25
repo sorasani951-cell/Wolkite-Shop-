@@ -84,6 +84,24 @@
     body[data-theme="dark"] .quiz-explanation {
       background: rgba(250, 204, 21, 0.12); border-color: rgba(250, 204, 21, 0.3); color: #FEF08A;
     }
+    body[data-theme="dark"] #eduNotifBanner {
+      background: rgba(245, 158, 11, 0.14) !important;
+      border-color: rgba(245, 158, 11, 0.45) !important;
+    }
+    .edu-notif-clickable {
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .edu-notif-clickable:active {
+      transform: scale(0.985);
+    }
+    .edu-notif-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 8px; padding: 6px 12px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--edu-accent), #6366F1);
+      color: white; font-size: 0.74rem; font-weight: 800;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+    }
     body[data-theme="dark"] .mode-pill.active { background: #1E293B; color: var(--secondary); }
     body[data-theme="dark"] .mode-pill.edu-active { background: #1E293B; color: var(--edu-accent); }
 
@@ -1059,12 +1077,13 @@
       <div id="view-edu-quiz" class="view active">
         <div id="eduLoading" style="text-align:center; font-size:0.8rem; color:var(--gray); padding:10px; display:none;">የBIKAT መረጃዎችን በመጫን ላይ...</div>
 
-        <!-- 🔔 In-App Notification / Announcement Banner -->
-        <div id="eduNotifBanner" class="section-card" style="display:none; background:#FEF3C7; border-color:var(--gold); position:relative; padding-right:34px;">
-          <button onclick="eduDismissNotif()" style="position:absolute; right:10px; top:8px; background:none; border:none; font-size:1.1rem; color:var(--gray); cursor:pointer;">&times;</button>
+        <!-- 🔔 In-App Notification / Announcement Banner (Clickable like Wolkite Shop Offers) -->
+        <div id="eduNotifBanner" class="section-card" onclick="eduOpenLatestNotifTarget()" style="display:none; background:#FEF3C7; border-color:var(--gold); position:relative; padding-right:34px;">
+          <button type="button" onclick="event.stopPropagation(); eduDismissNotif();" style="position:absolute; right:10px; top:8px; background:none; border:none; font-size:1.2rem; color:var(--gray); cursor:pointer; z-index:2;">&times;</button>
           <div style="font-size:0.78rem; font-weight:bold; color:var(--gold); margin-bottom:4px;">🔔 አዲስ ማስታወቂያ (Notification)</div>
           <div id="eduNotifText" style="font-size:0.82rem; color:var(--text); line-height:1.45; white-space:pre-wrap;"></div>
-          <div id="eduNotifDate" style="font-size:0.68rem; color:var(--gray); margin-top:4px;"></div>
+          <div id="eduNotifCtaWrap" style="display:none;"><span class="edu-notif-cta" id="eduNotifCtaLabel">🚀 Open Quiz ➔</span></div>
+          <div id="eduNotifDate" style="font-size:0.68rem; color:var(--gray); margin-top:6px;"></div>
         </div>
 
         <!-- Student Summary Banner -->
@@ -1203,6 +1222,22 @@
       <!-- EDU PROFILE VIEW -->
       <div id="view-edu-profile" class="view">
         <div class="section-card" id="eduProfileCard"></div>
+
+        <!-- Direct Feedback Box on Profile -->
+        <div class="section-card" style="border-color:rgba(79, 70, 229, 0.25);">
+          <h4 style="font-size:0.92rem; color:var(--edu-accent); margin-bottom:4px;">💬 ቀጥታ አስተያየት ይስጡ (Send Feedback)</h4>
+          <p style="font-size:0.78rem; color:var(--gray); margin-bottom:10px; line-height:1.45;">
+            ስለ BIKAT ትምህርት አፕ፣ ጥያቄዎች ወይም ማንኛውም ሀሳብ ካለዎት ቀጥታ ለአድሚን እዚህ ይጻፉ፦
+          </p>
+          <form onsubmit="eduSubmitFeedback(event, 'eduProfileFeedbackInput', 'eduProfileFeedbackBtn', 'Profile Page', 'eduProfileFeedbackStatus')">
+            <div class="form-group" style="margin-bottom:8px;">
+              <textarea id="eduProfileFeedbackInput" rows="3" placeholder="አስተያየትዎን ወይም ጥያቄዎን እዚህ ይጻፉ..." required></textarea>
+            </div>
+            <button type="submit" id="eduProfileFeedbackBtn" class="btn-action btn-edu">📤 Send Feedback</button>
+          </form>
+          <div id="eduProfileFeedbackStatus" style="display:none; margin-top:8px; font-size:0.78rem; font-weight:700; color:#16A34A;"></div>
+        </div>
+
         <div class="section-card">
           <h4 style="font-size:0.88rem; margin-bottom:10px;">📢 ጠቃሚ ሊንኮች</h4>
           <a class="btn-action btn-edu" style="margin-bottom:8px;" href="https://t.me/bikat_quiz" target="_blank">📢 የBIKAT ቻናል (@bikat_quiz)</a>
@@ -1227,6 +1262,7 @@
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-pay', this)">💳 Payments</div>
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-manage', this)">🗑 Manage</div>
             <div class="p-tab" onclick="eduSwitchAdminTab('ea-students', this)">👥 Students</div>
+            <div class="p-tab" id="eaFeedbackTabBtn" onclick="eduSwitchAdminTab('ea-feedback', this)">💬 Feedback</div>
           </div>
 
           <!-- ADD QUESTIONS (CHAPTERS + SUBJECT EXAMS + WEEKLY EXAMS) -->
@@ -1310,6 +1346,12 @@
           <div id="ea-notify" class="p-content">
             <form onsubmit="eduAdminSendAnnouncement(event)">
               <div class="form-group">
+                <label>🔗 ሲነካ የሚወስድበት ጥያቄ / ፈተና (Link to Quiz - አማራጭ)</label>
+                <select id="eaNotifTargetSelect">
+                  <option value="">-- ምንም (General Notification Only) --</option>
+                </select>
+              </div>
+              <div class="form-group">
                 <label>📢 ለሁሉም ተማሪዎች የሚታይ ማስታወቂያ (In-App Notification)</label>
                 <textarea id="eaNotifInput" rows="4" placeholder="ለምሳሌ: 🔥 የBiology Chapter 2 አዲስ 25 ጥያቄዎች ተጭነዋል! አሁኑኑ ገብተው ይስሩ!" required></textarea>
               </div>
@@ -1337,6 +1379,11 @@
           <!-- STUDENTS LIST -->
           <div id="ea-students" class="p-content">
             <div id="eduAdminStudentsList"></div>
+          </div>
+
+          <!-- STUDENT FEEDBACKS LIST -->
+          <div id="ea-feedback" class="p-content">
+            <div id="eduAdminFeedbackList"></div>
           </div>
         </div>
       </div>
@@ -2217,6 +2264,7 @@
     // =========================================================================
     const BIKAT_ANNOUNCEMENTS = `${DB_BASE}/bikat/announcements`;
     const BIKAT_EXAM_CONTROLS = `${DB_BASE}/bikat/exam_controls`;
+    const BIKAT_FEEDBACKS = `${DB_BASE}/bikat/feedbacks`;
     function getPracticeSize(level) { return (level && level.toLowerCase().includes('rem')) ? 15 : 25; }
     const BONUS_POINTS_THRESHOLD = 50;
     const BONUS_INVITE_THRESHOLD = 5;
@@ -2228,6 +2276,7 @@
     let bikatPayments = {};
     let bikatAnnouncements = {};
     let bikatExamControls = {};
+    let bikatFeedbacks = {};
     let myStudent = null;
 
     let eduNav = { level: null, stream: null, subject: null, chapter: null, practice: 1 };
@@ -2259,12 +2308,13 @@
     async function eduLoadAllData(referrerId = null) {
       document.getElementById('eduLoading').style.display = 'block';
       try {
-        const [resS, resQ, resP, resA, resEC] = await Promise.all([
+        const [resS, resQ, resP, resA, resEC, resFB] = await Promise.all([
           fetch(`${BIKAT_STUDENTS}.json`),
           fetch(`${BIKAT_QUESTIONS}.json`),
           fetch(`${BIKAT_PAYMENTS}.json`),
           fetch(`${BIKAT_ANNOUNCEMENTS}.json`),
-          fetch(`${BIKAT_EXAM_CONTROLS}.json`)
+          fetch(`${BIKAT_EXAM_CONTROLS}.json`),
+          fetch(`${BIKAT_FEEDBACKS}.json`)
         ]);
         bikatStudents = (await resS.json()) || {};
         const rawQ = (await resQ.json()) || {};
@@ -2272,6 +2322,7 @@
         bikatPayments = (await resP.json()) || {};
         bikatAnnouncements = (await resA.json()) || {};
         bikatExamControls = (await resEC.json()) || {};
+        bikatFeedbacks = (await resFB.json()) || {};
 
         if (!bikatStudents[currentUser.id]) {
           myStudent = {
@@ -2323,6 +2374,8 @@
 
     function eduRenderLatestNotification() {
       const banner = document.getElementById('eduNotifBanner');
+      const ctaWrap = document.getElementById('eduNotifCtaWrap');
+      const ctaLabel = document.getElementById('eduNotifCtaLabel');
       const keys = Object.keys(bikatAnnouncements || {}).sort();
       if (keys.length === 0) { banner.style.display = 'none'; return; }
       const latestKey = keys[keys.length - 1];
@@ -2332,7 +2385,84 @@
       document.getElementById('eduNotifText').innerText = item.text || '';
       document.getElementById('eduNotifDate').innerText = item.date ? new Date(item.date).toLocaleString() : '';
       banner.dataset.notifKey = latestKey;
+
+      if (item.target && item.target.chapter) {
+        banner.classList.add('edu-notif-clickable');
+        if (ctaWrap) ctaWrap.style.display = 'block';
+        if (ctaLabel) {
+          const subLbl = item.target.subject && item.target.subject !== 'Weekly Exam' ? `${item.target.subject} • ` : '';
+          ctaLabel.innerText = `🚀 ወደ ${subLbl}${item.target.chapter} ግባ ➔`;
+        }
+      } else {
+        banner.classList.remove('edu-notif-clickable');
+        if (ctaWrap) ctaWrap.style.display = 'none';
+      }
       banner.style.display = 'block';
+    }
+
+    function eduOpenLatestNotifTarget() {
+      const banner = document.getElementById('eduNotifBanner');
+      const key = banner ? banner.dataset.notifKey : null;
+      if (!key || !bikatAnnouncements[key]) return;
+      const item = bikatAnnouncements[key];
+      if (!item.target || !item.target.chapter) return;
+
+      const t = item.target;
+      const cat = t.cat || 'chapter';
+      if (t.level && t.level !== 'All') eduNav.level = t.level;
+      if (t.stream && t.stream !== 'All' && t.stream !== 'None') eduNav.stream = t.stream;
+      if (t.subject) eduNav.subject = t.subject;
+      eduNav.chapter = t.chapter;
+
+      if (cat === 'weekly_exam') {
+        eduOpenWeeklyExam(t.level || 'All', t.stream || 'All', t.chapter);
+      } else if (cat === 'subject_exam') {
+        eduSelectSubjectExam(t.chapter);
+      } else {
+        eduSelectChapter(t.chapter);
+      }
+    }
+
+    async function eduSubmitFeedback(e, inputId, btnId, sourceLabel, statusId) {
+      e.preventDefault();
+      const inp = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      const statusEl = document.getElementById(statusId);
+      if (!inp) return;
+      const text = inp.value.trim();
+      if (!text) return;
+
+      const origBtnText = btn ? btn.innerText : '📤 Send Feedback';
+      if (btn) { btn.innerText = 'በመላክ ላይ...'; btn.disabled = true; }
+
+      const fbId = `FB_${Date.now()}`;
+      const payload = {
+        id: fbId,
+        user_id: currentUser.id,
+        user_name: (myStudent && myStudent.full_name) || currentUser.first_name || currentUser.username || 'ተማሪ',
+        username: currentUser.username || '',
+        education_level: (myStudent && myStudent.education_level) || 'Not Set',
+        source: sourceLabel || 'Profile Page',
+        text,
+        date: new Date().toISOString()
+      };
+
+      try {
+        await fetch(`${BIKAT_FEEDBACKS}/${fbId}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+        bikatFeedbacks[fbId] = payload;
+        inp.value = '';
+        if (statusEl) {
+          statusEl.innerText = '✅ እናመሰግናለን! አስተያየትዎ በተሳካ ሁኔታ ለአድሚን ተልኳል።';
+          statusEl.style.display = 'block';
+        } else {
+          notifyUser('✅ እናመሰግናለን! አስተያየትዎ ለአድሚን ተልኳል።');
+        }
+        if (Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
+      } catch(err) {
+        notifyUser('ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ።');
+      } finally {
+        if (btn) { btn.innerText = origBtnText; btn.disabled = false; }
+      }
     }
 
     function eduDismissNotif() {
@@ -2966,9 +3096,23 @@
       }, 1000);
     }
 
+    function eduBuildEndQuizFeedbackHtml(contextLabel) {
+      return `
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); text-align:left;">
+          <div style="font-size:0.84rem; font-weight:800; color:var(--edu-accent); margin-bottom:4px;">💬 ስለዚህ ልምምድ / ፈተና አስተያየት ይስጡ</div>
+          <p style="font-size:0.74rem; color:var(--gray); margin-bottom:8px;">ጥያቄዎቹ እንዴት ነበሩ? ሀሳብዎን እዚህ ያስቀምጡልን፦</p>
+          <form onsubmit="eduSubmitFeedback(event, 'eduQuizEndFbInput', 'eduQuizEndFbBtn', '${escAttr(contextLabel)}', 'eduQuizEndFbStatus')">
+            <textarea id="eduQuizEndFbInput" rows="2" placeholder="አስተያየትዎን እዚህ ይጻፉ..." style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:12px; font-size:0.84rem; background:var(--surface); color:var(--text); margin-bottom:8px;" required></textarea>
+            <button type="submit" id="eduQuizEndFbBtn" class="btn-action btn-edu" style="padding:9px; font-size:0.8rem;">📤 Send Feedback</button>
+          </form>
+          <div id="eduQuizEndFbStatus" style="display:none; margin-top:8px; font-size:0.78rem; font-weight:700; color:#16A34A; text-align:center;"></div>
+        </div>`;
+    }
+
     function eduAutoFinishTimedExam() {
       if (!eduActiveQuiz) return;
-      const { score, earned, questions } = eduActiveQuiz;
+      const { score, earned, questions, subject, chapter } = eduActiveQuiz;
+      const ctxLabel = `${subject || 'Exam'} • ${chapter || ''} (Score: ${score}/${questions.length})`;
       localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
       eduActiveQuiz = null;
       const stage = document.getElementById('eduQuizStage');
@@ -2983,6 +3127,7 @@
               <button class="btn-action btn-edu" onclick="eduShowSubjects()">🔄 Back to Subjects</button>
               <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🏆 Leaderboard</button>
             </div>
+            ${eduBuildEndQuizFeedbackHtml(ctxLabel)}
           </div>`;
       }
     }
@@ -3072,19 +3217,22 @@
 
       if (eduActiveQuiz.index >= eduActiveQuiz.questions.length) {
         eduStopCountdownTimer();
-        const { score, earned, questions } = eduActiveQuiz;
+        const { score, earned, questions, subject, chapter, practice, mode } = eduActiveQuiz;
+        const partLabel = mode === 'chapter' ? ` • Practice ${practice || 1}` : '';
+        const ctxLabel = `${subject || 'Quiz'} • ${chapter || ''}${partLabel} (Score: ${score}/${questions.length})`;
         localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
         eduActiveQuiz = null;
         stage.innerHTML = `
           <div class="section-card" style="text-align:center; padding:24px 16px;">
             <div style="font-size:2.5rem; margin-bottom:8px;">🎉</div>
-            <h2 style="color:var(--edu-accent); margin-bottom:10px;">ፈተናውን አጠናቀዋል!</h2>
+            <h2 style="color:var(--edu-accent); margin-bottom:10px;">እንኳን ደስ አላችሁ! ፈተናውን አጠናቀዋል!</h2>
             <p style="font-size:0.95rem; margin-bottom:6px;">🎯 ትክክለኛ መልስ: <b>${score} / ${questions.length}</b></p>
             <p style="font-size:0.9rem; color:var(--primary); margin-bottom:16px;">⭐ አዲስ ያገኙት ነጥብ: <b>+${earned} ነጥብ</b></p>
             <div style="display:flex; gap:8px;">
               <button class="btn-action btn-edu" onclick="eduShowSubjects()">🔄 More Quizzes</button>
               <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🏆 Leaderboard</button>
             </div>
+            ${eduBuildEndQuizFeedbackHtml(ctxLabel)}
           </div>`;
         return;
       }
@@ -3853,24 +4001,30 @@
       const { cat, level, stream, subject, chapter, count } = lastAddedBatch;
       const header = cat === 'chapter' ? '🔥 አዲስ ጥያቄዎች ተጭነዋል!' : '📝 አዲስ ፈተና (Exam) ተጭኗል!';
       const text = `${header}\n\n📚 ክፍል: ${level} (${stream})\n📘 ትምህርት: ${subject}\n📑 ${cat === 'chapter' ? 'ምዕራፍ' : 'ፈተና'}: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
-      await eduPublishAnnouncementText(text);
+      await eduPublishAnnouncementText(text, { cat, level, stream, subject, chapter });
       document.getElementById('eaLastSavedBox').style.display = 'none';
     }
 
-        async function eduAdminSendAnnouncement(e) {
+    async function eduAdminSendAnnouncement(e) {
       e.preventDefault();
       const text = document.getElementById('eaNotifInput').value.trim();
       if (!text) return;
+      const targetRaw = document.getElementById('eaNotifTargetSelect')?.value || '';
+      let targetObj = null;
+      if (targetRaw) {
+        const [cat, level, stream, subject, chapter] = targetRaw.split('|');
+        targetObj = { cat, level, stream, subject, chapter };
+      }
       const btn = document.getElementById('eaNotifBtn');
       btn.innerText = "በመላክ ላይ..."; btn.disabled = true;
-      await eduPublishAnnouncementText(text);
+      await eduPublishAnnouncementText(text, targetObj);
       document.getElementById('eaNotifInput').value = '';
       btn.innerText = "🔔 Publish Notification"; btn.disabled = false;
     }
 
-    async function eduPublishAnnouncementText(text) {
+    async function eduPublishAnnouncementText(text, target = null) {
       const id = `ANN_${Date.now()}`;
-      const obj = { text, date: new Date().toISOString() };
+      const obj = { text, target, date: new Date().toISOString() };
       try {
         await fetch(`${BIKAT_ANNOUNCEMENTS}/${id}.json`, { method: 'PUT', body: JSON.stringify(obj) });
         bikatAnnouncements[id] = obj;
@@ -3879,6 +4033,25 @@
         eduRenderAdmin();
         notifyUser("✅ ማስታወቂያው ለሁሉም ተማሪዎች እንዲታይ ተለጥፏል! 🔔");
       } catch(e) { notifyUser("ስህተት ተፈጥሯል!"); }
+    }
+
+    async function eduAdminDeleteAnnouncement(annId) {
+      if (!confirm("ይህን ማስታወቂያ ማጥፋት ይፈልጋሉ?")) return;
+      try {
+        await fetch(`${BIKAT_ANNOUNCEMENTS}/${annId}.json`, { method: 'DELETE' });
+        delete bikatAnnouncements[annId];
+        eduRenderLatestNotification();
+        eduRenderAdmin();
+      } catch(e) {}
+    }
+
+    async function eduAdminDeleteFeedback(fbId) {
+      if (!confirm("ይህን አስተያየት ማጥፋት ይፈልጋሉ?")) return;
+      try {
+        await fetch(`${BIKAT_FEEDBACKS}/${fbId}.json`, { method: 'DELETE' });
+        delete bikatFeedbacks[fbId];
+        eduRenderAdmin();
+      } catch(e) {}
     }
 
     function eduShareAnnouncementToChannel() {
@@ -3902,13 +4075,45 @@
       const subSet = [...new Set(bikatQuestions.map(q => q.subject))];
       document.getElementById('eaSubjectList').innerHTML = subSet.map(s => `<option value="${escAttr(s)}">`).join('');
 
+      // Populate Target Quiz/Exam Dropdown in Notify Tab
+      const notifTargetSel = document.getElementById('eaNotifTargetSelect');
+      if (notifTargetSel) {
+        const curVal = notifTargetSel.value;
+        const targetKeys = new Set();
+        const targetOpts = [`<option value="">-- ምንም (General Notification Only) --</option>`];
+        bikatQuestions.forEach(q => {
+          const cat = q.content_category || 'chapter';
+          const lev = q.level || 'All';
+          const str = q.stream || 'All';
+          const sub = q.subject || 'Weekly Exam';
+          const ch = q.chapter || '';
+          const k = `${cat}|${lev}|${str}|${sub}|${ch}`;
+          if (!targetKeys.has(k) && ch) {
+            targetKeys.add(k);
+            const icon = cat === 'weekly_exam' ? '🔥' : (cat === 'subject_exam' ? '📝' : '📑');
+            targetOpts.push(`<option value="${escAttr(k)}">${icon} ${escHtml(lev)} (${escHtml(str)}) • ${escHtml(sub)} → ${escHtml(ch)}</option>`);
+          }
+        });
+        notifTargetSel.innerHTML = targetOpts.join('');
+        if (curVal) notifTargetSel.value = curVal;
+      }
+
       // Past Announcements
       const annBox = document.getElementById('eaPastNotifs');
       const annKeys = Object.keys(bikatAnnouncements || {}).sort().reverse().slice(0, 5);
-      annBox.innerHTML = annKeys.length ? `<h4 style="font-size:0.8rem; margin-bottom:6px;">የቅርብ ማስታወቂያዎች</h4>` + annKeys.map(k => `
-        <div style="background:#F9FAFB; padding:8px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.76rem;">
-          <div style="white-space:pre-wrap;">${escHtml(bikatAnnouncements[k].text)}</div>
-        </div>`).join('') : '';
+      annBox.innerHTML = annKeys.length ? `<h4 style="font-size:0.8rem; margin-bottom:6px;">የቅርብ ማስታወቂያዎች</h4>` + annKeys.map(k => {
+        const ann = bikatAnnouncements[k];
+        const linkedBadge = (ann.target && ann.target.chapter)
+          ? `<div style="margin-top:4px; font-size:0.7rem; color:var(--edu-accent); font-weight:700;">🔗 Linked: ${escHtml(ann.target.subject || '')} → ${escHtml(ann.target.chapter)}</div>`
+          : '';
+        return `<div style="background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.76rem; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <div style="flex:1; min-width:0;">
+            <div style="white-space:pre-wrap;">${escHtml(ann.text)}</div>
+            ${linkedBadge}
+          </div>
+          <button type="button" style="background:var(--danger); color:white; border:none; padding:4px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer; flex-shrink:0;" onclick="eduAdminDeleteAnnouncement('${escAttr(k)}')">🗑</button>
+        </div>`;
+      }).join('') : '';
 
       // Payments
       const payBox = document.getElementById('eduAdminPaymentsList');
@@ -3998,6 +4203,34 @@
             <button style="background:${s.is_vip == 1 ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${s.is_vip == 1 ? 0 : 1})">${s.is_vip == 1 ? 'Un-VIP' : 'VIP'}</button>
           </div>
         </div>`).join('');
+
+      // Student Feedbacks list (next to Students tab)
+      const fbArr = Object.values(bikatFeedbacks || {}).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const fbTabBtn = document.getElementById('eaFeedbackTabBtn');
+      if (fbTabBtn) fbTabBtn.innerText = fbArr.length ? `💬 Feedback (${fbArr.length})` : '💬 Feedback';
+      const fbBox = document.getElementById('eduAdminFeedbackList');
+      if (fbBox) {
+        if (fbArr.length === 0) {
+          fbBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center; padding:12px;">እስካሁን የተላከ አስተያየት የለም።</p>';
+        } else {
+          fbBox.innerHTML = fbArr.map(fb => `
+            <div style="background:var(--surface); padding:10px 12px; border-radius:10px; border:1px solid var(--border); margin-bottom:8px; font-size:0.8rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px; margin-bottom:4px;">
+                <div>
+                  <b>${escHtml(fb.user_name || 'ተማሪ')}</b>
+                  <span style="color:var(--edu-accent); font-size:0.72rem;">${fb.username ? '@' + escHtml(fb.username) : ''}</span>
+                  <div style="font-size:0.7rem; color:var(--gray);">📍 ${escHtml(fb.source || 'Profile')} • 📚 ${escHtml(fb.education_level || '-')}</div>
+                </div>
+                <small style="color:var(--gray); font-size:0.66rem; white-space:nowrap;">${fb.date ? new Date(fb.date).toLocaleDateString() : ''}</small>
+              </div>
+              <div style="background:var(--card-bg); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin:6px 0; white-space:pre-wrap; line-height:1.45;">${escHtml(fb.text)}</div>
+              <div style="display:flex; gap:6px; justify-content:flex-end;">
+                <button style="background:#2563EB; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:0.72rem; font-weight:bold; cursor:pointer;" onclick="contactDirect('${escAttr(fb.username)}', 'ሰላም ${escAttr(fb.user_name || 'ተማሪ')}! ስለ BIKAT አስተያየትዎ እናመሰግናለን።', '${escAttr(fb.user_id)}')">💬 Chat</button>
+                <button style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:6px; font-size:0.72rem; font-weight:bold; cursor:pointer;" onclick="eduAdminDeleteFeedback('${escAttr(fb.id)}')">🗑 Delete</button>
+              </div>
+            </div>`).join('');
+        }
+      }
     }
 
     async function eduAdminApprovePay(payId, status) {
