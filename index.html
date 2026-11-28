@@ -1430,8 +1430,9 @@
                 <div class="form-group">
                   <label>ስትሪም (Stream)</label>
                   <select id="eaStream" onchange="eduAdminRefreshSubjectSelect()">
-                    <option value="Natural">Natural</option>
-                    <option value="Social">Social</option>
+                    <option value="Natural">🧬 Natural</option>
+                    <option value="Social">📖 Social</option>
+                    <option value="Both">🔄 N/S (Natural & Social)</option>
                     <option value="All" id="eaStreamAllOpt" style="display:none;">All (ሁሉም)</option>
                   </select>
                 </div>
@@ -2589,6 +2590,20 @@
       return `${y}-${m}-${day}`;
     }
 
+    function eduStreamMatches(qStream, targetStream) {
+      if (!targetStream || targetStream === 'All' || targetStream === 'Both' || targetStream === 'N/S') return true;
+      const qs = String(qStream || '').trim();
+      if (!qs || qs === 'None' || qs === 'All' || qs === 'Both' || qs === 'N/S') return true;
+      return qs === targetStream;
+    }
+
+    function eduFormatStreamLabel(streamVal) {
+      const s = String(streamVal || '').trim();
+      if (s === 'Both' || s === 'N/S') return 'N/S (Natural & Social)';
+      if (s === 'All' || s === 'None' || !s) return 'All';
+      return s;
+    }
+
     function eduSetLoadStatus(msg) {
       const el = document.getElementById('eduLoading');
       if (!el) return;
@@ -2920,7 +2935,12 @@
       const resolvedChapter = (matchedQ && matchedQ.chapter) ? matchedQ.chapter : targetChap;
 
       if (resolvedLevel && resolvedLevel !== 'All') eduNav.level = resolvedLevel;
-      if (resolvedStream && resolvedStream !== 'All' && resolvedStream !== 'None') eduNav.stream = resolvedStream;
+      if (resolvedStream && resolvedStream !== 'All' && resolvedStream !== 'None' && resolvedStream !== 'Both' && resolvedStream !== 'N/S') {
+        eduNav.stream = resolvedStream;
+      } else if (!eduNav.stream) {
+        const parsedMe = eduParseLevelStream(myStudent?.education_level);
+        eduNav.stream = parsedMe ? parsedMe.stream : 'Natural';
+      }
       if (resolvedSubject) eduNav.subject = resolvedSubject;
       eduNav.chapter = resolvedChapter;
       eduSetStepper(3);
@@ -3113,7 +3133,7 @@
           String(u.subject || '').toLowerCase() === String(subject).toLowerCase() &&
           String(u.chapter || '').toLowerCase() === String(chapter).toLowerCase() &&
           (!u.level || !lev || u.level === lev) &&
-          (!u.stream || !str || u.stream === 'None' || u.stream === str)
+          (!u.stream || !str || eduStreamMatches(u.stream, str))
         );
         if (found) return true;
       }
@@ -3327,7 +3347,7 @@
       const weeklyQs = bikatQuestions.filter(q => {
         if (q.content_category !== 'weekly_exam') return false;
         if (filterLevel && q.level && q.level !== 'All' && q.level !== filterLevel) return false;
-        if (filterStream && q.stream && q.stream !== 'All' && q.stream !== 'None' && q.stream !== filterStream) return false;
+        if (filterStream && !eduStreamMatches(q.stream, filterStream)) return false;
         return true;
       });
       const map = {};
@@ -3361,7 +3381,8 @@
           } else {
             statusTag = `<span style="color:var(--gold); font-weight:700;">⏳ ይጠብቁ • ⏱ ${meta.duration_min} ደቂቃ</span>`;
           }
-          const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${ex.stream && ex.stream !== 'All' && ex.stream !== 'None' ? ' ' + ex.stream : ''}`;
+          const strTag = (ex.stream === 'Both' || ex.stream === 'N/S') ? ' N/S' : (ex.stream && ex.stream !== 'All' && ex.stream !== 'None' ? ' ' + ex.stream : '');
+          const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${strTag}`;
           return `<button class="edu-list-btn" style="margin-bottom:8px;" onclick="eduOpenWeeklyExam('${escAttr(ex.level)}', '${escAttr(ex.stream)}', '${escAttr(ex.title)}')">
             <div>
               <div>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.questions.length} ጥያቄ • ${escHtml(tag)})</small></div>
@@ -3487,7 +3508,7 @@
         const qCat = q.content_category || 'chapter';
         if (category && qCat !== category) return false;
         if (level && level !== 'All' && q.level !== level) return false;
-        if (stream && stream !== 'All' && q.stream && q.stream !== 'None' && q.stream !== 'All' && q.stream !== stream) return false;
+        if (!eduStreamMatches(q.stream, stream)) return false;
         if (subject && q.subject !== subject) return false;
         if (chapter && q.chapter !== chapter) return false;
         return true;
@@ -3501,7 +3522,7 @@
         const qCat = q.content_category || 'chapter';
         if (qCat === 'weekly_exam') return false;
         if (q.level !== eduNav.level) return false;
-        if (eduNav.stream && q.stream && q.stream !== 'None' && q.stream !== eduNav.stream) return false;
+        if (!eduStreamMatches(q.stream, eduNav.stream)) return false;
         return true;
       });
       const subjects = [...new Set(qs.map(q => q.subject))];
@@ -5107,7 +5128,7 @@
 
       const qs = bikatQuestions.filter(q =>
         (q.content_category || 'chapter') !== 'weekly_exam' &&
-        q.level === level && (q.stream === stream || q.stream === 'None')
+        q.level === level && (q.stream === stream || q.stream === 'None' || (stream === 'Both' && (q.stream === 'All' || q.stream === 'N/S')))
       );
       const subs = [...new Set(qs.map(q => q.subject))];
 
@@ -5172,7 +5193,7 @@
 
       const qs = bikatQuestions.filter(q =>
         (q.content_category || 'chapter') === cat &&
-        q.level === level && (q.stream === stream || q.stream === 'None') && q.subject === subSel
+        q.level === level && (q.stream === stream || q.stream === 'None' || (stream === 'Both' && (q.stream === 'All' || q.stream === 'N/S'))) && q.subject === subSel
       );
       const chCounts = {};
       qs.forEach(q => { chCounts[q.chapter] = (chCounts[q.chapter] || 0) + 1; });
@@ -5325,7 +5346,8 @@
       if (!lastAddedBatch) return;
       const { cat, level, stream, subject, chapter, count } = lastAddedBatch;
       const header = cat === 'chapter' ? '🔥 አዲስ ጥያቄዎች ተጭነዋል!' : '📝 አዲስ ፈተና (Exam) ተጭኗል!';
-      const text = `${header}\n\n📚 ክፍል: ${level} (${stream})\n📘 ትምህርት: ${subject}\n📑 ${cat === 'chapter' ? 'ምዕራፍ' : 'ፈተና'}: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
+      const streamLbl = eduFormatStreamLabel(stream);
+      const text = `${header}\n\n📚 ክፍል: ${level} (${streamLbl})\n📘 ትምህርት: ${subject}\n📑 ${cat === 'chapter' ? 'ምዕራፍ' : 'ፈተና'}: ${chapter}\n➕ የገቡ ጥያቄዎች: ${count}\n\nአሁኑኑ ገብተው በመስራት ነጥብዎን ያሳድጉ! 🚀`;
       await eduPublishAnnouncementText(text, { cat, level, stream, subject, chapter });
       document.getElementById('eaLastSavedBox').style.display = 'none';
     }
@@ -5534,7 +5556,7 @@
         }).join('');
       }
 
-      // Stats, Free/Paid Toggle & Bulk Delete
+      // Stats, Stream (N/S), Free/Paid Toggle & Bulk Delete
       const statsMap = {};
       bikatQuestions.forEach(q => {
         const cat = q.content_category || 'chapter';
@@ -5555,6 +5577,13 @@
           const nextType = isAllPaid ? 'free' : 'paid';
           const toggleLabel = isAllPaid ? '🆓 Set Free' : '🔒 Set Paid';
           const toggleBg = isAllPaid ? '#10B981' : '#F59E0B';
+
+          // Stream button (Natural -> N/S Both -> Social -> Natural)
+          const isBothStream = (str === 'Both' || str === 'All' || str === 'None' || str === 'N/S');
+          const streamBtnLabel = isBothStream ? '🔄 N/S' : (str === 'Social' ? '📖 S' : '🧬 N');
+          const streamBtnBg = isBothStream ? '#4F46E5' : (str === 'Social' ? '#0284C7' : '#0D9488');
+          const strDisplay = isBothStream ? 'N/S (ሁለቱም)' : str;
+
           const catBadge = cat === 'weekly_exam' ? '🔥 Weekly' : (cat === 'subject_exam' ? '📝 Exam' : '📚 Chap');
           let weeklyControlRow = '';
           if (cat === 'weekly_exam') {
@@ -5572,10 +5601,11 @@
           return `<div style="background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
               <div style="flex:1; min-width:0;">
-                <b>${catBadge}</b> • ${escHtml(lev)} (${escHtml(str)}) • ${escHtml(sub)}<br>
+                <b>${catBadge}</b> • ${escHtml(lev)} (${escHtml(strDisplay)}) • ${escHtml(sub)}<br>
                 <small style="color:var(--gray);">${escHtml(ch)} (${info.total} ጥያቄ • ${statusBadge})</small>
               </div>
-              <div style="display:flex; gap:4px; flex-shrink:0;">
+              <div style="display:flex; gap:4px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end;">
+                <button title="Change Stream: Natural / Social / N/S (Both)" style="background:${streamBtnBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminCycleChapterStream('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">${streamBtnLabel}</button>
                 <button style="background:${toggleBg}; color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;" onclick="eduAdminToggleChapterType('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}','${nextType}')">${toggleLabel}</button>
                 <button style="background:var(--danger); color:white; border:none; padding:5px 7px; border-radius:6px; font-size:0.7rem; cursor:pointer;" onclick="eduAdminDeleteChapter('${escAttr(cat)}','${escAttr(lev)}','${escAttr(str)}','${escAttr(sub)}','${escAttr(ch)}')">🗑</button>
               </div>
@@ -5652,6 +5682,44 @@
       document.getElementById('eaDeleteIdInput').value = '';
       notifyUser(`✅ ጥያቄ ${target} ጠፍቷል!`);
       await eduLoadAllData();
+    }
+
+    async function eduAdminCycleChapterStream(cat, lev, str, sub, ch) {
+      // Cycle: Natural -> Both (N/S) -> Social -> Natural
+      let nextStream = 'Both';
+      let nextLabel = '🔄 N/S (በሁለቱም Natural እና Social ላይ)';
+      if (str === 'Both' || str === 'All' || str === 'None' || str === 'N/S') {
+        nextStream = 'Social';
+        nextLabel = '📖 Social ብቻ';
+      } else if (str === 'Social') {
+        nextStream = 'Natural';
+        nextLabel = '🧬 Natural ብቻ';
+      }
+
+      if (!confirm(`የ ${sub} - ${ch} ስትሪም ወደ ${nextLabel} ይቀየር?`)) return;
+      const toUpdate = bikatQuestions.filter(q =>
+        (q.content_category || 'chapter') === cat &&
+        q.level === lev &&
+        String(q.stream || '') === String(str) &&
+        q.subject === sub &&
+        q.chapter === ch
+      );
+      if (toUpdate.length === 0) return;
+
+      try {
+        await Promise.all(toUpdate.map(q =>
+          fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ stream: nextStream })
+          })
+        ));
+        toUpdate.forEach(q => { q.stream = nextStream; });
+        eduSaveLocalCache();
+        notifyUser(`✅ ${toUpdate.length} ጥያቄዎች ወደ ${nextLabel} ተቀይረዋል!`);
+        eduRenderAdmin();
+      } catch(e) {
+        notifyUser("ስህተት ተፈጥሯል፣ እንደገና ይሞክሩ!");
+      }
     }
 
     async function eduAdminToggleChapterType(cat, lev, str, sub, ch, newType) {
@@ -5767,12 +5835,19 @@
           const qCat = foundQ.content_category || 'chapter';
           if (qCat === 'weekly_exam') {
             eduOpenWeeklyExam(foundQ.level || 'All', foundQ.stream || 'All', foundQ.chapter);
-          } else if (qCat === 'subject_exam') {
-            eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'subject_exam' };
-            eduSelectSubjectExam(foundQ.chapter);
           } else {
-            eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'chapter' };
-            eduSelectChapter(foundQ.chapter);
+            const parsedMe = eduParseLevelStream(myStudent?.education_level);
+            const fallbackStream = parsedMe ? parsedMe.stream : 'Natural';
+            const cleanStream = (foundQ.stream && foundQ.stream !== 'Both' && foundQ.stream !== 'All' && foundQ.stream !== 'None' && foundQ.stream !== 'N/S')
+              ? foundQ.stream
+              : fallbackStream;
+            if (qCat === 'subject_exam') {
+              eduNav = { level: foundQ.level, stream: cleanStream, subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'subject_exam' };
+              eduSelectSubjectExam(foundQ.chapter);
+            } else {
+              eduNav = { level: foundQ.level, stream: cleanStream, subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'chapter' };
+              eduSelectChapter(foundQ.chapter);
+            }
           }
         } else {
           eduRenderInitialQuizView();
