@@ -777,6 +777,81 @@
     }
     .edu-step-arrow { color: var(--gray); opacity: 0.45; font-weight: 800; flex-shrink: 0; user-select: none; }
 
+    /* Weekly Exam Neutral Selected State & Question Pills */
+    .quiz-opt-btn.selected-exam {
+      background: var(--edu-bg);
+      border-color: var(--edu-accent);
+      box-shadow: 0 0 0 1.5px var(--edu-accent);
+    }
+    .quiz-opt-btn.selected-exam .opt-letter {
+      background: var(--edu-accent);
+      color: white;
+    }
+    .exam-q-pills {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px;
+    }
+    .exam-q-pill {
+      min-width: 28px; height: 28px; padding: 0 6px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--gray);
+      font-size: 0.72rem; font-weight: 800; cursor: pointer;
+    }
+    .exam-q-pill.answered {
+      background: var(--edu-bg); color: var(--edu-accent); border-color: var(--edu-accent);
+    }
+    .exam-q-pill.current {
+      background: var(--edu-accent); color: white; border-color: var(--edu-accent);
+    }
+
+    /* Daily Progress Analytics, Donut Chart, Forex Graph & Weakness Detector */
+    .analytics-cmp-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+    }
+    .analytics-cmp-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 10px;
+    }
+    .analytics-cmp-label {
+      font-size: 0.7rem; font-weight: 700; color: var(--gray); margin-bottom: 4px;
+    }
+    .analytics-cmp-val {
+      font-size: 1.28rem; font-weight: 900; color: var(--text); line-height: 1.2;
+    }
+    .analytics-cmp-sub {
+      font-size: 0.68rem; color: var(--gray); margin-top: 3px;
+    }
+    .delta-pill {
+      display: inline-flex; align-items: center; gap: 3px;
+      margin-top: 5px; padding: 2px 8px; border-radius: 999px;
+      font-size: 0.66rem; font-weight: 800;
+    }
+    .delta-pill.up { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    body[data-theme="dark"] .delta-pill.up { color: #6EE7B7; }
+    .delta-pill.down { background: rgba(239, 68, 68, 0.15); color: #DC2626; }
+    body[data-theme="dark"] .delta-pill.down { color: #FCA5A5; }
+    .delta-pill.neutral { background: rgba(100, 116, 139, 0.14); color: var(--gray); }
+
+    .donut-wrap {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px; margin-bottom: 12px;
+    }
+    .forex-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 12px; margin-bottom: 12px;
+    }
+    .weakness-item {
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      border-left: 4px solid var(--danger);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+    }
+    .strength-item {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-left: 4px solid var(--secondary);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+    }
+
     /* Interactive Tutorial / Onboarding Modal */
     .guide-step-card {
       display: flex; align-items: flex-start; gap: 12px;
@@ -791,6 +866,50 @@
     }
     .guide-step-num.shop-num {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    /* =========================================
+       PROGRESSIVE / STEP-BY-STEP LOADING SKELETONS
+       ========================================= */
+    @keyframes skelShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skel-box {
+      background: linear-gradient(90deg, var(--surface) 25%, rgba(148, 163, 184, 0.22) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: skelShimmer 1.35s infinite linear;
+      border-radius: 12px;
+    }
+    .skel-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .skel-prod-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .stage-load-pill {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--edu-bg); color: var(--edu-accent);
+      border: 1px solid rgba(79, 70, 229, 0.22);
+      padding: 8px 12px; border-radius: 12px; font-size: 0.76rem; font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .stage-load-pill.shop-pill {
+      background: rgba(16, 185, 129, 0.12); color: var(--primary);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    body[data-theme="dark"] .stage-load-pill.shop-pill { color: var(--secondary); }
+    @keyframes miniSpin {
+      to { transform: rotate(360deg); }
+    }
+    .mini-spinner {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid currentColor; border-top-color: transparent;
+      animation: miniSpin 0.7s linear infinite; flex-shrink: 0;
     }
   </style>
 </head>
@@ -1146,32 +1265,45 @@
 
       <!-- EDU VIP & FREE SHORT NOTES VIEW -->
       <div id="view-edu-vip" class="view">
-        <!-- Single Subject VIP (30 ETB / 2 Months) -->
+        <!-- Single Subject VIP (50 ETB / 1 Month or 5 Invites) -->
         <div class="section-card" style="border-color:var(--edu-accent);">
-          <h3 style="color:var(--edu-accent); margin-bottom:6px;">📘 የ1 ትምህርት VIP (30 ብር / ለ1 ወር)</h3>
+          <h3 style="color:var(--edu-accent); margin-bottom:6px;">📘 የ1 ሙሉ ትምህርት VIP (50 ብር / ለ1 ወር)</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            🔓 በመረጡት 1 ስትሪም ውስጥ ለ <b>1 የትምህርት ዓይነት (Subject)</b> ብቻ ለ1 ወር ያለ ገደብ መዳረሻ!<br>
-            💡 <i>ወይም 50 ነጥብ በመሙላት / 5 ጓደኛ በመጋበዝ 1 ትምህርት ለ1 ወር በነፃ መክፈት ይችላሉ።</i>
+            🔓 የመረጡትን <b>1 ሙሉ ትምህርት (Subject)</b> ሁሉንም ምዕራፎች እና ፈተናዎች ለ<b>1 ወር</b> ያለ ገደብ ይከፍታል!<br>
+            🎁 <i>ወይም <b>5 ጓደኞችን በመጋበዝ</b> 1 ሙሉ ትምህርት ለ1 ወር በነፃ መክፈት ይችላሉ።</i>
           </p>
           <div class="form-group" style="margin-top:8px;">
             <label>የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology, Physics)</label>
             <input type="text" id="eduVipSubjectInput" list="eaSubjectList" placeholder="ትምህርት ይምረጡ ወይም ይጻፉ...">
           </div>
-          <button class="btn-action btn-edu" onclick="eduStartSingleSubjectVip()">📸 Send 1-Subject Receipt (30 ETB)</button>
+          <button class="btn-action btn-edu" onclick="eduStartSingleSubjectVip()">📸 Send 1-Subject Receipt (50 ETB)</button>
+          <div id="eduInviteClaimBox" style="margin-top:8px;"></div>
         </div>
 
-        <!-- Full VIP (100 ETB / All Subjects) -->
+        <!-- Full Semester VIP (150 ETB / All Subjects Full Semester) -->
         <div class="section-card" style="background:var(--gold-bg); border-color:var(--gold);">
-          <h3 style="color:var(--gold); margin-bottom:6px;">👑 FULL VIP — ሁሉም ትምህርቶች (100 ብር)</h3>
+          <h3 style="color:var(--gold); margin-bottom:6px;">👑 FULL SEMESTER VIP — ሁሉም ትምህርቶች (150 ብር)</h3>
           <p style="font-size:0.8rem; color:var(--text); line-height:1.5;">
-            🔓 <b>ሁሉንም የትምህርት ዓይነቶች</b> እና የተቆለፉ (Paid) ጥያቄዎች ያለ ገደብ ይሰራሉ!<br>
+            🔓 <b>ሁሉንም የትምህርት ዓይነቶች</b>፣ ምዕራፎች እና ፈተናዎች ለ<b>ሙሉ Semester</b> ያለ ገደብ ይከፍታል!<br>
             🔓 Remedial እና Freshman (Natural & Social) ሁሉም ትምህርቶች ይከፈታሉ!
           </p>
           <div class="payment-box">
             🏦 <b>ንግድ ባንክ (CBE):</b> <code>1000649943188</code> (በሶራ ታጁ)<br>
             📱 <b>ቴሌብር (Telebirr):</b> <code>0948944979</code> (በሶራ ታጁ)
           </div>
-          <button class="btn-action" style="background:var(--gold); color:white;" onclick="eduOpenPaymentModal('full_vip', 'Full VIP (All Subjects)', 'All Streams', '100 ብር', 'ALL')">📸 Send Full VIP Receipt (100 ETB)</button>
+          <button class="btn-action" style="background:var(--gold); color:white;" onclick="eduOpenPaymentModal('full_vip', 'Full Semester VIP (All Subjects)', 'ሙሉ Semester (Full Semester)', '150 ብር', 'ALL')">📸 Send Full Semester Receipt (150 ETB)</button>
+        </div>
+
+        <!-- Progressive Point-Based Chapter Unlocks -->
+        <div class="section-card" style="border-color:var(--secondary);">
+          <h3 style="color:var(--primary); margin-bottom:6px;">🎯 በነጥብ ምዕራፍ (Unit) መክፈቻ</h3>
+          <p style="font-size:0.78rem; color:var(--gray); line-height:1.55; margin-bottom:8px;">
+            ጥያቄ እየሰሩ ነጥብ ሲያጠራቅሙ ነጥብ ባገኙበት ትምህርት <b>ቀጣዩ 1 ምዕራፍ</b> በራሱ ይከፈትልዎታል፦<br>
+            • <b>50 ነጥብ</b> ሲደርሱ → ቀጣይ 1 ምዕራፍ ለ<b>15 ቀን</b><br>
+            • <b>150 ነጥብ</b> (+100) ሲደርሱ → ቀጣይ 1 ምዕራፍ ለ<b>1 ወር</b><br>
+            • <b>300 ነጥብ</b> (+150) ሲደርሱ → ቀጣይ 1 ምዕራፍ ለ<b>1 ወር</b>
+          </p>
+          <div id="eduMilestoneProgressBox" style="font-size:0.78rem; font-weight:700; color:var(--edu-accent);"></div>
         </div>
 
         <!-- FREE Short Notes -> Main BIKAT Channel -->
@@ -1195,7 +1327,7 @@
         <div class="section-card">
           <h3 style="color:var(--edu-accent); margin-bottom:6px;">🎁 ጓደኞችን በመጋበዝ ነፃ መዳረሻ ያግኙ!</h3>
           <p style="font-size:0.8rem; color:var(--gray); line-height:1.5;">
-            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> ወይም <b>50 ነጥብ</b> ሲሞሉ ለ <b>1 ትምህርት (Subject)</b> ለ<b>1 ወር</b> ያለ ገደብ ነፃ መዳረሻ ይከፈትልዎታል።
+            ጓደኛዎ በሊንክዎ ሲገባ <b>+2 ነጥብ</b> ያገኛሉ! <b>5 ሰው ሲጋብዙ</b> የመረጡትን <b>1 ሙሉ ትምህርት (Subject)</b> ለ<b>1 ወር</b> በነፃ ይከፍታሉ።
           </p>
           <div class="copy-box">
             <input type="text" id="eduRefLinkInput" readonly>
@@ -1220,6 +1352,7 @@
             <button class="lb-tab" onclick="eduSwitchLbPeriod('weekly', this)">Weekly</button>
             <button class="lb-tab" onclick="eduSwitchLbPeriod('monthly', this)">Monthly</button>
             <button class="lb-tab active" onclick="eduSwitchLbPeriod('all', this)">All Time</button>
+            <button class="lb-tab" onclick="eduSwitchLbPeriod('weekly_exam', this)">🔥 Weekly Exam</button>
           </div>
           <div id="eduLbPodium" class="lb-podium"></div>
           <div id="eduLeaderboardList" class="lb-list-panel"></div>
@@ -1229,6 +1362,7 @@
       <!-- EDU PROFILE VIEW -->
       <div id="view-edu-profile" class="view">
         <div class="section-card" id="eduProfileCard"></div>
+        <div class="section-card" id="eduProgressAnalyticsCard"></div>
 
         <!-- Direct Feedback Box on Profile -->
         <div class="section-card" style="border-color:rgba(79, 70, 229, 0.25);">
@@ -1385,6 +1519,9 @@
 
           <!-- STUDENTS LIST -->
           <div id="ea-students" class="p-content">
+            <div class="form-group" style="margin-bottom:10px;">
+              <input type="text" id="eaStudentSearchInput" placeholder="🔍 ተማሪ ፈልግ (በስም፣ @username ወይም ID)..." oninput="eduRenderAdminStudentsList()">
+            </div>
             <div id="eduAdminStudentsList"></div>
           </div>
 
@@ -1532,6 +1669,22 @@
     </div>
   </div>
 
+  <!-- ADMIN STUDENT PROGRESS & COACHING MODAL -->
+  <div id="studentProgressModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="eduCloseStudentProgressModal()">&times;</span>
+      <div id="studentProgressModalBody"></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY EXAM ANSWER KEY & REVIEW MODAL -->
+  <div id="weeklyExamReviewModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="eduCloseWeeklyReviewModal()">&times;</span>
+      <div id="weeklyExamReviewBody"></div>
+    </div>
+  </div>
+
   <!-- INTERACTIVE QUICK GUIDE / TUTORIAL MODAL -->
   <div id="guideModal" class="modal">
     <div class="modal-content">
@@ -1564,8 +1717,8 @@
         <div class="guide-step-card">
           <div class="guide-step-num">3</div>
           <div>
-            <strong style="font-size:0.86rem;">Earn Points & Unlock VIP</strong>
-            <p style="font-size:0.78rem; color:var(--gray); margin-top:2px;">Every correct answer gives <b>+2 points</b>. Reach <b>50 points</b> or invite <b>5 friends</b> to unlock a subject for 1 month free!</p>
+            <strong style="font-size:0.86rem;">Earn Points & Unlock Chapters / VIP</strong>
+            <p style="font-size:0.78rem; color:var(--gray); margin-top:2px;">Reach <b>50 pts</b> (15 days), <b>150 pts</b> (1 month), or <b>300 pts</b> (1 month) to unlock the next chapter! Invite <b>5 friends</b> or pay <b>50 ETB</b> for 1 full subject (1 month), or <b>150 ETB</b> for Full Semester VIP.</p>
           </div>
         </div>
       </div>
@@ -1724,6 +1877,7 @@
       if (mode === 'shop') {
         document.getElementById('headerTitle').innerText = 'Wolkite Shop';
         document.getElementById('headerSub').innerText = 'Wolkite University Student Marketplace';
+        if (!shopDataLoaded) loadAllData();
       } else {
         document.getElementById('headerTitle').innerText = 'BIKAT Education';
         document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
@@ -1740,6 +1894,11 @@
     // =========================================================================
     let products = []; let shops = {}; let orders = {}; let totalBotUsers = 0; let offers = {};
     let myShop = null;
+    let shopDataLoaded = false;
+    let shopAdminOrdersLoaded = false;
+    let currentFilteredProducts = [];
+    let renderedProductLimit = 8;
+    const SHOP_PAGE_SIZE = 8;
     let uploadedImages = ["", "", ""];
     let uploadedAvatarBase64 = "";
     let editingProductId = null; let editingProductImageBase64 = "";
@@ -1769,6 +1928,9 @@
       document.getElementById(`view-${viewName}`).classList.add('active');
       if(btn) btn.classList.add('active');
       requestAnimationFrame(() => updateNavIndicator('navBarShop'));
+      if (viewName === 'profile' && !shopAdminOrdersLoaded) {
+        loadShopOrdersAndAdminData();
+      }
     }
 
     async function trackUser() {
@@ -1780,22 +1942,111 @@
       } catch(e) {}
     }
 
-    async function loadAllData() {
-      document.getElementById('loadingIndicator').style.display = 'block';
+    function shopHydrateFromCache() {
       try {
-        const [resP, resS, resO, resU, resOf] = await Promise.all([
-          fetch(`${FIREBASE_PRODUCTS}.json`), fetch(`${FIREBASE_SHOPS}.json`),
-          fetch(`${FIREBASE_ORDERS}.json`), fetch(`${FIREBASE_USERS}.json`), fetch(`${FIREBASE_OFFERS}.json`)
-        ]);
-        const dataP = await resP.json(); const dataS = await resS.json(); const dataO = await resO.json(); const dataU = await resU.json(); const dataOf = await resOf.json();
-        products = []; if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
-        shops = dataS || {}; orders = dataO || {}; offers = dataOf || {};
-        const usersData = dataU || {}; totalBotUsers = Object.keys(usersData).length;
-        myShop = shops[currentUser.id] || null;
+        const cP = localStorage.getItem('wshop_cache_products');
+        const cS = localStorage.getItem('wshop_cache_shops');
+        const cO = localStorage.getItem('wshop_cache_offers');
+        if (cS) shops = JSON.parse(cS) || {};
+        if (cO) offers = JSON.parse(cO) || {};
+        if (cP) {
+          products = JSON.parse(cP) || [];
+          myShop = shops[currentUser.id] || null;
+          renderShopUI(); renderOffers(); filterProducts(); renderShopsGrid();
+          return products.length > 0;
+        }
       } catch(e) {}
-      document.getElementById('loadingIndicator').style.display = 'none';
-      renderShopUI(); filterProducts(); renderMyListings(); renderMyOrders(); renderOffers(); renderShopsGrid();
-      if(Number(currentUser.id) === ADMIN_ID) renderAdminDashboard();
+      return false;
+    }
+
+    function shopSaveCache() {
+      try {
+        localStorage.setItem('wshop_cache_offers', JSON.stringify(offers));
+        localStorage.setItem('wshop_cache_shops', JSON.stringify(shops));
+        // Cache top 14 products (lightweight) so instant reload never exceeds quota
+        const slimProds = products.slice(0, 14).map(p => ({
+          ...p,
+          images: p.images && p.images[0] ? [p.images[0]] : []
+        }));
+        localStorage.setItem('wshop_cache_products', JSON.stringify(slimProds));
+      } catch(e) {}
+    }
+
+    function shopShowSkeletons() {
+      const grid = document.getElementById('productGrid');
+      if (!grid || products.length > 0) return;
+      grid.innerHTML = [1, 2, 3, 4].map(() => `
+        <div class="skel-prod-card">
+          <div class="skel-box" style="height:138px; border-radius:0;"></div>
+          <div style="padding:11px;">
+            <div class="skel-box" style="height:13px; width:82%; margin-bottom:8px;"></div>
+            <div class="skel-box" style="height:11px; width:60%; margin-bottom:8px;"></div>
+            <div class="skel-box" style="height:15px; width:45%;"></div>
+          </div>
+        </div>`).join('');
+    }
+
+    async function loadShopOrdersAndAdminData() {
+      try {
+        const isAdmin = Number(currentUser.id) === ADMIN_ID;
+        const reqs = [fetch(`${FIREBASE_ORDERS}.json`)];
+        if (isAdmin) reqs.push(fetch(`${FIREBASE_USERS}.json`));
+        const [resO, resU] = await Promise.all(reqs);
+        orders = (await resO.json()) || {};
+        if (resU) {
+          const usersData = (await resU.json()) || {};
+          totalBotUsers = Object.keys(usersData).length;
+        }
+        shopAdminOrdersLoaded = true;
+        renderMyOrders();
+        if (isAdmin) renderAdminDashboard();
+      } catch(e) {}
+    }
+
+    // Step-by-step Shop Loading:
+    // Stage 1: Offers & Shops (fast) -> Stage 2: Products (8 items first) -> Stage 3: Orders/Admin (lazy)
+    async function loadAllData() {
+      const hasCache = shopHydrateFromCache();
+      const ind = document.getElementById('loadingIndicator');
+      if (ind) {
+        ind.innerHTML = `<div class="stage-load-pill shop-pill"><span class="mini-spinner"></span><span>ደረጃ 1/2: ሱቆች እና ቅናሾች በመጫን ላይ...</span></div>`;
+        ind.style.display = 'block';
+      }
+      if (!hasCache) shopShowSkeletons();
+
+      try {
+        // Stage 1: Fast offers & shops first
+        const [resOf, resS] = await Promise.all([
+          fetch(`${FIREBASE_OFFERS}.json`),
+          fetch(`${FIREBASE_SHOPS}.json`)
+        ]);
+        offers = (await resOf.json()) || {};
+        shops = (await resS.json()) || {};
+        myShop = shops[currentUser.id] || null;
+        renderShopUI();
+        renderOffers();
+
+        // Stage 2: Products
+        if (ind) {
+          ind.innerHTML = `<div class="stage-load-pill shop-pill"><span class="mini-spinner"></span><span>ደረጃ 2/2: እቃዎች በመጫን ላይ...</span></div>`;
+        }
+        const resP = await fetch(`${FIREBASE_PRODUCTS}.json`);
+        const dataP = await resP.json();
+        products = [];
+        if (dataP) Object.keys(dataP).forEach(key => products.push({ id: key, ...dataP[key] }));
+        shopDataLoaded = true;
+        shopSaveCache();
+      } catch(e) {}
+
+      if (ind) ind.style.display = 'none';
+      filterProducts();
+      renderMyListings();
+      renderShopsGrid();
+
+      // Stage 3: Load orders & admin analytics lazily only if needed
+      if (myShop || Number(currentUser.id) === ADMIN_ID) {
+        setTimeout(() => loadShopOrdersAndAdminData(), 350);
+      }
     }
 
     async function syncOldSellers() {
@@ -1904,7 +2155,7 @@
     }
 
     window.onclick = function(event) {
-      const modals = ['productModal', 'editShopModal', 'editProductModal', 'addOfferModal', 'orderPhoneModal', 'shareImageModal', 'eduPaymentModal', 'guideModal'];
+      const modals = ['productModal', 'editShopModal', 'editProductModal', 'addOfferModal', 'orderPhoneModal', 'shareImageModal', 'eduPaymentModal', 'guideModal', 'studentProgressModal', 'weeklyExamReviewModal'];
       modals.forEach(mId => {
         const el = document.getElementById(mId);
         if (event.target === el) {
@@ -1938,13 +2189,21 @@
       renderProducts(filtered);
     }
 
-    function renderProducts(items) {
-      const grid = document.getElementById('productGrid'); grid.innerHTML = '';
-      if(items.length === 0) { grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>'; return; }
+    function renderProducts(items, resetLimit = true) {
+      const grid = document.getElementById('productGrid');
+      if (resetLimit) renderedProductLimit = SHOP_PAGE_SIZE;
+      currentFilteredProducts = items;
+      grid.innerHTML = '';
+      if (items.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; color:var(--gray); grid-column: span 2; padding:20px;">በዚህ ማጣሪያ የተገኘ እቃ የለም።</p>';
+        return;
+      }
       items.sort((a, b) => { if(a.isPinned && !b.isPinned) return -1; if(!a.isPinned && b.isPinned) return 1; return (b.likes || 0) - (a.likes || 0); });
+      const visibleSlice = items.slice(0, renderedProductLimit);
       const isAdmin = (Number(currentUser.id) === ADMIN_ID);
       const userLikes = JSON.parse(localStorage.getItem('user_likes') || '[]');
-      items.forEach(p => {
+      let cardsHtml = '';
+      visibleSlice.forEach(p => {
         const isPinnedHtml = p.isPinned ? `<span class="status-badge badge-pinned">📌</span>` : '';
         const sellerShop = shops[p.sellerId];
         const sName = sellerShop ? sellerShop.name : (p.sellerName || 'ተማሪ ሻጭ');
@@ -1966,15 +2225,15 @@
             <button style="margin-top:4px; width:100%; background:var(--secondary); color:white; border:none; padding:4px; border-radius:4px;" onclick="postToChannel('${escAttr(p.id)}'); event.stopPropagation();">📢 Post to Channel</button>`;
         }
         const displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img || 'https://via.placeholder.com/150');
-        grid.innerHTML += `
+        cardsHtml += `
           <div class="product-card ${p.isPinned ? 'pinned' : ''}" onclick="openModal('${escAttr(p.id)}')" style="cursor:pointer;">
             ${isPinnedHtml}
             ${p.isSold ? `<span class="status-badge badge-sold">❌ ተሽጧል</span>` : ''}
-            <img src="${displayImg}" class="product-img">
+            <img src="${displayImg}" class="product-img" loading="lazy" decoding="async">
             <div class="product-info">
               <div class="product-title">${escHtml(p.title)}</div>
               <div class="product-shop" onclick="viewShop('${escAttr(p.sellerId)}'); event.stopPropagation();">
-                <img src="${sAvatar}" style="${avatarStyle}" alt="Avatar">
+                <img src="${sAvatar}" style="${avatarStyle}" alt="Avatar" loading="lazy">
                 ${escHtml(sName)} ${proHtml}
               </div>
               <div class="product-price">${escHtml(p.price || p.finalPrice || 0)} ETB</div>
@@ -1985,6 +2244,19 @@
             </div>
           </div>`;
       });
+      if (items.length > renderedProductLimit) {
+        const rem = items.length - renderedProductLimit;
+        cardsHtml += `
+          <div style="grid-column: span 2; text-align:center; padding:8px 0;">
+            <button type="button" class="btn-action btn-tg" onclick="loadMoreShopProducts()">⬇️ ተጨማሪ እቃዎችን አሳይ (${rem} ቀሪ)</button>
+          </div>`;
+      }
+      grid.innerHTML = cardsHtml;
+    }
+
+    function loadMoreShopProducts() {
+      renderedProductLimit += SHOP_PAGE_SIZE;
+      renderProducts(currentFilteredProducts, false);
     }
 
     function selectShopsCategory(cat, btn) {
@@ -2273,11 +2545,23 @@
     const BIKAT_EXAM_CONTROLS = `${DB_BASE}/bikat/exam_controls`;
     const BIKAT_FEEDBACKS = `${DB_BASE}/bikat/feedbacks`;
     function getPracticeSize(level) { return (level && level.toLowerCase().includes('rem')) ? 15 : 25; }
-    const BONUS_POINTS_THRESHOLD = 50;
-    const BONUS_INVITE_THRESHOLD = 5;
-    const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days (1 month)
+
+    // Progressive Point Milestones (each unlocks ONLY the next 1 chapter/unit)
+    const POINT_MILESTONES = [
+      { pts: 50,  days: 15, label: '15 ቀን' },
+      { pts: 150, days: 30, label: '1 ወር' },
+      { pts: 300, days: 30, label: '1 ወር' }
+    ];
+    const INVITE_THRESHOLD = 5;
+    const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days (1 month)
+    const SEMESTER_MS  = 120 * 24 * 60 * 60 * 1000;  // 120 days (1 semester)
 
     let eduDataLoaded = false;
+    let eduQuestionsLoaded = false;
+    let eduAllStudentsLoaded = false;
+    let eduPaymentsLoaded = false;
+    let eduFeedbacksLoaded = false;
+
     let bikatStudents = {};
     let bikatQuestions = [];
     let bikatPayments = {};
@@ -2291,7 +2575,116 @@
     let eduTimerInterval = null;
     let eduPendingPayment = null;
     let eduReceiptBase64 = "";
-    let lastAddedBatch = null; // { level, stream, subject, chapter, count }
+    let lastAddedBatch = null;
+
+    function eduSafeKey(str) {
+      return String(str || '').replace(/[.#$\[\]\/\\]/g, '_').trim();
+    }
+
+    function eduDateStr(offsetDays = 0) {
+      const d = new Date(Date.now() + offsetDays * 86400000);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function eduSetLoadStatus(msg) {
+      const el = document.getElementById('eduLoading');
+      if (!el) return;
+      if (!msg) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      } else {
+        el.innerHTML = `<div class="stage-load-pill"><span class="mini-spinner"></span><span>${escHtml(msg)}</span></div>`;
+        el.style.display = 'block';
+      }
+    }
+
+    function eduShowQuizSkeletons() {
+      const stage = document.getElementById('eduQuizStage');
+      if (!stage) return;
+      stage.innerHTML = [1, 2, 3, 4].map(() => `
+        <div class="skel-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="flex:1;">
+            <div class="skel-box" style="height:14px; width:58%; margin-bottom:6px;"></div>
+            <div class="skel-box" style="height:10px; width:36%;"></div>
+          </div>
+          <div class="skel-box" style="width:24px; height:24px; border-radius:50%;"></div>
+        </div>`).join('');
+    }
+
+    function eduSaveLocalCache() {
+      try {
+        if (myStudent) localStorage.setItem(`bikat_cache_stu_${currentUser.id}`, JSON.stringify(myStudent));
+        localStorage.setItem('bikat_cache_ann', JSON.stringify(bikatAnnouncements));
+        localStorage.setItem('bikat_cache_ec', JSON.stringify(bikatExamControls));
+        if (bikatQuestions.length > 0 && bikatQuestions.length <= 2500) {
+          const slimQs = bikatQuestions.map(q => {
+            const copy = { ...q };
+            delete copy.comments;
+            return copy;
+          });
+          localStorage.setItem('bikat_cache_qs', JSON.stringify(slimQs));
+        }
+      } catch(e) {}
+    }
+
+    function eduHydrateFromCache() {
+      let hydratedAny = false;
+      try {
+        const cStu = localStorage.getItem(`bikat_cache_stu_${currentUser.id}`);
+        const cAnn = localStorage.getItem('bikat_cache_ann');
+        const cEc = localStorage.getItem('bikat_cache_ec');
+        const cQs = localStorage.getItem('bikat_cache_qs');
+        if (cAnn) bikatAnnouncements = JSON.parse(cAnn) || {};
+        if (cEc) bikatExamControls = JSON.parse(cEc) || {};
+        if (cQs) {
+          const parsedQs = JSON.parse(cQs);
+          if (Array.isArray(parsedQs) && parsedQs.length > 0) {
+            bikatQuestions = parsedQs;
+            eduQuestionsLoaded = true;
+          }
+        }
+        if (cStu) {
+          myStudent = JSON.parse(cStu);
+          if (myStudent && myStudent.user_id) {
+            bikatStudents[currentUser.id] = myStudent;
+            hydratedAny = true;
+          }
+        }
+      } catch(e) {}
+      return hydratedAny;
+    }
+
+    async function eduEnsureAllStudentsLoaded(force = false) {
+      if (eduAllStudentsLoaded && !force) return;
+      try {
+        const resS = await fetch(`${BIKAT_STUDENTS}.json`);
+        const allS = (await resS.json()) || {};
+        bikatStudents = allS;
+        if (myStudent) bikatStudents[currentUser.id] = { ...(allS[currentUser.id] || {}), ...myStudent };
+        eduAllStudentsLoaded = true;
+      } catch(e) {}
+    }
+
+    async function eduEnsurePaymentsLoaded(force = false) {
+      if (eduPaymentsLoaded && !force) return;
+      try {
+        const resP = await fetch(`${BIKAT_PAYMENTS}.json`);
+        bikatPayments = (await resP.json()) || {};
+        eduPaymentsLoaded = true;
+      } catch(e) {}
+    }
+
+    async function eduEnsureFeedbacksLoaded(force = false) {
+      if (eduFeedbacksLoaded && !force) return;
+      try {
+        const resFB = await fetch(`${BIKAT_FEEDBACKS}.json`);
+        bikatFeedbacks = (await resFB.json()) || {};
+        eduFeedbacksLoaded = true;
+      } catch(e) {}
+    }
 
     function eduSwitchTab(viewId, btn) {
       document.querySelectorAll('#mode-edu .view').forEach(v => v.classList.remove('active'));
@@ -2299,10 +2692,35 @@
       document.getElementById(`view-${viewId}`).classList.add('active');
       if (btn) btn.classList.add('active');
       requestAnimationFrame(() => updateNavIndicator('navBarEdu'));
-      if (viewId === 'edu-rank') eduRenderLeaderboard();
-      if (viewId === 'edu-profile') eduRenderProfile();
-      if (viewId === 'edu-vip') eduRenderMyPayments();
-      if (viewId === 'edu-admin' && Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
+
+      if (viewId === 'edu-rank') {
+        eduRenderLeaderboard();
+        if (!eduAllStudentsLoaded) {
+          eduEnsureAllStudentsLoaded().then(() => eduRenderLeaderboard());
+        }
+      }
+      if (viewId === 'edu-profile') {
+        eduRenderProfile();
+        if (!eduAllStudentsLoaded) {
+          eduEnsureAllStudentsLoaded().then(() => eduRenderProfile());
+        }
+      }
+      if (viewId === 'edu-vip') {
+        eduRenderVipPageExtras();
+        eduRenderMyPayments();
+        const hasLocalPays = myStudent && myStudent.my_payments && Object.keys(myStudent.my_payments).length > 0;
+        if (!hasLocalPays && !eduPaymentsLoaded) {
+          eduEnsurePaymentsLoaded().then(() => eduRenderMyPayments());
+        }
+      }
+      if (viewId === 'edu-admin' && Number(currentUser.id) === ADMIN_ID) {
+        eduRenderAdmin();
+        Promise.all([
+          eduEnsureAllStudentsLoaded(true),
+          eduEnsurePaymentsLoaded(true),
+          eduEnsureFeedbacksLoaded(true)
+        ]).then(() => eduRenderAdmin());
+      }
     }
 
     function eduSwitchAdminTab(tabId, btn) {
@@ -2312,71 +2730,130 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    async function eduLoadAllData(referrerId = null) {
-      document.getElementById('eduLoading').style.display = 'block';
-      try {
-        const [resS, resQ, resP, resA, resEC, resFB] = await Promise.all([
-          fetch(`${BIKAT_STUDENTS}.json`),
-          fetch(`${BIKAT_QUESTIONS}.json`),
-          fetch(`${BIKAT_PAYMENTS}.json`),
-          fetch(`${BIKAT_ANNOUNCEMENTS}.json`),
-          fetch(`${BIKAT_EXAM_CONTROLS}.json`),
-          fetch(`${BIKAT_FEEDBACKS}.json`)
-        ]);
-        bikatStudents = (await resS.json()) || {};
-        const rawQ = (await resQ.json()) || {};
-        bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
-        bikatPayments = (await resP.json()) || {};
-        bikatAnnouncements = (await resA.json()) || {};
-        bikatExamControls = (await resEC.json()) || {};
-        bikatFeedbacks = (await resFB.json()) || {};
-
-        if (!bikatStudents[currentUser.id]) {
-          myStudent = {
-            user_id: currentUser.id,
-            username: currentUser.username || "",
-            full_name: currentUser.first_name || currentUser.username || "ተማሪ",
-            education_level: "Not Set",
-            total_points: 0,
-            invited_count: 0,
-            is_vip: 0,
-            bonus_subject: null,
-            bonus_expires_at: 0,
-            subject_vips: {},
-            answered_questions: {},
-            joined_at: new Date().toISOString()
-          };
-          await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(myStudent) });
-          bikatStudents[currentUser.id] = myStudent;
-
-          if (referrerId && String(referrerId) !== String(currentUser.id) && bikatStudents[referrerId]) {
-            const refUser = bikatStudents[referrerId];
-            const refPatch = eduBuildPointsPatch(refUser, 2);
-            refPatch.invited_count = (refUser.invited_count || 0) + 1;
-            await fetch(`${BIKAT_STUDENTS}/${referrerId}.json`, {
-              method: 'PATCH',
-              body: JSON.stringify(refPatch)
-            });
-          }
-        } else {
-          myStudent = bikatStudents[currentUser.id];
-        }
-        eduDataLoaded = true;
-      } catch(e) {}
-      document.getElementById('eduLoading').style.display = 'none';
-
+    // Step-by-Step Progressive Loader (ተራ በተራ):
+    // Stage 0 (0ms): Instant cache or Telegram name + skeleton UI
+    // Stage 1 (~0.3s): Fetch ONLY this student + announcements + exam_controls (no heavy receipts/all users!)
+    // Stage 2: Fetch questions & render subjects/chapters immediately
+    // Stage 3: Lazy-load Leaderboard / Payments / Admin only when needed
+    async function eduLoadAllData(referrerId = null, skipInitialStageRender = false) {
       if (Number(currentUser.id) === ADMIN_ID) {
         document.getElementById('navEduAdmin').style.display = 'flex';
       }
 
+      // Stage 0: Instant First Paint from cache or Telegram user object
+      const hadCache = eduHydrateFromCache();
+      if (!hadCache) {
+        myStudent = {
+          user_id: currentUser.id,
+          username: currentUser.username || "",
+          full_name: currentUser.first_name || currentUser.username || "ተማሪ",
+          education_level: "Not Set",
+          total_points: 0,
+          weekly_exam_points: 0,
+          invited_count: 0,
+          is_vip: 0,
+          vip_expires_at: 0,
+          subject_vips: {},
+          invite_claimed_subjects: [],
+          unlocked_chapters: {},
+          claimed_point_milestones: {},
+          pending_chapter_unlocks: [],
+          daily_stats: {},
+          chapter_stats: {},
+          weekly_exam_attempts: {},
+          answered_questions: {},
+          my_payments: {},
+          joined_at: new Date().toISOString()
+        };
+      }
       eduRenderHero();
       eduRenderLatestNotification();
       eduCheckPausedQuiz();
-      eduRenderInitialQuizView();
-      eduRenderLeaderboard();
-      eduRenderMyPayments();
-      eduRenderProfile();
-      if (Number(currentUser.id) === ADMIN_ID) eduRenderAdmin();
+      if (!skipInitialStageRender) {
+        if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+          eduRenderInitialQuizView();
+        } else {
+          eduShowQuizSkeletons();
+        }
+      }
+
+      // Stage 1: Lightweight personal profile + announcements + exam controls (~2 KB total!)
+      eduSetLoadStatus('ደረጃ 1/2: መገለጫ እና ማስታወቂያ በመጫን ላይ...');
+      try {
+        const [resMe, resA, resEC] = await Promise.all([
+          fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`),
+          fetch(`${BIKAT_ANNOUNCEMENTS}.json`),
+          fetch(`${BIKAT_EXAM_CONTROLS}.json`)
+        ]);
+        const serverMe = await resMe.json();
+        bikatAnnouncements = (await resA.json()) || {};
+        bikatExamControls = (await resEC.json()) || {};
+
+        if (!serverMe) {
+          // Brand-new student registration
+          await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, { method: 'PUT', body: JSON.stringify(myStudent) });
+          bikatStudents[currentUser.id] = myStudent;
+
+          if (referrerId && String(referrerId) !== String(currentUser.id)) {
+            fetch(`${BIKAT_STUDENTS}/${referrerId}.json`).then(r => r.json()).then(refUser => {
+              if (!refUser) return;
+              const refPatch = eduBuildPointsPatch(refUser, 2);
+              refPatch.invited_count = (refUser.invited_count || 0) + 1;
+              return fetch(`${BIKAT_STUDENTS}/${referrerId}.json`, {
+                method: 'PATCH',
+                body: JSON.stringify(refPatch)
+              });
+            }).catch(() => {});
+          }
+        } else {
+          myStudent = serverMe;
+          bikatStudents[currentUser.id] = myStudent;
+        }
+        eduDataLoaded = true;
+        eduSaveLocalCache();
+      } catch(e) {}
+
+      eduRenderHero();
+      eduRenderLatestNotification();
+      eduCheckPausedQuiz();
+      if (!skipInitialStageRender) {
+        const parsed = eduParseLevelStream(myStudent?.education_level);
+        if (!parsed) {
+          eduShowLevelPicker();
+        } else if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+          eduRenderInitialQuizView();
+        }
+      }
+
+      // Stage 2: Load Questions Bank
+      eduSetLoadStatus('ደረጃ 2/2: ጥያቄዎች በመጫን ላይ...');
+      try {
+        const resQ = await fetch(`${BIKAT_QUESTIONS}.json`);
+        const rawQ = (await resQ.json()) || {};
+        bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
+        eduQuestionsLoaded = true;
+        eduSaveLocalCache();
+      } catch(e) {}
+
+      eduSetLoadStatus(null);
+      if (!skipInitialStageRender && !eduActiveQuiz) {
+        eduRenderInitialQuizView();
+      }
+
+      // Stage 3: Background prefetch of leaderboard/admin only AFTER main UI is completely ready
+      setTimeout(() => {
+        if (Number(currentUser.id) === ADMIN_ID) {
+          Promise.all([
+            eduEnsureAllStudentsLoaded(true),
+            eduEnsurePaymentsLoaded(true),
+            eduEnsureFeedbacksLoaded(true)
+          ]).then(() => {
+            if (document.getElementById('view-edu-admin').classList.contains('active')) eduRenderAdmin();
+          });
+        } else if (document.getElementById('view-edu-rank').classList.contains('active')) {
+          eduEnsureAllStudentsLoaded().then(() => eduRenderLeaderboard());
+        }
+      }, 1500);
     }
 
     function eduRenderLatestNotification() {
@@ -2414,10 +2891,11 @@
       const item = bikatAnnouncements[key];
       if (!item.target || !item.target.chapter) return;
 
-      // Safely pause any running quiz before jumping to the linked quiz/exam
       if (eduActiveQuiz) {
         eduStopCountdownTimer();
-        try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
+        if (eduActiveQuiz.mode !== 'weekly_exam') {
+          try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
+        }
         eduActiveQuiz = null;
         eduCheckPausedQuiz();
       }
@@ -2427,7 +2905,6 @@
       const targetChap = String(t.chapter || '').trim();
       const targetSub = String(t.subject || '').trim();
 
-      // Match actual question in bikatQuestions so level/stream/subject/chapter always align 100%
       const matchedQ = bikatQuestions.find(q => {
         const qCat = q.content_category || 'chapter';
         if (qCat !== cat) return false;
@@ -2508,14 +2985,36 @@
       banner.style.display = 'none';
     }
 
+    function eduIsFullSemesterVip(stu) {
+      if (!stu) return false;
+      if (stu.is_vip != 1) return false;
+      if (!stu.vip_expires_at) return true; // Legacy permanent/manual admin VIP
+      return Number(stu.vip_expires_at) > Date.now();
+    }
+
     function eduGetStudentVipTier(stu) {
       if (!stu) return 'free';
       if (stu._demo_tier) return stu._demo_tier;
-      if (stu.is_vip == 1) return 'full';
+      if (eduIsFullSemesterVip(stu)) return 'full';
       const now = Date.now();
-      if (stu.subject_vips && Object.values(stu.subject_vips).some(exp => exp > now)) return 'unit';
-      if (stu.bonus_subject && (!stu.bonus_expires_at || stu.bonus_expires_at > now)) return 'unit';
+      if (stu.subject_vips && Object.values(stu.subject_vips).some(exp => Number(exp) > now)) return 'unit';
+      if (stu.unlocked_chapters && Object.values(stu.unlocked_chapters).some(u => u && Number(u.expires_at) > now)) return 'unit';
       return 'free';
+    }
+
+    function eduGetNextMilestone(pts) {
+      const p = Number(pts) || 0;
+      for (const m of POINT_MILESTONES) {
+        if (p < m.pts) return m;
+      }
+      return null;
+    }
+
+    function eduGetAvailableInviteSlots(stu) {
+      if (!stu) return 0;
+      const totalEarned = Math.floor((Number(stu.invited_count) || 0) / INVITE_THRESHOLD);
+      const claimedArr = Array.isArray(stu.invite_claimed_subjects) ? stu.invite_claimed_subjects : Object.values(stu.invite_claimed_subjects || {});
+      return Math.max(0, totalEarned - claimedArr.length);
     }
 
     function eduRenderHero() {
@@ -2540,33 +3039,45 @@
       }
 
       if (tier === 'full') {
-        vipChip.innerText = '💎 FULL VIP'; vipChip.className = 'edu-chip vip';
-        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-diamond'; heroVipTag.innerText = '💎 FULL VIP'; }
+        vipChip.innerText = '💎 SEMESTER VIP'; vipChip.className = 'edu-chip vip';
+        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-diamond'; heroVipTag.innerText = '💎 SEMESTER VIP'; }
       } else if (tier === 'unit') {
-        vipChip.innerText = '👑 VIP (1 Unit)'; vipChip.className = 'edu-chip vip';
-        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-gold'; heroVipTag.innerText = '👑 VIP'; }
+        vipChip.innerText = '👑 ACTIVE UNLOCK'; vipChip.className = 'edu-chip vip';
+        if (heroVipTag) { heroVipTag.style.display = 'inline-flex'; heroVipTag.className = 'vip-badge-pill badge-gold'; heroVipTag.innerText = '👑 UNLOCKED'; }
       } else {
         vipChip.innerText = '👤 Free Tier'; vipChip.className = 'edu-chip';
         if (heroVipTag) { heroVipTag.style.display = 'none'; }
       }
 
-      document.getElementById('eduPointsChip').innerText = `🏆 ${myStudent.total_points || 0} / ${BONUS_POINTS_THRESHOLD} ነጥብ`;
-      document.getElementById('eduInviteChip').innerText = `👥 ${myStudent.invited_count || 0} / ${BONUS_INVITE_THRESHOLD} ግብዣ`;
+      const curPts = myStudent.total_points || 0;
+      const nextM = eduGetNextMilestone(curPts);
+      document.getElementById('eduPointsChip').innerText = nextM
+        ? `🏆 ${curPts} / ${nextM.pts} ነጥብ`
+        : `🏆 ${curPts} ነጥብ (MAX)`;
+      document.getElementById('eduInviteChip').innerText = `👥 ${myStudent.invited_count || 0} / ${INVITE_THRESHOLD} ግብዣ`;
 
       const now = Date.now();
-      const activeSubVips = [];
+      const activeItems = [];
       if (myStudent.subject_vips) {
         Object.entries(myStudent.subject_vips).forEach(([sub, exp]) => {
-          if (exp > now) activeSubVips.push(sub);
+          if (Number(exp) > now) {
+            const dLeft = Math.max(1, Math.ceil((Number(exp) - now) / 86400000));
+            activeItems.push(`📘 ${sub} (${dLeft} ቀን)`);
+          }
         });
       }
-      if (myStudent.bonus_subject && (!myStudent.bonus_expires_at || myStudent.bonus_expires_at > now)) {
-        if (!activeSubVips.includes(myStudent.bonus_subject)) activeSubVips.push(myStudent.bonus_subject);
+      if (myStudent.unlocked_chapters) {
+        Object.values(myStudent.unlocked_chapters).forEach(u => {
+          if (u && Number(u.expires_at) > now) {
+            const dLeft = Math.max(1, Math.ceil((Number(u.expires_at) - now) / 86400000));
+            activeItems.push(`📑 ${u.subject} • ${u.chapter} (${dLeft} ቀን)`);
+          }
+        });
       }
       const bLine = document.getElementById('eduBonusLine');
-      if (activeSubVips.length > 0 && myStudent.is_vip != 1) {
+      if (activeItems.length > 0 && !eduIsFullSemesterVip(myStudent)) {
         bLine.style.display = 'block';
-        bLine.innerText = `🔓 የተከፈቱ ትምህርቶች (ለ1 ወር): ${activeSubVips.join(', ')}`;
+        bLine.innerText = `🔓 የተከፈቱ: ${activeItems.join(' | ')}`;
       } else {
         bLine.style.display = 'none';
       }
@@ -2575,37 +3086,169 @@
       if (refInput) refInput.value = `${BOT_APP_LINK}?startapp=ref_${currentUser.id}`;
     }
 
-        function eduHasSubjectAccess(subject, allowClaim = false) {
+    // Check if student has full access to an ENTIRE subject (Full Semester VIP OR 50 ETB / 5-Invite Subject VIP)
+    function eduHasFullSubjectAccess(subject) {
       if (!myStudent) return false;
-      if (Number(currentUser.id) === ADMIN_ID || myStudent.is_vip == 1) return true;
+      if (Number(currentUser.id) === ADMIN_ID || eduIsFullSemesterVip(myStudent)) return true;
       const now = Date.now();
-
-      // Check 50 ETB single-subject VIP (2 months)
       if (myStudent.subject_vips && subject) {
         const subKey = Object.keys(myStudent.subject_vips).find(k => k.toLowerCase() === subject.toLowerCase());
-        if (subKey && myStudent.subject_vips[subKey] > now) return true;
-      }
-
-      // Check 50 points / 5 invites bonus (1 subject for 2 months)
-      const qualifies = (myStudent.total_points || 0) >= BONUS_POINTS_THRESHOLD || (myStudent.invited_count || 0) >= BONUS_INVITE_THRESHOLD;
-      if (!qualifies) return false;
-
-      if (myStudent.bonus_subject && myStudent.bonus_subject.toLowerCase() === (subject || '').toLowerCase()) {
-        if (!myStudent.bonus_expires_at || myStudent.bonus_expires_at > now) return true;
-      }
-      if (!myStudent.bonus_subject && allowClaim && subject) {
-        const exp = now + ONE_MONTH_MS;
-        myStudent.bonus_subject = subject;
-        myStudent.bonus_expires_at = exp;
-        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
-          method: 'PATCH',
-          body: JSON.stringify({ bonus_subject: subject, bonus_expires_at: exp })
-        }).catch(() => {});
-        eduRenderHero();
-        notifyUser(`🎉 እንኳን ደስ አለዎት! ለ ${subject} ትምህርት ለ1 ወር ያለ ገደብ ነፃ መዳረሻ አግኝተዋል! 🔓`);
-        return true;
+        if (subKey && Number(myStudent.subject_vips[subKey]) > now) return true;
       }
       return false;
+    }
+
+    // Check if student has access to a SPECIFIC chapter/unit (Full Subject Access OR 50/150/300 Point Milestone Unlock)
+    function eduHasChapterAccess(subject, chapter, level = null, stream = null, allowPendingClaim = false) {
+      if (eduHasFullSubjectAccess(subject)) return true;
+      if (!myStudent || !subject || !chapter) return false;
+      const now = Date.now();
+      const lev = level || eduNav.level || '';
+      const str = stream || eduNav.stream || '';
+
+      if (myStudent.unlocked_chapters) {
+        const found = Object.values(myStudent.unlocked_chapters).find(u =>
+          u &&
+          Number(u.expires_at) > now &&
+          String(u.subject || '').toLowerCase() === String(subject).toLowerCase() &&
+          String(u.chapter || '').toLowerCase() === String(chapter).toLowerCase() &&
+          (!u.level || !lev || u.level === lev) &&
+          (!u.stream || !str || u.stream === 'None' || u.stream === str)
+        );
+        if (found) return true;
+      }
+
+      // If student earned a point milestone outside a chapter (e.g. referral/weekly exam), auto-apply pending unlock here
+      const pending = Array.isArray(myStudent.pending_chapter_unlocks) ? myStudent.pending_chapter_unlocks : [];
+      if (allowPendingClaim && pending.length > 0) {
+        const token = pending.shift();
+        const exp = now + (Number(token.days) || 15) * 86400000;
+        const uKey = eduSafeKey(`${lev}_${str}_${subject}_${chapter}`);
+        if (!myStudent.unlocked_chapters) myStudent.unlocked_chapters = {};
+        myStudent.unlocked_chapters[uKey] = {
+          subject, chapter, level: lev, stream: str,
+          expires_at: exp, source: `points_${token.pts || 50}`
+        };
+        myStudent.pending_chapter_unlocks = pending;
+        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            unlocked_chapters: myStudent.unlocked_chapters,
+            pending_chapter_unlocks: pending
+          })
+        }).catch(() => {});
+        eduRenderHero();
+        notifyUser(`🎉 በነጥብ ሽልማትዎ (${token.pts} ነጥብ) የ ${subject} — ${chapter} ምዕራፍ ለ${token.label || '15 ቀን'} ተከፍቶልዎታል! 🔓`);
+        return true;
+      }
+
+      return false;
+    }
+
+    // Progressive Point-Based Unlock: 50 pts -> next 1 chapter (15 days), 150 pts -> next 1 chapter (30 days), 300 pts -> next 1 chapter (30 days)
+    function eduProcessPointMilestones(currentSubject, currentChapter) {
+      if (!myStudent) return;
+      const pts = Number(myStudent.total_points) || 0;
+      if (!myStudent.claimed_point_milestones) myStudent.claimed_point_milestones = {};
+      if (!myStudent.unlocked_chapters) myStudent.unlocked_chapters = {};
+      if (!Array.isArray(myStudent.pending_chapter_unlocks)) myStudent.pending_chapter_unlocks = [];
+
+      let changed = false;
+      const messages = [];
+
+      for (const m of POINT_MILESTONES) {
+        if (pts >= m.pts && !myStudent.claimed_point_milestones[String(m.pts)]) {
+          myStudent.claimed_point_milestones[String(m.pts)] = true;
+          changed = true;
+
+          // Find the next locked chapter after currentChapter in currentSubject
+          let targetSub = currentSubject;
+          let targetChap = null;
+          const lev = eduNav.level || '';
+          const str = eduNav.stream || '';
+
+          if (currentSubject && currentSubject !== 'Weekly Exam' && lev) {
+            const subQs = eduGetFilteredQuestions(lev, str, currentSubject, null, 'chapter');
+            const orderedChaps = [...new Set(subQs.map(q => q.chapter))];
+            const curIdx = orderedChaps.indexOf(currentChapter);
+            const searchOrder = curIdx >= 0
+              ? [...orderedChaps.slice(curIdx + 1), ...orderedChaps.slice(0, curIdx)]
+              : orderedChaps;
+
+            for (const cand of searchOrder) {
+              const candQs = subQs.filter(q => q.chapter === cand);
+              const hasPaid = candQs.some(q => (q.question_type || 'free') === 'paid');
+              if (hasPaid && !eduHasChapterAccess(currentSubject, cand, lev, str, false)) {
+                targetChap = cand;
+                break;
+              }
+            }
+          }
+
+          if (targetSub && targetChap) {
+            const uKey = eduSafeKey(`${lev}_${str}_${targetSub}_${targetChap}`);
+            myStudent.unlocked_chapters[uKey] = {
+              subject: targetSub,
+              chapter: targetChap,
+              level: lev,
+              stream: str,
+              expires_at: Date.now() + m.days * 86400000,
+              source: `points_${m.pts}`
+            };
+            messages.push(`🎉 እንኳን ደስ አለዎት! ${m.pts} ነጥብ ስለደረሱ የ ${targetSub} ቀጣይ ምዕራፍ (${targetChap}) ለ${m.label} ተከፍቶልዎታል! 🔓`);
+          } else {
+            myStudent.pending_chapter_unlocks.push({ pts: m.pts, days: m.days, label: m.label });
+            messages.push(`🎉 እንኳን ደስ አለዎት! ${m.pts} ነጥብ ደርሰዋል! የፈለጉትን 1 የተቆለፈ ምዕራፍ ሲነኩ ለ${m.label} ወዲያውኑ ይከፈትልዎታል! 🔓`);
+          }
+        }
+      }
+
+      if (changed) {
+        fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            claimed_point_milestones: myStudent.claimed_point_milestones,
+            unlocked_chapters: myStudent.unlocked_chapters,
+            pending_chapter_unlocks: myStudent.pending_chapter_unlocks
+          })
+        }).catch(() => {});
+        eduRenderHero();
+        if (messages.length > 0) notifyUser(messages.join('\n\n'));
+      }
+    }
+
+    async function eduClaimInviteSubject(subject) {
+      if (!myStudent || !subject) return;
+      const slots = eduGetAvailableInviteSlots(myStudent);
+      if (slots <= 0) {
+        notifyUser(`🎁 1 ሙሉ ትምህርት ለ1 ወር በነፃ ለመክፈት 5 ጓደኞችን መጋበዝ ያስፈልጋል (አሁን ያለዎት: ${myStudent.invited_count || 0}/5)።`);
+        return;
+      }
+      if (eduHasFullSubjectAccess(subject)) {
+        notifyUser(`✅ ${subject} አስቀድሞ ተከፍቷል!`);
+        return;
+      }
+      const exp = Date.now() + ONE_MONTH_MS;
+      if (!myStudent.subject_vips) myStudent.subject_vips = {};
+      myStudent.subject_vips[subject] = exp;
+      const claimedArr = Array.isArray(myStudent.invite_claimed_subjects)
+        ? [...myStudent.invite_claimed_subjects]
+        : Object.values(myStudent.invite_claimed_subjects || {});
+      claimedArr.push(subject);
+      myStudent.invite_claimed_subjects = claimedArr;
+
+      try {
+        await fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            subject_vips: myStudent.subject_vips,
+            invite_claimed_subjects: claimedArr
+          })
+        });
+      } catch(e) {}
+      eduRenderHero();
+      eduRenderVipPageExtras();
+      notifyUser(`🎉 በ5 ግብዣ ሽልማትዎ የ ${subject} ሙሉ ትምህርት ለ1 ወር ተከፍቶልዎታል! 🔓`);
     }
 
     function eduParseLevelStream(edStr) {
@@ -2638,9 +3281,20 @@
       return {
         key,
         duration_min: Number(saved.duration_min) || 30,
-        status: saved.status || 'waiting', // 'waiting' | 'started' | 'stopped'
+        status: saved.status || 'waiting',
         started_at: Number(saved.started_at) || 0
       };
+    }
+
+    function eduGetWeeklyExamAttempt(examKey) {
+      if (myStudent && myStudent.weekly_exam_attempts && myStudent.weekly_exam_attempts[examKey]) {
+        return myStudent.weekly_exam_attempts[examKey];
+      }
+      try {
+        const raw = localStorage.getItem(`bikat_wexam_done_${currentUser.id}_${examKey}`);
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
+      return null;
     }
 
     function eduPrepareShuffledQuestions(rawQuestions) {
@@ -2653,7 +3307,6 @@
           { orig: 'C', text: cleanOpt(q.option_c), isCorrect: correctOrig === 'C' },
           { orig: 'D', text: cleanOpt(q.option_d), isCorrect: correctOrig === 'D' }
         ];
-        // Fisher-Yates shuffle
         for (let i = items.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [items[i], items[j]] = [items[j], items[i]];
@@ -2694,14 +3347,20 @@
       } else {
         inner = exams.map(ex => {
           const meta = eduGetWeeklyExamMeta(ex.level, ex.stream, ex.title);
+          const attempt = eduGetWeeklyExamAttempt(meta.key);
           const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
           const isExpired = meta.status === 'stopped' || (meta.status === 'started' && Date.now() >= endTime);
           const isLive = meta.status === 'started' && !isExpired;
-          const statusTag = isLive
-            ? `<span style="color:#16A34A; font-weight:800;">🟢 Live • ⏱ ${meta.duration_min} ደቂቃ</span>`
-            : (isExpired
-              ? `<span style="color:var(--danger); font-weight:700;">🔴 ሰዓቱ አልቋል</span>`
-              : `<span style="color:var(--gold); font-weight:700;">⏳ ይጠብቁ • ⏱ ${meta.duration_min} ደቂቃ</span>`);
+          let statusTag = '';
+          if (attempt) {
+            statusTag = `<span style="color:var(--edu-accent); font-weight:800;">✅ ተፈትነዋል (${attempt.score}/${attempt.total}) • መልስ ይመልከቱ</span>`;
+          } else if (isLive) {
+            statusTag = `<span style="color:#16A34A; font-weight:800;">🟢 Live • ⏱ ${meta.duration_min} ደቂቃ</span>`;
+          } else if (isExpired) {
+            statusTag = `<span style="color:var(--danger); font-weight:700;">🔴 ሰዓቱ አልቋል</span>`;
+          } else {
+            statusTag = `<span style="color:var(--gold); font-weight:700;">⏳ ይጠብቁ • ⏱ ${meta.duration_min} ደቂቃ</span>`;
+          }
           const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${ex.stream && ex.stream !== 'All' && ex.stream !== 'None' ? ' ' + ex.stream : ''}`;
           return `<button class="edu-list-btn" style="margin-bottom:8px;" onclick="eduOpenWeeklyExam('${escAttr(ex.level)}', '${escAttr(ex.stream)}', '${escAttr(ex.title)}')">
             <div>
@@ -2733,15 +3392,17 @@
     }
 
     function eduStepClick(stepNum) {
-      // Save any active quiz safely before navigating
       if (eduActiveQuiz) {
+        if (eduActiveQuiz.mode === 'weekly_exam') {
+          notifyUser("⚠️ ሳምንታዊ ፈተና ላይ ስለሆኑ መጀመሪያ ፈተናውን ያጠናቅቁ (Submit Exam)!");
+          return;
+        }
         eduStopCountdownTimer();
         try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
         eduActiveQuiz = null;
         eduCheckPausedQuiz();
       }
 
-      // Ensure eduNav.level & eduNav.stream are populated from student profile if set
       if (!eduNav.level) {
         const parsed = eduParseLevelStream(myStudent?.education_level);
         if (parsed) {
@@ -2775,7 +3436,6 @@
           eduSelectSubject(eduNav.subject);
           return;
         }
-        // Check if user has a paused quiz to jump right back into
         try {
           const raw = localStorage.getItem('bikat_paused_quiz_' + currentUser.id);
           if (raw) {
@@ -2858,7 +3518,8 @@
       } else {
         html = `<h3 style="font-size:0.95rem; margin-bottom:10px;">📘 የትምህርት ዓይነት ይምረጡ (${escHtml(title)})</h3>`;
         subjects.forEach(sub => {
-          html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)}</span><span>➔</span></button>`;
+          const fullSubUnlocked = eduHasFullSubjectAccess(sub);
+          html += `<button class="edu-list-btn" onclick="eduSelectSubject('${escAttr(sub)}')"><span>📘 ${escHtml(sub)}</span><span>${fullSubUnlocked ? '👑 ' : ''}➔</span></button>`;
         });
       }
       if (weeklyExams.length > 0) {
@@ -2875,12 +3536,20 @@
       const examQs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
       const chapCount = new Set(chapterQs.map(q => q.chapter)).size;
       const examCount = new Set(examQs.map(q => q.chapter)).size;
+      const invSlots = eduGetAvailableInviteSlots(myStudent);
+      const inviteBanner = (invSlots > 0 && !eduHasFullSubjectAccess(subject))
+        ? `<div class="section-card" style="background:var(--gold-bg); border-color:var(--gold); text-align:center;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--gold); margin-bottom:6px;">🎁 ${invSlots} የ5-ግብዣ ነፃ Subject ሽልማት አለዎት!</div>
+            <button class="btn-action" style="background:var(--gold); color:white;" onclick="eduClaimInviteSubject('${escAttr(subject)}').then(() => eduSelectSubject('${escAttr(subject)}'))">🔓 Unlock All ${escHtml(subject)} for 1 Month Free</button>
+          </div>`
+        : '';
 
       stage.innerHTML = `
         <div class="edu-back-row">
           <button class="btn-back-sm" onclick="eduShowSubjects()">🔙 Subjects</button>
           <strong style="font-size:0.92rem; color:var(--edu-accent);">📘 ${escHtml(subject)}</strong>
         </div>
+        ${inviteBanner}
         <p style="font-size:0.8rem; color:var(--gray); margin-bottom:12px;">የሚፈልጉትን አማራጭ ይምረጡ👇</p>
         <div class="edu-choice-grid">
           <div class="edu-choice-card q-choice" onclick="eduShowSubjectChapters('${escAttr(subject)}')">
@@ -2902,7 +3571,6 @@
       const stage = document.getElementById('eduQuizStage');
       const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'chapter');
       const chapters = [...new Set(qs.map(q => q.chapter))];
-      const hasAccess = eduHasSubjectAccess(subject);
 
       let html = `
         <div class="edu-back-row">
@@ -2916,7 +3584,8 @@
         chapters.forEach(chap => {
           const chQs = qs.filter(q => q.chapter === chap);
           const hasPaid = chQs.some(q => q.question_type === 'paid');
-          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          const chapAccess = eduHasChapterAccess(subject, chap, eduNav.level, eduNav.stream, false);
+          const icon = !hasPaid ? '' : (chapAccess ? '🔓' : '🔒');
           html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${chQs.length} Qs)</small></span><span>${icon} ➔</span></button>`;
         });
       }
@@ -2929,7 +3598,7 @@
       const stage = document.getElementById('eduQuizStage');
       const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
       const exams = [...new Set(qs.map(q => q.chapter))];
-      const hasAccess = eduHasSubjectAccess(subject);
+      const hasFullSub = eduHasFullSubjectAccess(subject);
 
       let html = `
         <div class="edu-back-row">
@@ -2943,35 +3612,52 @@
         exams.forEach(exName => {
           const exQs = qs.filter(q => q.chapter === exName);
           const hasPaid = exQs.some(q => q.question_type === 'paid');
-          const icon = !hasPaid ? '' : (hasAccess ? '🔓' : '🔒');
+          const icon = !hasPaid ? '' : (hasFullSub ? '🔓' : '🔒');
           html += `<button class="edu-list-btn" onclick="eduSelectSubjectExam('${escAttr(exName)}')"><span>📝 ${escHtml(exName)} <small style="color:var(--gray);">(${exQs.length} Qs)</small></span><span>${icon} ➔</span></button>`;
         });
       }
       stage.innerHTML = html;
     }
 
+    function eduBuildLockedScreenHtml(subject, chapter, backFnCall) {
+      const invSlots = eduGetAvailableInviteSlots(myStudent);
+      const curPts = myStudent?.total_points || 0;
+      const nextM = eduGetNextMilestone(curPts);
+      const ptsInfo = nextM
+        ? `• <b>${nextM.pts} ነጥብ</b> ሲደርሱ (ቀሪ ${nextM.pts - curPts} ነጥብ) → ቀጣይ 1 ምዕራፍ ለ<b>${nextM.label}</b> ይከፈታል`
+        : `• የነጥብ ሽልማቶችን (50 / 150 / 300) ተጠቅመዋል`;
+      const claimBtn = invSlots > 0
+        ? `<button class="btn-action" style="background:var(--gold); color:white; margin-bottom:8px;" onclick="eduClaimInviteSubject('${escAttr(subject)}').then(() => eduSelectSubject('${escAttr(subject)}'))">🎁 Claim 5-Invite Free Subject (1 Month)</button>`
+        : '';
+
+      return `
+        <div class="section-card" style="text-align:center;">
+          <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ምዕራፍ / ፈተና የተቆለፈ ነው!</h3>
+          <p style="font-size:0.82rem; color:var(--gray); line-height:1.55; margin-bottom:14px; text-align:left;">
+            ${ptsInfo}<br>
+            • ለ <b>${escHtml(subject)}</b> ሙሉ ትምህርት (ለ1 ወር) — <b>50 ብር</b> ወይም <b>5 ጓደኛ መጋበዝ</b><br>
+            • ለሁሉም ትምህርቶች (Full Semester VIP) — <b>150 ብር</b>
+          </p>
+          ${claimBtn}
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Unlock VIP (50 / 150 ETB)</button>
+            <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 Invite Friends</button>
+          </div>
+          <a class="btn-action" style="background:#374151; color:white; margin-bottom:8px;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
+          <button class="btn-back-sm" onclick="${backFnCall}">🔙 Back</button>
+        </div>`;
+    }
+
     function eduSelectSubjectExam(examName) {
       eduNav.chapter = examName;
       eduNav.mode = 'subject_exam';
       const stage = document.getElementById('eduQuizStage');
-      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      const hasAccess = eduHasFullSubjectAccess(eduNav.subject);
       let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, examName, 'subject_exam');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0) {
-        stage.innerHTML = `
-          <div class="section-card" style="text-align:center;">
-            <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ፈተና የተቆለፈ (VIP) ነው!</h3>
-            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
-              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ1 ወር) — <b>30 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
-              • ለሁሉም ትምህርቶች (Full VIP) — <b>100 ብር</b>
-            </p>
-            <div style="display:flex; gap:8px; margin-bottom:8px;">
-              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Unlock VIP</button>
-              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 Invite Friends</button>
-            </div>
-            <button class="btn-back-sm" onclick="eduShowSubjectExams('${escAttr(eduNav.subject)}')">🔙 Back</button>
-          </div>`;
+        stage.innerHTML = eduBuildLockedScreenHtml(eduNav.subject, examName, `eduShowSubjectExams('${escAttr(eduNav.subject)}')`);
         return;
       }
 
@@ -2994,11 +3680,12 @@
       eduNav = { level, stream, subject: 'Weekly Exam', chapter: title, practice: 1, mode: 'weekly_exam' };
       const stage = document.getElementById('eduQuizStage');
       const meta = eduGetWeeklyExamMeta(level, stream, title);
+      const attempt = eduGetWeeklyExamAttempt(meta.key);
       const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
       const isExpired = meta.status === 'stopped' || (meta.status === 'started' && Date.now() >= endTime);
       const isWaiting = meta.status === 'waiting' || !meta.started_at;
 
-      const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
+      const hasAccess = (Number(currentUser.id) === ADMIN_ID || eduIsFullSemesterVip(myStudent));
       let qs = bikatQuestions.filter(q =>
         q.content_category === 'weekly_exam' &&
         (q.level || 'All') === level &&
@@ -3007,12 +3694,12 @@
       );
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
-      if (qs.length === 0) {
+      if (qs.length === 0 && !attempt) {
         stage.innerHTML = `
           <div class="section-card" style="text-align:center;">
             <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ሳምንታዊ ፈተና ለVIP አባላት ነው!</h3>
-            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">Full VIP (100 ብር) በመክፈት ሁሉንም ፈተናዎች ያለ ገደብ ይስሩ።</p>
-            <button class="btn-action btn-edu" style="margin-bottom:8px;" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Unlock Full VIP</button>
+            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">Full Semester VIP (150 ብር) በመክፈት ሁሉንም ፈተናዎች ያለ ገደብ ይስሩ።</p>
+            <button class="btn-action btn-edu" style="margin-bottom:8px;" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Unlock Semester VIP</button>
             <button class="btn-back-sm" onclick="eduRenderInitialQuizView()">🔙 Back</button>
           </div>`;
         return;
@@ -3020,7 +3707,14 @@
 
       const firstQId = qs[0] ? qs[0].id : '';
       let actionHtml = '';
-      if (isWaiting) {
+      if (attempt) {
+        actionHtml = `
+          <div style="background:var(--edu-bg); border:1.5px solid var(--edu-accent); border-radius:12px; padding:12px; margin-bottom:12px; font-size:0.84rem; color:var(--edu-accent); font-weight:800;">
+            ✅ ይህን ሳምንታዊ ፈተና ቀድመው ተፈትነዋል! (ዳግም መፈተን አይቻልም)<br>
+            <span style="font-size:0.95rem;">🎯 ውጤትዎ: ${attempt.score} / ${attempt.total} (${Math.round((attempt.score / Math.max(1, attempt.total)) * 100)}%)</span>
+          </div>
+          <button class="btn-action btn-edu" onclick="eduOpenWeeklyReviewModal('${escAttr(meta.key)}')">📋 መልሶችን እና ማብራሪያ ይመልከቱ (Review Answers)</button>`;
+      } else if (isWaiting) {
         actionHtml = `
           <div style="background:var(--gold-bg); border:1px solid var(--gold); border-radius:12px; padding:12px; margin-bottom:12px; font-size:0.82rem; color:var(--gold); font-weight:700;">
             ⏳ ፈተናው ገና አልተጀመረም — አድሚኑ Start እስኪል ይጠብቁ!
@@ -3036,10 +3730,13 @@
         const remMin = Math.floor(remSec / 60);
         const remS = String(remSec % 60).padStart(2, '0');
         actionHtml = `
-          <div style="background:rgba(16,185,129,0.12); border:1px solid var(--secondary); border-radius:12px; padding:10px; margin-bottom:14px; font-size:0.84rem; color:var(--primary); font-weight:800;">
+          <div style="background:rgba(16,185,129,0.12); border:1px solid var(--secondary); border-radius:12px; padding:10px; margin-bottom:12px; font-size:0.84rem; color:var(--primary); font-weight:800;">
             🟢 ፈተናው ተጀምሯል! ቀሪ ሰዓት: ${remMin}:${remS}
           </div>
-          <button class="btn-action btn-edu" onclick="eduStartExamRun('weekly_exam')">🚀 Start Exam</button>`;
+          <div style="font-size:0.75rem; color:var(--gray); margin-bottom:12px;">
+            ⚠️ ማሳሰቢያ: መልሶች የሚታዩት ፈተናውን ሲጨርሱ መጨረሻ ላይ ነው፤ እንዲሁም ፈተናው የሚወሰደው <b>1 ጊዜ ብቻ</b> ነው።
+          </div>
+          <button class="btn-action btn-edu" onclick="eduStartExamRun('weekly_exam')">🚀 Start Exam (1 Attempt)</button>`;
       }
 
       stage.innerHTML = `
@@ -3059,18 +3756,25 @@
     function eduStartExamRun(mode) {
       let qs = [];
       let endTime = null;
+      let examKey = null;
+
       if (mode === 'subject_exam') {
-        const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+        const hasAccess = eduHasFullSubjectAccess(eduNav.subject);
         qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter, 'subject_exam');
         if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
       } else {
         const meta = eduGetWeeklyExamMeta(eduNav.level, eduNav.stream, eduNav.chapter);
+        examKey = meta.key;
+        if (eduGetWeeklyExamAttempt(examKey)) {
+          notifyUser("⚠️ ይህን ሳምንታዊ ፈተና ቀድመው ተፈትነዋል! ዳግም መፈተን አይቻልም።");
+          return eduOpenWeeklyExam(eduNav.level, eduNav.stream, eduNav.chapter);
+        }
         endTime = meta.started_at + (meta.duration_min * 60 * 1000);
         if (meta.status !== 'started' || Date.now() >= endTime) {
           notifyUser("⏰ የፈተናው ሰዓት አልቋል ወይም ገና አልተጀመረም!");
           return eduOpenWeeklyExam(eduNav.level, eduNav.stream, eduNav.chapter);
         }
-        const hasAccess = (Number(currentUser.id) === ADMIN_ID || (myStudent && myStudent.is_vip == 1));
+        const hasAccess = (Number(currentUser.id) === ADMIN_ID || eduIsFullSemesterVip(myStudent));
         qs = bikatQuestions.filter(q =>
           q.content_category === 'weekly_exam' &&
           (q.level || 'All') === eduNav.level &&
@@ -3089,6 +3793,8 @@
         score: 0,
         earned: 0,
         answeredCurrent: false,
+        userAnswers: {}, // Used for weekly_exam deferred grading
+        examKey,
         subject: eduNav.subject,
         chapter: eduNav.chapter,
         practice: 1,
@@ -3146,8 +3852,184 @@
         </div>`;
     }
 
+    // Track daily_stats & chapter_stats on every answered question
+    function eduRecordQuestionAttempt(q, isRight) {
+      if (!myStudent || !q) return;
+      const todayKey = eduDateStr(0);
+      if (!myStudent.daily_stats) myStudent.daily_stats = {};
+      const dStat = myStudent.daily_stats[todayKey] || { attempted: 0, correct: 0, wrong: 0 };
+      dStat.attempted = (dStat.attempted || 0) + 1;
+      if (isRight) dStat.correct = (dStat.correct || 0) + 1;
+      else dStat.wrong = (dStat.wrong || 0) + 1;
+      myStudent.daily_stats[todayKey] = dStat;
+
+      const sub = q.subject || eduNav.subject || 'General';
+      const ch = q.chapter || eduNav.chapter || 'General';
+      const lev = q.level || eduNav.level || '';
+      const str = q.stream || eduNav.stream || '';
+      const cKey = eduSafeKey(`${lev}_${str}_${sub}_${ch}`);
+      if (!myStudent.chapter_stats) myStudent.chapter_stats = {};
+      const cStat = myStudent.chapter_stats[cKey] || {
+        subject: sub, chapter: ch, level: lev, stream: str,
+        attempted: 0, correct: 0, wrong: 0
+      };
+      cStat.attempted = (cStat.attempted || 0) + 1;
+      if (isRight) cStat.correct = (cStat.correct || 0) + 1;
+      else cStat.wrong = (cStat.wrong || 0) + 1;
+      cStat.last_practiced = new Date().toISOString();
+      myStudent.chapter_stats[cKey] = cStat;
+
+      fetch(`${BIKAT_STUDENTS}/${currentUser.id}/daily_stats/${todayKey}.json`, {
+        method: 'PUT', body: JSON.stringify(dStat)
+      }).catch(() => {});
+      fetch(`${BIKAT_STUDENTS}/${currentUser.id}/chapter_stats/${cKey}.json`, {
+        method: 'PUT', body: JSON.stringify(cStat)
+      }).catch(() => {});
+    }
+
+    function eduBuildReviewItemsHtml(reviewItems) {
+      return reviewItems.map((it, idx) => {
+        const isCorrect = it.user_ans && it.user_ans === it.correct_ans;
+        const borderCol = isCorrect ? '#16A34A' : '#DC2626';
+        const statusBadge = isCorrect
+          ? `<span style="color:#16A34A; font-weight:800;">✅ ትክክል (+2 ነጥብ)</span>`
+          : `<span style="color:#DC2626; font-weight:800;">❌ ${it.user_ans ? 'ተሳስተዋል' : 'አልተመለሰም'}</span>`;
+        const opts = it.options || {};
+        const optsHtml = ['A','B','C','D'].map(L => {
+          let bg = 'var(--surface)';
+          let bdr = 'var(--border)';
+          let tag = '';
+          if (L === it.correct_ans) {
+            bg = 'rgba(22, 163, 74, 0.14)'; bdr = '#16A34A'; tag = ' ✅ (Correct)';
+          } else if (L === it.user_ans && !isCorrect) {
+            bg = 'rgba(220, 38, 38, 0.14)'; bdr = '#DC2626'; tag = ' ❌ (Your Answer)';
+          }
+          return `<div style="padding:6px 9px; border-radius:8px; border:1px solid ${bdr}; background:${bg}; font-size:0.78rem; margin-bottom:4px;">
+            <b>${L}.</b> ${escHtml(opts[L] || '')}${tag}
+          </div>`;
+        }).join('');
+
+        return `
+          <div style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ${borderCol}; border-radius:12px; padding:12px; margin-bottom:10px; text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.74rem; margin-bottom:6px;">
+              <b>ጥያቄ ${idx + 1}</b>
+              ${statusBadge}
+            </div>
+            <div style="font-size:0.84rem; font-weight:600; margin-bottom:8px; white-space:pre-wrap;">${escHtml(it.question)}</div>
+            ${optsHtml}
+            ${it.explanation ? `<div style="margin-top:6px; padding:8px; border-radius:8px; background:rgba(245,158,11,0.12); font-size:0.76rem; line-height:1.45;"><b>💡 ማብራሪያ:</b> ${escHtml(it.explanation)}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function eduFinalizeWeeklyExam(timedOut = false) {
+      if (!eduActiveQuiz) return;
+      eduStopCountdownTimer();
+      const { questions, userAnswers, subject, chapter, examKey } = eduActiveQuiz;
+      const key = examKey || eduMakeExamKey(eduNav.level, eduNav.stream, chapter);
+
+      let score = 0;
+      let earned = 0;
+      const ansMap = myStudent.answered_questions || {};
+      const newlyAnswered = {};
+      const reviewItems = [];
+
+      questions.forEach((q, idx) => {
+        const correct = (q.shuffled_correct || q.correct_answer || 'A').toUpperCase().trim();
+        const chosen = (userAnswers && userAnswers[idx]) ? userAnswers[idx] : '';
+        const isRight = chosen === correct;
+        if (isRight) {
+          score += 1;
+          if (!ansMap[q.id]) {
+            ansMap[q.id] = true;
+            newlyAnswered[q.id] = true;
+            earned += 2;
+          }
+        }
+        eduRecordQuestionAttempt(q, isRight);
+        reviewItems.push({
+          question: q.question,
+          options: q.shuffled_options || { A: q.option_a, B: q.option_b, C: q.option_c, D: q.option_d },
+          user_ans: chosen,
+          correct_ans: correct,
+          explanation: q.explanation || ''
+        });
+      });
+
+      myStudent.answered_questions = ansMap;
+      const ptsPatch = earned > 0 ? eduBuildPointsPatch(myStudent, earned) : {};
+      const weeklyExamPts = (Number(myStudent.weekly_exam_points) || 0) + (score * 2);
+      ptsPatch.weekly_exam_points = weeklyExamPts;
+      Object.assign(myStudent, ptsPatch);
+
+      const attemptRecord = {
+        exam_key: key,
+        title: chapter,
+        level: eduNav.level || 'All',
+        stream: eduNav.stream || 'All',
+        score,
+        total: questions.length,
+        earned_points: score * 2,
+        completed_at: new Date().toISOString(),
+        review: reviewItems
+      };
+
+      if (!myStudent.weekly_exam_attempts) myStudent.weekly_exam_attempts = {};
+      myStudent.weekly_exam_attempts[key] = attemptRecord;
+
+      try {
+        localStorage.setItem(`bikat_wexam_done_${currentUser.id}_${key}`, JSON.stringify(attemptRecord));
+        localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
+      } catch(e) {}
+
+      // Persist to Firebase
+      const fullPatch = {
+        ...ptsPatch,
+        [`weekly_exam_attempts/${key}`]: attemptRecord
+      };
+      Object.keys(newlyAnswered).forEach(qid => {
+        fullPatch[`answered_questions/${qid}`] = true;
+      });
+      fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`, {
+        method: 'PATCH',
+        body: JSON.stringify(fullPatch)
+      }).catch(() => {});
+
+      eduRenderHero();
+      if (earned > 0) eduProcessPointMilestones(subject, chapter);
+
+      const wRank = eduGetStudentWeeklyExamRank(currentUser.id);
+      const pct = Math.round((score / Math.max(1, questions.length)) * 100);
+      const ctxLabel = `Weekly Exam • ${chapter} (Score: ${score}/${questions.length})`;
+      eduActiveQuiz = null;
+
+      const stage = document.getElementById('eduQuizStage');
+      if (stage) {
+        stage.innerHTML = `
+          <div class="section-card" style="text-align:center; padding:22px 14px; border:2px solid ${timedOut ? 'var(--danger)' : 'var(--edu-accent)'};">
+            <div style="font-size:2.4rem; margin-bottom:6px;">${timedOut ? '⏰' : '🏆'}</div>
+            <h2 style="color:${timedOut ? 'var(--danger)' : 'var(--edu-accent)'}; margin-bottom:8px;">
+              ${timedOut ? 'ሰዓቱ አልቋል! ፈተናው በራሱ ተረክቧል።' : 'ሳምንታዊ ፈተናውን አጠናቀዋል!'}
+            </h2>
+            <p style="font-size:0.98rem; margin-bottom:4px;">🎯 ውጤት: <b>${score} / ${questions.length} (${pct}%)</b></p>
+            <p style="font-size:0.86rem; color:var(--primary); margin-bottom:4px;">⭐ Weekly Exam ነጥብ: <b>+${score * 2} ነጥብ</b></p>
+            <p style="font-size:0.84rem; color:var(--gold); font-weight:800; margin-bottom:14px;">🏅 Weekly Exam ደረጃዎ: <b>#${wRank}</b></p>
+            <div style="display:flex; gap:8px; margin-bottom:16px;">
+              <button class="btn-action btn-edu" onclick="eduShowSubjects()">🔄 Back to Quizzes</button>
+              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank')); eduSwitchLbPeriod('weekly_exam', document.querySelector('#eduLbTabs .lb-tab:last-child'));">🔥 Weekly Rank</button>
+            </div>
+            <h4 style="text-align:left; font-size:0.9rem; margin-bottom:10px; color:var(--text);">📋 የጥያቄዎች መልስ እና ማብራሪያ (Answer Review)</h4>
+            ${eduBuildReviewItemsHtml(reviewItems)}
+            ${eduBuildEndQuizFeedbackHtml(ctxLabel)}
+          </div>`;
+      }
+    }
+
     function eduAutoFinishTimedExam() {
       if (!eduActiveQuiz) return;
+      if (eduActiveQuiz.mode === 'weekly_exam') {
+        return eduFinalizeWeeklyExam(true);
+      }
       const { score, earned, questions, subject, chapter } = eduActiveQuiz;
       const ctxLabel = `${subject || 'Exam'} • ${chapter || ''} (Score: ${score}/${questions.length})`;
       localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
@@ -3173,25 +4055,12 @@
       eduNav.chapter = chapter;
       eduNav.mode = 'chapter';
       const stage = document.getElementById('eduQuizStage');
-      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      const hasAccess = eduHasChapterAccess(eduNav.subject, chapter, eduNav.level, eduNav.stream, true);
       let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, chapter, 'chapter');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0) {
-        stage.innerHTML = `
-          <div class="section-card" style="text-align:center;">
-            <h3 style="color:var(--danger); margin-bottom:8px;">🔒 ይህ ምዕራፍ የተቆለፈ (VIP) ነው!</h3>
-            <p style="font-size:0.82rem; color:var(--gray); line-height:1.5; margin-bottom:14px;">
-              • ለ <b>${escHtml(eduNav.subject)}</b> ብቻ (ለ1 ወር) — <b>30 ብር</b> ወይም <b>50 ነጥብ / 5 ግብዣ</b><br>
-              • ለሁሉም ትምህርቶች (Full VIP) — <b>100 ብር</b>
-            </p>
-            <div style="display:flex; gap:8px; margin-bottom:8px;">
-              <button class="btn-action btn-edu" onclick="eduSwitchTab('edu-vip', document.getElementById('navEduVip'))">💎 Unlock VIP</button>
-              <button class="btn-action btn-tg" onclick="eduSwitchTab('edu-rank', document.getElementById('navEduRank'))">🎁 Invite Friends</button>
-            </div>
-            <a class="btn-action" style="background:#374151; color:white; margin-bottom:8px;" href="https://t.me/sorataju1" target="_blank">👨‍💻 አድሚን አናግር (@sorataju1)</a>
-            <button class="btn-back-sm" onclick="eduShowSubjectChapters('${escAttr(eduNav.subject)}')">🔙 Back</button>
-          </div>`;
+        stage.innerHTML = eduBuildLockedScreenHtml(eduNav.subject, chapter, `eduShowSubjectChapters('${escAttr(eduNav.subject)}')`);
         return;
       }
 
@@ -3215,7 +4084,7 @@
     }
 
     function eduStartPractice(practiceNum) {
-      const hasAccess = eduHasSubjectAccess(eduNav.subject, true);
+      const hasAccess = eduHasChapterAccess(eduNav.subject, eduNav.chapter, eduNav.level, eduNav.stream, true);
       let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, eduNav.chapter, 'chapter');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
       qs.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
@@ -3243,6 +4112,36 @@
       eduRenderCurrentQuestion();
     }
 
+    function eduJumpToQuestion(idx) {
+      if (!eduActiveQuiz) return;
+      if (idx < 0 || idx >= eduActiveQuiz.questions.length) return;
+      eduActiveQuiz.index = idx;
+      eduActiveQuiz.answeredCurrent = false;
+      eduRenderCurrentQuestion();
+    }
+
+    function eduSelectWeeklyOption(selected) {
+      if (!eduActiveQuiz || eduActiveQuiz.mode !== 'weekly_exam') return;
+      if (!eduActiveQuiz.userAnswers) eduActiveQuiz.userAnswers = {};
+      eduActiveQuiz.userAnswers[eduActiveQuiz.index] = selected;
+      eduRenderCurrentQuestion();
+    }
+
+    function eduConfirmSubmitWeeklyExam() {
+      if (!eduActiveQuiz) return;
+      const total = eduActiveQuiz.questions.length;
+      const answeredCount = Object.keys(eduActiveQuiz.userAnswers || {}).length;
+      const unans = total - answeredCount;
+      const msg = unans > 0
+        ? `ገና ${unans} ጥያቄ አልመለሱም! እርግጠኛ ነዎት ፈተናውን አሁን ማስረከብ (Submit) ይፈልጋሉ?`
+        : `ሁሉንም ${total} ጥያቄዎች መልሰዋል። ፈተናውን ያስረክቡ (Submit Exam)?`;
+      if (tg.showConfirm) {
+        tg.showConfirm(msg, ok => { if (ok) eduFinalizeWeeklyExam(false); });
+      } else if (confirm(msg)) {
+        eduFinalizeWeeklyExam(false);
+      }
+    }
+
     function eduRenderCurrentQuestion() {
       const stage = document.getElementById('eduQuizStage');
       if (!eduActiveQuiz) return eduRenderInitialQuizView();
@@ -3253,6 +4152,9 @@
       }
 
       if (eduActiveQuiz.index >= eduActiveQuiz.questions.length) {
+        if (eduActiveQuiz.mode === 'weekly_exam') {
+          return eduFinalizeWeeklyExam(false);
+        }
         eduStopCountdownTimer();
         const { score, earned, questions, subject, chapter, practice, mode } = eduActiveQuiz;
         const partLabel = mode === 'chapter' ? ` • Practice ${practice || 1}` : '';
@@ -3281,6 +4183,7 @@
       const optsMap = q.shuffled_options || {
         A: q.option_a, B: q.option_b, C: q.option_c, D: q.option_d
       };
+      const isWeeklyExam = eduActiveQuiz.mode === 'weekly_exam';
 
       let timerHtml = '';
       if (eduActiveQuiz.endTime) {
@@ -3292,6 +4195,43 @@
             <span>⏱ ሳምንታዊ ፈተና ቀሪ ሰዓት</span>
             <span id="eduExamTimerDisplay">${mins}:${secs}</span>
           </div>`;
+      }
+
+      if (isWeeklyExam) {
+        const chosen = (eduActiveQuiz.userAnswers || {})[eduActiveQuiz.index] || '';
+        const pillsHtml = eduActiveQuiz.questions.map((_, i) => {
+          const isCur = i === eduActiveQuiz.index;
+          const isAns = Boolean((eduActiveQuiz.userAnswers || {})[i]);
+          return `<button type="button" class="exam-q-pill ${isCur ? 'current' : (isAns ? 'answered' : '')}" onclick="eduJumpToQuestion(${i})">${i + 1}</button>`;
+        }).join('');
+        const isLast = eduActiveQuiz.index + 1 >= total;
+
+        stage.innerHTML = `
+          ${timerHtml}
+          <div class="edu-back-row">
+            <span style="font-size:0.78rem; font-weight:bold; color:var(--edu-accent);">ጥያቄ ${eduActiveQuiz.index + 1}/${total} • መልስ መጨረሻ ላይ ይታያል</span>
+            <button class="btn-back-sm" style="background:var(--secondary); color:white;" onclick="eduConfirmSubmitWeeklyExam()">✅ Submit</button>
+          </div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+          <div class="exam-q-pills">${pillsHtml}</div>
+          <div class="quiz-question-box">
+            <div>${escHtml(q.question)}</div>
+            ${q.source ? `<div style="margin-top:8px; font-size:0.72rem; color:var(--gray);">📌 ምንጭ: ${escHtml(q.source)}</div>` : ''}
+          </div>
+          <div id="eduOptionsBox">
+            ${['A','B','C','D'].map(letter => `
+              <button class="quiz-opt-btn ${chosen === letter ? 'selected-exam' : ''}" id="optBtn_${letter}" onclick="eduSelectWeeklyOption('${letter}')">
+                <span class="opt-letter">${letter}</span>
+                <span>${escHtml(optsMap[letter])}</span>
+              </button>`).join('')}
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            ${eduActiveQuiz.index > 0 ? `<button class="btn-action" style="flex:1; background:var(--surface); color:var(--text); border:1px solid var(--border);" onclick="eduJumpToQuestion(${eduActiveQuiz.index - 1})">⬅️ Previous</button>` : ''}
+            ${!isLast
+              ? `<button class="btn-action btn-edu" style="flex:1;" onclick="eduJumpToQuestion(${eduActiveQuiz.index + 1})">➡️ Next Question</button>`
+              : `<button class="btn-action btn-tg" style="flex:1;" onclick="eduConfirmSubmitWeeklyExam()">✅ Finish & See Answers</button>`}
+          </div>`;
+        return;
       }
 
       stage.innerHTML = `
@@ -3326,6 +4266,7 @@
 
     async function eduAnswer(selected) {
       if (!eduActiveQuiz || eduActiveQuiz.answeredCurrent) return;
+      if (eduActiveQuiz.mode === 'weekly_exam') return eduSelectWeeklyOption(selected);
       eduActiveQuiz.answeredCurrent = true;
 
       const q = eduActiveQuiz.questions[eduActiveQuiz.index];
@@ -3338,6 +4279,8 @@
         if (l === correct) btn.classList.add('correct');
         else if (l === selected && !isRight) btn.classList.add('wrong');
       });
+
+      eduRecordQuestionAttempt(q, isRight);
 
       let feedbackMsg = '';
       if (isRight) {
@@ -3358,6 +4301,7 @@
           fetch(`${BIKAT_STUDENTS}/${currentUser.id}/answered_questions/${q.id}.json`, {
             method: 'PUT', body: 'true'
           }).catch(() => {});
+          eduProcessPointMilestones(eduActiveQuiz.subject, eduActiveQuiz.chapter);
         } else {
           feedbackMsg = '✅ <b>ትክክል መልሰዋል!</b> <small>(ቀድሞ ስለመለሱት ተጨማሪ ነጥብ አይሰጥም)</small>';
         }
@@ -3385,13 +4329,13 @@
 
     function eduPauseQuiz() {
       if (!eduActiveQuiz) return;
+      if (eduActiveQuiz.mode === 'weekly_exam') return eduConfirmSubmitWeeklyExam();
       const prevMode = eduActiveQuiz.mode || 'chapter';
       eduStopCountdownTimer();
       try { localStorage.setItem('bikat_paused_quiz_' + currentUser.id, JSON.stringify(eduActiveQuiz)); } catch(e) {}
       eduActiveQuiz = null;
       eduCheckPausedQuiz();
-      if (prevMode === 'weekly_exam') eduRenderInitialQuizView();
-      else if (prevMode === 'subject_exam') eduShowSubjectExams(eduNav.subject);
+      if (prevMode === 'subject_exam') eduShowSubjectExams(eduNav.subject);
       else eduSelectChapter(eduNav.chapter);
     }
 
@@ -3400,7 +4344,7 @@
         const raw = localStorage.getItem('bikat_paused_quiz_' + currentUser.id);
         if (raw) {
           const saved = JSON.parse(raw);
-          if (saved.endTime && Date.now() >= saved.endTime) {
+          if (saved.mode === 'weekly_exam' || (saved.endTime && Date.now() >= saved.endTime)) {
             localStorage.removeItem('bikat_paused_quiz_' + currentUser.id);
             document.getElementById('eduResumeBanner').style.display = 'none';
             return;
@@ -3430,7 +4374,7 @@
       } catch(e) {}
     }
 
-        function eduRenderQuestionComments(commentsObj) {
+    function eduRenderQuestionComments(commentsObj) {
       const box = document.getElementById('eduQCommentsList'); if (!box) return;
       if (!commentsObj || Object.keys(commentsObj).length === 0) {
         box.innerHTML = '<p style="font-size:0.75rem; color:var(--gray); text-align:center; padding:4px;">እስካሁን አስተያየት የለም። የመጀመሪያው ይሁኑ!</p>';
@@ -3465,14 +4409,66 @@
       } catch(e) { notifyUser("አስተያየቱን መላክ አልተቻለም"); }
     }
 
+    function eduOpenWeeklyReviewModal(examKey) {
+      const att = eduGetWeeklyExamAttempt(examKey);
+      const body = document.getElementById('weeklyExamReviewBody');
+      if (!att || !body) return;
+      const pct = Math.round((att.score / Math.max(1, att.total)) * 100);
+      body.innerHTML = `
+        <h3 style="color:var(--edu-accent); margin-bottom:4px; font-size:1.05rem;">📋 ${escHtml(att.title || 'Weekly Exam')}</h3>
+        <p style="font-size:0.8rem; color:var(--gray); margin-bottom:12px;">🎯 ውጤት: <b>${att.score} / ${att.total} (${pct}%)</b> • ⭐ +${att.earned_points || (att.score * 2)} ነጥብ</p>
+        ${eduBuildReviewItemsHtml(att.review || [])}`;
+      document.getElementById('weeklyExamReviewModal').style.display = 'block';
+    }
+    function eduCloseWeeklyReviewModal() {
+      document.getElementById('weeklyExamReviewModal').style.display = 'none';
+    }
+
     // =========================================================================
-    // BIKAT PAYMENTS (50 ETB 1-Subject / 2 Months, 100 ETB Full VIP, 300 ETB Notes)
+    // BIKAT PAYMENTS (50 ETB 1-Subject / 1 Month, 150 ETB Full Semester VIP)
     // =========================================================================
+    function eduRenderVipPageExtras() {
+      const invBox = document.getElementById('eduInviteClaimBox');
+      if (invBox && myStudent) {
+        const slots = eduGetAvailableInviteSlots(myStudent);
+        if (slots > 0) {
+          invBox.innerHTML = `
+            <div style="background:var(--gold-bg); border:1px solid var(--gold); border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:0.78rem; font-weight:800; color:var(--gold); margin-bottom:6px;">🎁 ${slots} ነፃ የ1-ወር ሙሉ ትምህርት ሽልማት (በ5 ግብዣ) አለዎት!</div>
+              <button type="button" class="btn-action" style="background:var(--gold); color:white; padding:8px;" onclick="eduClaimTypedSubjectByInvite()">🔓 Unlock Typed Subject Free (5 Invites)</button>
+            </div>`;
+        } else {
+          const rem = Math.max(0, INVITE_THRESHOLD - ((myStudent.invited_count || 0) % INVITE_THRESHOLD));
+          invBox.innerHTML = `<p style="font-size:0.74rem; color:var(--gray); text-align:center;">👥 1 ሙሉ ትምህርት በነፃ ለመክፈት ተጨማሪ <b>${rem}</b> ጓደኛ ይጋብዙ (${myStudent.invited_count || 0}/${INVITE_THRESHOLD})</p>`;
+        }
+      }
+
+      const msBox = document.getElementById('eduMilestoneProgressBox');
+      if (msBox && myStudent) {
+        const pts = Number(myStudent.total_points) || 0;
+        const nextM = eduGetNextMilestone(pts);
+        if (nextM) {
+          const pct = Math.min(100, Math.round((pts / nextM.pts) * 100));
+          msBox.innerHTML = `
+            <div>📊 የአሁኑ ነጥብዎ: <b>${pts} / ${nextM.pts}</b> (ቀጣይ ምዕራፍ ለ<b>${nextM.label}</b> ለመክፈት ${nextM.pts - pts} ነጥብ ይቀርዎታል)</div>
+            <div class="quiz-progress-bar" style="margin-top:6px; margin-bottom:0;"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>`;
+        } else {
+          msBox.innerHTML = `✅ ሁሉንም የነጥብ ሽልማቶች (50 / 150 / 300 ነጥብ) አጠናቀዋል!`;
+        }
+      }
+    }
+
+    async function eduClaimTypedSubjectByInvite() {
+      const subj = document.getElementById('eduVipSubjectInput').value.trim();
+      if (!subj) { notifyUser("እባክዎ መጀመሪያ የሚከፍቱትን ትምህርት ስም ከላይ ይጻፉ (ምሳሌ: Biology)"); return; }
+      await eduClaimInviteSubject(subj);
+    }
+
     function eduStartSingleSubjectVip() {
       const subj = document.getElementById('eduVipSubjectInput').value.trim();
       if (!subj) { notifyUser("እባክዎ መጀመሪያ የሚከፍቱትን ትምህርት ስም ይጻፉ (ምሳሌ: Biology)"); return; }
       const lev = myStudent?.education_level || 'Not Set';
-      eduOpenPaymentModal('subject_vip', lev, 'ለ1 ወር (1 ትምህርት)', '30 ብር', subj);
+      eduOpenPaymentModal('subject_vip', lev, 'ለ1 ወር (1 ሙሉ ትምህርት)', '50 ብር', subj);
     }
 
     function eduOpenPaymentModal(type, level, stream, amount, subject = '') {
@@ -3484,8 +4480,8 @@
       document.getElementById('eduPayImgPlus').style.display = 'block';
 
       let title = `📖 Short Note: ${level} (${amount})`;
-      if (type === 'subject_vip') title = `📘 1-Subject VIP: ${subject} (30 ብር)`;
-      else if (type === 'full_vip') title = `👑 Full VIP — ሁሉም ትምህርቶች (100 ብር)`;
+      if (type === 'subject_vip') title = `📘 1-Subject VIP: ${subject} (50 ብር)`;
+      else if (type === 'full_vip') title = `👑 Full Semester VIP — ሁሉም ትምህርቶች (150 ብር)`;
 
       document.getElementById('eduPayModalTitle').innerText = title;
       document.getElementById('eduPayModalInfo').innerHTML = `
@@ -3540,8 +4536,25 @@
         created_at: new Date().toISOString()
       };
       try {
-        await fetch(`${BIKAT_PAYMENTS}/${reqId}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+        const lightSummary = {
+          id: reqId,
+          type: payload.type,
+          level: payload.level,
+          subject: payload.subject,
+          amount: payload.amount,
+          status: 'pending',
+          created_at: payload.created_at
+        };
+        await Promise.all([
+          fetch(`${BIKAT_PAYMENTS}/${reqId}.json`, { method: 'PUT', body: JSON.stringify(payload) }),
+          fetch(`${BIKAT_STUDENTS}/${currentUser.id}/my_payments/${reqId}.json`, { method: 'PUT', body: JSON.stringify(lightSummary) })
+        ]);
         bikatPayments[reqId] = payload;
+        if (myStudent) {
+          if (!myStudent.my_payments) myStudent.my_payments = {};
+          myStudent.my_payments[reqId] = lightSummary;
+          eduSaveLocalCache();
+        }
         eduClosePaymentModal();
         eduRenderMyPayments();
         notifyUser("⏳ የክፍያ ደረሰኝዎ ደርሶናል! በአድሚን ሲረጋገጥ ወዲያውኑ ይከፈትልዎታል። ✅");
@@ -3551,14 +4564,19 @@
 
     function eduRenderMyPayments() {
       const box = document.getElementById('eduMyPaymentsList'); if (!box) return;
-      const mine = Object.values(bikatPayments).filter(p => String(p.user_id) === String(currentUser.id)).reverse();
+      const fromFull = Object.values(bikatPayments || {}).filter(p => String(p.user_id) === String(currentUser.id));
+      const fromStudent = myStudent && myStudent.my_payments ? Object.values(myStudent.my_payments) : [];
+      const mergedMap = {};
+      fromStudent.forEach(p => { if (p && p.id) mergedMap[p.id] = p; });
+      fromFull.forEach(p => { if (p && p.id) mergedMap[p.id] = p; });
+      const mine = Object.values(mergedMap).sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
       if (mine.length === 0) { box.innerHTML = '<p style="font-size:0.78rem; color:var(--gray);">እስካሁን የላኩት የክፍያ ጥያቄ የለም።</p>'; return; }
       const stMap = { pending: '⏳ በመጠባበቅ ላይ', approved: '✅ ጸድቋል', rejected: '❌ ውድቅ ሆኗል' };
       box.innerHTML = mine.map(p => {
         let label = '📖 Note: ' + escHtml(p.level);
-        if (p.type === 'full_vip') label = '👑 Full VIP (All Subjects)';
+        if (p.type === 'full_vip') label = '👑 Full Semester VIP (All Subjects)';
         else if (p.type === 'subject_vip') label = '📘 1-Subject VIP: ' + escHtml(p.subject);
-        return `<div style="background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:6px; font-size:0.8rem;">
+        return `<div style="background:var(--surface); padding:10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.8rem;">
           <b>${label}</b> (${escHtml(p.amount)})<br>
           <span style="color:var(--gray);">${stMap[p.status] || p.status}</span>
         </div>`;
@@ -3566,7 +4584,7 @@
     }
 
     // =========================================================================
-    // BIKAT LEADERBOARD, REFERRALS & PROFILE
+    // BIKAT LEADERBOARD (INCLUDING SEPARATE WEEKLY EXAM RANK), REFERRALS & PROFILE
     // =========================================================================
     function eduCopyRefLink() {
       const inp = document.getElementById('eduRefLinkInput');
@@ -3588,14 +4606,13 @@
       if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
-    let eduLbPeriod = 'all'; // 'daily' | 'weekly' | 'monthly' | 'all'
+    let eduLbPeriod = 'all'; // 'daily' | 'weekly' | 'monthly' | 'all' | 'weekly_exam'
 
     function eduGetPeriodKeys() {
       const now = new Date();
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const d = String(now.getDate()).padStart(2, '0');
-      // ISO week number
       const tmp = new Date(Date.UTC(y, now.getMonth(), now.getDate()));
       const dayNum = tmp.getUTCDay() || 7;
       tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
@@ -3622,12 +4639,22 @@
     }
 
     function eduGetStudentPeriodPoints(stu, period) {
+      if (period === 'weekly_exam') return Number(stu.weekly_exam_points) || 0;
       if (period === 'all') return stu.total_points || 0;
       const keys = eduGetPeriodKeys();
       if (period === 'daily') return (stu.daily_key === keys.daily) ? (stu.daily_points || 0) : 0;
       if (period === 'weekly') return (stu.weekly_key === keys.weekly) ? (stu.weekly_points || 0) : 0;
       if (period === 'monthly') return (stu.monthly_key === keys.monthly) ? (stu.monthly_points || 0) : 0;
       return stu.total_points || 0;
+    }
+
+    function eduGetStudentWeeklyExamRank(uid) {
+      const realMap = {};
+      Object.values(bikatStudents).forEach(s => { if (s && s.user_id) realMap[String(s.user_id)] = s; });
+      if (myStudent && myStudent.user_id) realMap[String(myStudent.user_id)] = myStudent;
+      const sorted = Object.values(realMap).sort((a, b) => (Number(b.weekly_exam_points) || 0) - (Number(a.weekly_exam_points) || 0));
+      const idx = sorted.findIndex(s => String(s.user_id) === String(uid));
+      return idx >= 0 ? idx + 1 : '-';
     }
 
     function eduSwitchLbPeriod(period, btn) {
@@ -3658,7 +4685,6 @@
       const countBadge = document.getElementById('eduLbCountBadge');
       if (!podiumBox || !listBox) return;
 
-      // Real registered students only (authentic scores & authentic VIP status)
       const realMap = {};
       Object.values(bikatStudents).forEach(s => {
         if (s && s.user_id) realMap[String(s.user_id)] = { ...s };
@@ -3675,7 +4701,11 @@
         }))
         .sort((a, b) => (b._pts - a._pts) || ((b.total_points || 0) - (a.total_points || 0)));
 
-      if (countBadge) countBadge.innerText = `👥 ${ranked.length} Students`;
+      if (countBadge) {
+        countBadge.innerText = eduLbPeriod === 'weekly_exam'
+          ? `🔥 Weekly Exam • ${ranked.length}`
+          : `👥 ${ranked.length} Students`;
+      }
 
       if (ranked.length === 0) {
         podiumBox.innerHTML = `<div style="color:rgba(255,255,255,0.88); font-size:0.82rem; padding:30px 10px; text-align:center;">No students ranked yet. Start a quiz to claim #1! 🚀</div>`;
@@ -3685,10 +4715,9 @@
 
       const ringClassFor = (t) => t === 'full' ? 'vip-ring-diamond' : (t === 'unit' ? 'vip-ring-gold' : '');
       const tagHtmlFor = (t) => t === 'full'
-        ? `<span class="vip-badge-pill badge-diamond" style="font-size:0.55rem; padding:1px 5px;">💎 FULL VIP</span>`
-        : (t === 'unit' ? `<span class="vip-badge-pill badge-gold" style="font-size:0.55rem; padding:1px 5px;">👑 VIP</span>` : '');
+        ? `<span class="vip-badge-pill badge-diamond" style="font-size:0.55rem; padding:1px 5px;">💎 VIP</span>`
+        : (t === 'unit' ? `<span class="vip-badge-pill badge-gold" style="font-size:0.55rem; padding:1px 5px;">👑 UNLOCK</span>` : '');
 
-      // Top 3 Podium in order: 2nd (left), 1st (center), 3rd (right)
       const topOrder = [
         { rank: 2, stu: ranked[1] },
         { rank: 1, stu: ranked[0] },
@@ -3712,7 +4741,6 @@
           </div>`;
       }).join('');
 
-      // Ranks 4+
       const rest = ranked.slice(3);
       if (rest.length === 0) {
         listBox.innerHTML = `<p style="font-size:0.78rem; color:var(--gray); text-align:center; padding:8px;">Invite classmates to join the leaderboard!</p>`;
@@ -3734,19 +4762,275 @@
       }).join('');
     }
 
-        function eduRenderProfile() {
-      const box = document.getElementById('eduProfileCard'); if (!box || !myStudent) return;
+    // =========================================================================
+    // DAILY PROGRESS GRAPHS, FOREX SUCCESS/FAIL CHART & WEAKNESS DETECTOR
+    // =========================================================================
+    function eduAnalyzeStudentProgress(stu) {
+      const daily = stu.daily_stats || {};
+      const todayKey = eduDateStr(0);
+      const yestKey = eduDateStr(-1);
+      const tStat = daily[todayKey] || { attempted: 0, correct: 0, wrong: 0 };
+      const yStat = daily[yestKey] || { attempted: 0, correct: 0, wrong: 0 };
+
+      const tAcc = tStat.attempted > 0 ? Math.round((tStat.correct / tStat.attempted) * 100) : null;
+      const yAcc = yStat.attempted > 0 ? Math.round((yStat.correct / yStat.attempted) * 100) : null;
+
+      // Build last 7 days series
+      const last7 = [];
+      let totalCorrect = 0;
+      let totalWrong = 0;
+      Object.values(daily).forEach(d => {
+        totalCorrect += Number(d.correct) || 0;
+        totalWrong += Number(d.wrong) || 0;
+      });
+      // Fallback if student answered questions before daily_stats existed
+      if (totalCorrect === 0 && totalWrong === 0 && stu.answered_questions) {
+        totalCorrect = Object.keys(stu.answered_questions).length;
+      }
+
+      for (let i = 6; i >= 0; i--) {
+        const k = eduDateStr(-i);
+        const st = daily[k] || { attempted: 0, correct: 0, wrong: 0 };
+        last7.push({
+          key: k,
+          shortLabel: i === 0 ? 'ዛሬ' : (i === 1 ? 'ትላንት' : k.slice(5)),
+          correct: Number(st.correct) || 0,
+          wrong: Number(st.wrong) || 0,
+          attempted: Number(st.attempted) || 0
+        });
+      }
+
+      // Compute study streak
+      let streak = 0;
+      for (let i = 0; i < 365; i++) {
+        const k = eduDateStr(-i);
+        if (daily[k] && (daily[k].attempted || 0) > 0) streak += 1;
+        else if (i > 0) break;
+      }
+
+      // Analyze chapter_stats for weaknesses & strengths
+      const chList = Object.values(stu.chapter_stats || {}).filter(c => c && (c.attempted || 0) > 0).map(c => {
+        const acc = Math.round(((c.correct || 0) / c.attempted) * 100);
+        return { ...c, acc };
+      });
+      const weakChapters = chList
+        .filter(c => (c.wrong || 0) > 0 && c.acc < 75)
+        .sort((a, b) => (a.acc - b.acc) || ((b.wrong || 0) - (a.wrong || 0)));
+      const strongChapters = chList
+        .filter(c => c.acc >= 75 && (c.correct || 0) >= 2)
+        .sort((a, b) => (b.acc - a.acc) || ((b.correct || 0) - (a.correct || 0)));
+
+      return {
+        tStat, yStat, tAcc, yAcc,
+        totalCorrect, totalWrong,
+        last7, streak, weakChapters, strongChapters
+      };
+    }
+
+    function eduLaunchWeakChapter(level, stream, subject, chapter) {
+      if (level && level !== 'All') eduNav.level = level;
+      if (stream && stream !== 'All' && stream !== 'None') eduNav.stream = stream;
+      eduNav.subject = subject;
+      eduNav.chapter = chapter;
+      eduSwitchTab('edu-quiz', document.getElementById('navEduQuiz'));
+      eduSetStepper(3);
+      eduSelectChapter(chapter);
+    }
+
+    function eduBuildAnalyticsHtml(stu, isAdminView = false) {
+      const a = eduAnalyzeStudentProgress(stu);
+      const qDiff = a.tStat.attempted - a.yStat.attempted;
+      const qDeltaCls = qDiff > 0 ? 'up' : (qDiff < 0 ? 'down' : 'neutral');
+      const qDeltaTxt = qDiff > 0
+        ? `📈 +${qDiff} ከትላንት በላይ`
+        : (qDiff < 0 ? `📉 ${qDiff} ከትላንት ያነሰ` : (a.tStat.attempted > 0 ? '⚖️ ከትላንት ጋር እኩል' : 'ዛሬ ገና አልተጀመረም'));
+
+      let accMain = a.tAcc !== null ? `${a.tAcc}%` : '--';
+      let accSub = `ትላንት: ${a.yAcc !== null ? a.yAcc + '%' : 'ምንም'}`;
+      let accDeltaCls = 'neutral';
+      let accDeltaTxt = 'ዛሬ ጥያቄ ሲሰሩ ይሰላል';
+      if (a.tAcc !== null && a.yAcc !== null) {
+        const diffAcc = a.tAcc - a.yAcc;
+        accDeltaCls = diffAcc > 0 ? 'up' : (diffAcc < 0 ? 'down' : 'neutral');
+        accDeltaTxt = diffAcc > 0
+          ? `🎯 +${diffAcc}% ባለመሳሳት የተሻለ`
+          : (diffAcc < 0 ? `⚠️ ${diffAcc}% ከትላንት የቀነሰ` : '⚖️ ከትላንት ጋር እኩል');
+      } else if (a.tAcc !== null) {
+        accDeltaCls = a.tAcc >= 70 ? 'up' : 'down';
+        accDeltaTxt = a.tAcc >= 70 ? '🌟 ጥሩ ትክክለኛነት!' : '💪 የበለጠ ትኩረት ያስፈልጋል';
+      }
+
+      // SVG Donut Chart (Success vs Fail)
+      const tot = a.totalCorrect + a.totalWrong;
+      const overallAcc = tot > 0 ? Math.round((a.totalCorrect / tot) * 100) : 0;
+      const radius = 36;
+      const circ = 2 * Math.PI * radius;
+      const successLen = tot > 0 ? (a.totalCorrect / tot) * circ : 0;
+
+      // SVG Forex-Style Up/Down Success vs Fail Bar Chart (Last 7 Days)
+      const maxBarVal = Math.max(5, ...a.last7.map(d => Math.max(d.correct, d.wrong)));
+      const chartW = 310;
+      const midY = 58;
+      const maxH = 42;
+      const colW = chartW / 7;
+      const forexBarsSvg = a.last7.map((d, i) => {
+        const cx = i * colW + colW / 2;
+        const barW = 16;
+        const upH = d.correct > 0 ? Math.max(4, Math.round((d.correct / maxBarVal) * maxH)) : 0;
+        const dnH = d.wrong > 0 ? Math.max(4, Math.round((d.wrong / maxBarVal) * maxH)) : 0;
+        return `
+          <g>
+            ${upH > 0 ? `<rect x="${cx - barW/2}" y="${midY - upH}" width="${barW}" height="${upH}" rx="4" fill="#10B981" />` : ''}
+            ${upH > 0 ? `<text x="${cx}" y="${midY - upH - 3}" text-anchor="middle" font-size="8" font-weight="800" fill="#10B981">+${d.correct}</text>` : ''}
+            ${dnH > 0 ? `<rect x="${cx - barW/2}" y="${midY + 1}" width="${barW}" height="${dnH}" rx="4" fill="#EF4444" />` : ''}
+            ${dnH > 0 ? `<text x="${cx}" y="${midY + dnH + 9}" text-anchor="middle" font-size="8" font-weight="800" fill="#EF4444">-${d.wrong}</text>` : ''}
+            <text x="${cx}" y="116" text-anchor="middle" font-size="8.5" font-weight="700" fill="#64748B">${escHtml(d.shortLabel)}</text>
+          </g>`;
+      }).join('');
+
+      // Weakness Detector HTML
+      let weaknessHtml = '';
+      if (a.weakChapters.length === 0) {
+        weaknessHtml = `<div style="font-size:0.78rem; color:var(--gray); background:var(--surface); padding:10px; border-radius:10px;">
+          ${tot > 0 ? '🎉 እስካሁን ከፍተኛ ድክመት የታየበት ምዕራፍ የለም! በዚሁ ይቀጥሉ።' : 'ጥያቄዎችን መስራት ሲጀምሩ ድክመት ያለባቸው ምዕራፎች እዚህ ይታያሉ።'}
+        </div>`;
+      } else {
+        weaknessHtml = a.weakChapters.slice(0, 4).map(w => {
+          const actionBtn = isAdminView
+            ? `<button type="button" style="background:#2563EB; color:white; border:none; padding:5px 9px; border-radius:8px; font-size:0.7rem; font-weight:800; cursor:pointer;" onclick="contactDirect('${escAttr(stu.username)}', 'ሰላም ${escAttr(stu.full_name || 'ተማሪ')}! በBIKAT ላይ ${escAttr(w.subject)} (${escAttr(w.chapter)}) ላይ ትንሽ ድክመት ታይቷል (${w.acc}%) — ዛሬ ደግመህ ተለማመደው 💪', '${escAttr(stu.user_id)}')">💬 Advise on This</button>`
+            : `<button type="button" style="background:var(--danger); color:white; border:none; padding:5px 9px; border-radius:8px; font-size:0.7rem; font-weight:800; cursor:pointer;" onclick="eduLaunchWeakChapter('${escAttr(w.level)}','${escAttr(w.stream)}','${escAttr(w.subject)}','${escAttr(w.chapter)}')">🔁 Practice Now</button>`;
+          return `
+            <div class="weakness-item">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                <div>
+                  <strong style="font-size:0.82rem; color:var(--danger);">⚠️ ${escHtml(w.subject)} — ${escHtml(w.chapter)}</strong>
+                  <div style="font-size:0.72rem; color:var(--gray); margin-top:2px;">ትክክለኛነት: <b>${w.acc}%</b> (${w.correct} ትክክል / ${w.wrong} ስህተት)</div>
+                </div>
+                ${actionBtn}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      // Strongest Chapter HTML
+      const strengthHtml = a.strongChapters.length > 0
+        ? `<div class="strength-item" style="margin-top:8px;">
+            <strong style="font-size:0.8rem; color:#059669;">💪 ጠንካራ ምዕራፍ: ${escHtml(a.strongChapters[0].subject)} — ${escHtml(a.strongChapters[0].chapter)} (${a.strongChapters[0].acc}%)</strong>
+          </div>`
+        : '';
+
+      // Weekly Exam History & Separate Rank
+      const wRank = eduGetStudentWeeklyExamRank(stu.user_id);
+      const wAttempts = Object.values(stu.weekly_exam_attempts || {});
+      const wListHtml = wAttempts.length === 0
+        ? `<p style="font-size:0.76rem; color:var(--gray);">እስካሁን የተወሰደ ሳምንታዊ ፈተና የለም።</p>`
+        : wAttempts.map(att => {
+          const wpct = Math.round((att.score / Math.max(1, att.total)) * 100);
+          return `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); padding:8px 10px; border-radius:10px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
+            <div>
+              <b>🔥 ${escHtml(att.title || 'Weekly Exam')}</b><br>
+              <small style="color:var(--gray);">🎯 ${att.score}/${att.total} (${wpct}%) • ⭐ +${att.earned_points || (att.score * 2)} pts</small>
+            </div>
+            ${!isAdminView ? `<button type="button" class="btn-back-sm" style="background:var(--edu-accent); color:white;" onclick="eduOpenWeeklyReviewModal('${escAttr(att.exam_key)}')">📋 Review</button>` : ''}
+          </div>`;
+        }).join('');
+
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:0.94rem; color:var(--edu-accent); margin:0;">📊 የዕለት ተዕለት እድገት (Daily Progress)</h4>
+          <span style="background:var(--gold-bg); color:var(--gold); padding:3px 9px; border-radius:999px; font-size:0.7rem; font-weight:800;">🔥 ${a.streak} ቀን Streak</span>
+        </div>
+
+        <!-- Today vs Yesterday Cards -->
+        <div class="analytics-cmp-grid">
+          <div class="analytics-cmp-card">
+            <div class="analytics-cmp-label">📝 ዛሬ የተሰሩ ጥያቄዎች</div>
+            <div class="analytics-cmp-val">${a.tStat.attempted} <small style="font-size:0.72rem; font-weight:600; color:var(--gray);">ጥያቄ</small></div>
+            <div class="analytics-cmp-sub">ትላንት: ${a.yStat.attempted} ጥያቄ</div>
+            <span class="delta-pill ${qDeltaCls}">${qDeltaTxt}</span>
+          </div>
+          <div class="analytics-cmp-card">
+            <div class="analytics-cmp-label">🎯 ዛሬ ባለመሳሳት (Accuracy)</div>
+            <div class="analytics-cmp-val">${accMain}</div>
+            <div class="analytics-cmp-sub">${accSub}</div>
+            <span class="delta-pill ${accDeltaCls}">${accDeltaTxt}</span>
+          </div>
+        </div>
+
+        <!-- Circle Donut Graph: Success vs Fail -->
+        <div class="donut-wrap">
+          <svg width="92" height="92" viewBox="0 0 92 92" style="flex-shrink:0;">
+            <circle cx="46" cy="46" r="${radius}" fill="none" stroke="${tot > 0 ? '#EF4444' : '#CBD5E1'}" stroke-width="11" />
+            ${tot > 0 ? `<circle cx="46" cy="46" r="${radius}" fill="none" stroke="#10B981" stroke-width="11" stroke-dasharray="${successLen} ${circ}" stroke-linecap="round" transform="rotate(-90 46 46)" />` : ''}
+            <text x="46" y="50" text-anchor="middle" font-size="14" font-weight="900" fill="currentColor">${overallAcc}%</text>
+          </svg>
+          <div style="flex:1; font-size:0.78rem; line-height:1.6;">
+            <div style="font-weight:800; margin-bottom:4px; color:var(--text);">⭕ አጠቃላይ Success vs Fail</div>
+            <div>🟢 <b>Success (ትክክል):</b> ${a.totalCorrect} ጥያቄ (${overallAcc}%)</div>
+            <div>🔴 <b>Fail (ስህተት):</b> ${a.totalWrong} ጥያቄ (${tot > 0 ? 100 - overallAcc : 0}%)</div>
+            <div style="color:var(--gray); font-size:0.7rem;">ዛሬ: ✅ ${a.tStat.correct} ትክክል | ❌ ${a.tStat.wrong} ስህተት</div>
+          </div>
+        </div>
+
+        <!-- Forex-Style 7-Day Success vs Fail Graph -->
+        <div class="forex-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:0.8rem; color:var(--text);">📈 የ7 ቀን Success / Fail Graph</strong>
+            <span style="font-size:0.66rem; color:var(--gray);">🟢 ላይ: ትክክል | 🔴 ታች: ስህተት</span>
+          </div>
+          <svg width="100%" height="122" viewBox="0 0 ${chartW} 122" preserveAspectRatio="none">
+            <line x1="6" y1="${midY}" x2="${chartW - 6}" y2="${midY}" stroke="#94A3B8" stroke-width="1" stroke-dasharray="3,3" />
+            ${forexBarsSvg}
+          </svg>
+        </div>
+
+        <!-- Weakness Detector -->
+        <div style="margin-top:12px;">
+          <h4 style="font-size:0.86rem; color:var(--danger); margin-bottom:6px;">🎯 ድክመት ያለባቸው ትምህርቶች እና ምዕራፎች</h4>
+          ${weaknessHtml}
+          ${strengthHtml}
+        </div>
+
+        <!-- Weekly Exam Separate Rank & Progress -->
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="font-size:0.86rem; color:var(--gold); margin:0;">🔥 Weekly Exam Progress & Rank</h4>
+            <span style="background:var(--edu-bg); color:var(--edu-accent); padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:800;">🏅 Rank #${wRank} • ${stu.weekly_exam_points || 0} pts</span>
+          </div>
+          ${wListHtml}
+        </div>`;
+    }
+
+    function eduRenderProfile() {
+      const box = document.getElementById('eduProfileCard');
+      const analyticsBox = document.getElementById('eduProgressAnalyticsCard');
+      if (!box || !myStudent) return;
+
       const ansCount = myStudent.answered_questions ? Object.keys(myStudent.answered_questions).length : 0;
-      const remPts = Math.max(0, BONUS_POINTS_THRESHOLD - (myStudent.total_points || 0));
-      const remInv = Math.max(0, BONUS_INVITE_THRESHOLD - (myStudent.invited_count || 0));
+      const nextM = eduGetNextMilestone(myStudent.total_points || 0);
+      const remPtsTxt = nextM ? `(ቀጣይ ምዕራፍ: ${nextM.pts - (myStudent.total_points || 0)} ነጥብ ቀሪ)` : '(MAX)';
+      const remInv = Math.max(0, INVITE_THRESHOLD - ((myStudent.invited_count || 0) % INVITE_THRESHOLD));
       const tier = eduGetStudentVipTier(myStudent);
       const ringCls = tier === 'full' ? 'vip-ring-diamond' : (tier === 'unit' ? 'vip-ring-gold' : '');
       const statusBadge = tier === 'full'
-        ? `<span class="vip-badge-pill badge-diamond">💎 FULL VIP</span>`
-        : (tier === 'unit' ? `<span class="vip-badge-pill badge-gold">👑 VIP</span>` : `👤 Free Tier`);
+        ? `<span class="vip-badge-pill badge-diamond">💎 FULL SEMESTER VIP</span>`
+        : (tier === 'unit' ? `<span class="vip-badge-pill badge-gold">👑 ACTIVE UNLOCK</span>` : `👤 Free Tier`);
       const avatarContent = currentUser.photo_url
         ? `<img src="${escAttr(currentUser.photo_url)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : escHtml(eduGetInitials(myStudent.full_name));
+
+      const now = Date.now();
+      const unlockedList = [];
+      if (myStudent.subject_vips) {
+        Object.entries(myStudent.subject_vips).forEach(([sub, exp]) => {
+          if (Number(exp) > now) unlockedList.push(`${sub} (ሙሉ ትምህርት)`);
+        });
+      }
+      if (myStudent.unlocked_chapters) {
+        Object.values(myStudent.unlocked_chapters).forEach(u => {
+          if (u && Number(u.expires_at) > now) unlockedList.push(`${u.subject} - ${u.chapter}`);
+        });
+      }
 
       box.innerHTML = `
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
@@ -3761,15 +5045,19 @@
         <div style="font-size:0.84rem; line-height:1.85;">
           🆔 <b>ID:</b> <code>${myStudent.user_id}</code><br>
           📚 <b>የተመረጠ ክፍል:</b> ${escHtml(myStudent.education_level)}<br>
-          🎁 <b>ነፃ / 1-ትምህርት (1 ወር):</b> ${escHtml(myStudent.bonus_subject || (myStudent.subject_vips ? Object.keys(myStudent.subject_vips).join(', ') : 'ገና አልተከፈተም'))}<br>
+          🔓 <b>የተከፈቱ:</b> ${escHtml(unlockedList.length ? unlockedList.join(', ') : 'ገና አልተከፈተም')}<br>
           ✅ <b>በትክክል የተመለሱ:</b> ${ansCount} ጥያቄ<br>
-          🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">(ቀሪ: ${remPts})</small><br>
-          👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ቀሪ: ${remInv})</small>
+          🏆 <b>አጠቃላይ ነጥብ:</b> ${myStudent.total_points || 0} <small style="color:var(--gray);">${remPtsTxt}</small><br>
+          👥 <b>የጋበዟቸው:</b> ${myStudent.invited_count || 0} <small style="color:var(--gray);">(ለቀጣይ ነፃ Subject: ${remInv} ቀሪ)</small>
         </div>`;
+
+      if (analyticsBox) {
+        analyticsBox.innerHTML = eduBuildAnalyticsHtml(myStudent, false);
+      }
     }
 
-        // =========================================================================
-    // BIKAT ADMIN PANEL (CONTINUOUS + EXISTING CHAPTERS + NOTIFICATIONS + VIP)
+    // =========================================================================
+    // BIKAT ADMIN PANEL (CONTINUOUS + EXISTING CHAPTERS + NOTIFICATIONS + VIP + STUDENT PROGRESS)
     // =========================================================================
     function eduAdminOnCategoryChange() {
       const cat = document.getElementById('eaContentCat').value;
@@ -4097,15 +5385,85 @@
       if (tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
     }
 
+    function eduRenderAdminStudentsList() {
+      const stuBox = document.getElementById('eduAdminStudentsList');
+      if (!stuBox) return;
+      const q = (document.getElementById('eaStudentSearchInput')?.value || '').toLowerCase().trim();
+      let studentsArr = Object.values(bikatStudents || {});
+      if (q) {
+        studentsArr = studentsArr.filter(s =>
+          String(s.full_name || '').toLowerCase().includes(q) ||
+          String(s.username || '').toLowerCase().includes(q) ||
+          String(s.user_id || '').includes(q)
+        );
+      }
+      studentsArr.sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
+
+      if (studentsArr.length === 0) {
+        stuBox.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center; padding:12px;">ምንም ተማሪ አልተገኘም።</p>';
+        return;
+      }
+
+      const todayKey = eduDateStr(0);
+      stuBox.innerHTML = studentsArr.slice(0, 60).map(s => {
+        const tAttempted = (s.daily_stats && s.daily_stats[todayKey]) ? (s.daily_stats[todayKey].attempted || 0) : 0;
+        const isVip = eduIsFullSemesterVip(s);
+        return `
+          <div style="background:var(--surface); padding:9px 10px; border-radius:10px; border:1px solid var(--border); margin-bottom:7px; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
+              <div style="flex:1; min-width:0;">
+                <b>${escHtml(s.full_name || 'ተማሪ')}</b> <span style="color:var(--edu-accent); font-size:0.72rem;">${s.username ? '@' + escHtml(s.username) : ''}</span><br>
+                <small style="color:var(--gray);">🏆 ${s.total_points || 0} ነጥብ | ዛሬ: ${tAttempted} Qs | ${isVip ? '👑 VIP' : '👤 Free'}</small>
+              </div>
+              <div style="display:flex; gap:4px; flex-shrink:0;">
+                <button style="background:var(--edu-accent); color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; font-weight:bold; cursor:pointer;" onclick="eduAdminOpenStudentProgress('${escAttr(s.user_id)}')">📊 Progress</button>
+                <button style="background:#2563EB; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="contactDirect('${escAttr(s.username)}', 'ሰላም ${escAttr(s.full_name || 'ተማሪ')}! ከBIKAT Admin ነው።', '${escAttr(s.user_id)}')">💬</button>
+                <button style="background:${isVip ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${isVip ? 0 : 1})">${isVip ? 'Un-VIP' : 'VIP'}</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function eduAdminOpenStudentProgress(uid) {
+      const stu = bikatStudents[uid] || (String(uid) === String(currentUser.id) ? myStudent : null);
+      const body = document.getElementById('studentProgressModalBody');
+      if (!stu || !body) return;
+
+      const a = eduAnalyzeStudentProgress(stu);
+      const topWeak = a.weakChapters[0];
+      const defaultAdvice = topWeak
+        ? `ሰላም ${stu.full_name || 'ተማሪ'}! በBIKAT ላይ እድገትህን አይቼዋለሁ — በ ${topWeak.subject} (${topWeak.chapter}) ላይ ትክክለኛነትህ ${topWeak.acc}% ስለሆነ እሱን ምዕራፍ ዛሬ ደግመህ ተለማመደው 💪`
+        : `ሰላም ${stu.full_name || 'ተማሪ'}! በBIKAT ላይ ጥሩ እየሰራህ ነው (${stu.total_points || 0} ነጥብ) — በዚሁ ቀጥል! 🚀`;
+
+      body.innerHTML = `
+        <div style="margin-bottom:12px;">
+          <h3 style="color:var(--edu-accent); font-size:1.05rem; margin-bottom:2px;">👤 ${escHtml(stu.full_name || 'ተማሪ')}</h3>
+          <div style="font-size:0.74rem; color:var(--gray);">
+            ${stu.username ? '@' + escHtml(stu.username) + ' • ' : ''}ID: <code>${stu.user_id}</code> • 📚 ${escHtml(stu.education_level || 'Not Set')}
+          </div>
+        </div>
+        ${eduBuildAnalyticsHtml(stu, true)}
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">
+          <label style="display:block; font-size:0.78rem; font-weight:800; color:var(--text); margin-bottom:6px;">💬 ለተማሪው የምክር መልዕክት ይላኩ (Direct Coaching)</label>
+          <textarea id="adminCoachMsgInput" rows="3" style="width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:10px; font-size:0.8rem; background:var(--surface); color:var(--text); margin-bottom:8px;">${escHtml(defaultAdvice)}</textarea>
+          <button type="button" class="btn-action btn-tg" onclick="contactDirect('${escAttr(stu.username)}', document.getElementById('adminCoachMsgInput').value, '${escAttr(stu.user_id)}')">💬 Open Telegram Chat & Send Advice</button>
+        </div>`;
+      document.getElementById('studentProgressModal').style.display = 'block';
+    }
+
+    function eduCloseStudentProgressModal() {
+      document.getElementById('studentProgressModal').style.display = 'none';
+    }
+
     function eduRenderAdmin() {
       const studentsArr = Object.values(bikatStudents);
       const paymentsArr = Object.values(bikatPayments).reverse();
       document.getElementById('eduStStudents').innerText = studentsArr.length;
-      document.getElementById('eduStVip').innerText = studentsArr.filter(s => s.is_vip == 1).length;
+      document.getElementById('eduStVip').innerText = studentsArr.filter(s => eduIsFullSemesterVip(s)).length;
       document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
       document.getElementById('eduStPendingPay').innerText = paymentsArr.filter(p => p.status === 'pending').length;
 
-      // Refresh subject/chapter dropdowns if empty
       if (document.getElementById('eaSubjectSelect').options.length === 0) {
         eduAdminRefreshSubjectSelect();
       }
@@ -4158,8 +5516,8 @@
       else {
         payBox.innerHTML = paymentsArr.map(p => {
           let pLabel = '📖 Note: ' + escHtml(p.level);
-          if (p.type === 'full_vip') pLabel = '👑 Full VIP (100 ብር)';
-          else if (p.type === 'subject_vip') pLabel = `📘 1-Subject VIP: ${escHtml(p.subject)} (30 ብር)`;
+          if (p.type === 'full_vip') pLabel = `👑 Full Semester VIP (${escHtml(p.amount || '150 ብር')})`;
+          else if (p.type === 'subject_vip') pLabel = `📘 1-Subject VIP: ${escHtml(p.subject)} (${escHtml(p.amount || '50 ብር')})`;
           return `<div style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.82rem;">
               <b>${pLabel}</b>
@@ -4176,7 +5534,7 @@
         }).join('');
       }
 
-      // Stats, Free/Paid Toggle & Bulk Delete (Chapters + Subject Exams + Weekly Exams)
+      // Stats, Free/Paid Toggle & Bulk Delete
       const statsMap = {};
       bikatQuestions.forEach(q => {
         const cat = q.content_category || 'chapter';
@@ -4227,19 +5585,7 @@
         }).join('');
       }
 
-      // Students list (with @username + Chat button)
-      const stuBox = document.getElementById('eduAdminStudentsList');
-      stuBox.innerHTML = studentsArr.sort((a,b) => (b.total_points||0)-(a.total_points||0)).slice(0, 50).map(s => `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; background:var(--surface); padding:8px 10px; border-radius:8px; border:1px solid var(--border); margin-bottom:6px; font-size:0.78rem;">
-          <div style="flex:1; min-width:0;">
-            <b>${escHtml(s.full_name || 'ተማሪ')}</b> <span style="color:var(--edu-accent); font-size:0.72rem;">${s.username ? '@' + escHtml(s.username) : ''}</span><br>
-            <small style="color:var(--gray);">🏆 ${s.total_points||0} ነጥብ | ID: ${s.user_id} | ${s.is_vip == 1 ? '👑 VIP' : '👤 Free'}</small>
-          </div>
-          <div style="display:flex; gap:4px; flex-shrink:0;">
-            <button style="background:#2563EB; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="contactDirect('${escAttr(s.username)}', 'ሰላም ${escAttr(s.full_name || 'ተማሪ')}! ከBIKAT Admin ነው።', '${escAttr(s.user_id)}')">💬 Chat</button>
-            <button style="background:${s.is_vip == 1 ? '#6B7280' : 'var(--gold)'}; color:white; border:none; padding:5px 8px; border-radius:6px; font-size:0.72rem; cursor:pointer;" onclick="eduAdminToggleVip('${s.user_id}', ${s.is_vip == 1 ? 0 : 1})">${s.is_vip == 1 ? 'Un-VIP' : 'VIP'}</button>
-          </div>
-        </div>`).join('');
+      eduRenderAdminStudentsList();
 
       // Student Feedbacks list (next to Students tab)
       const fbArr = Object.values(bikatFeedbacks || {}).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -4273,10 +5619,17 @@
     async function eduAdminApprovePay(payId, status) {
       const p = bikatPayments[payId]; if (!p) return;
       try {
-        await fetch(`${BIKAT_PAYMENTS}/${payId}.json`, { method: 'PATCH', body: JSON.stringify({ status }) });
+        await Promise.all([
+          fetch(`${BIKAT_PAYMENTS}/${payId}.json`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+          fetch(`${BIKAT_STUDENTS}/${p.user_id}/my_payments/${payId}.json`, { method: 'PATCH', body: JSON.stringify({ status }) })
+        ]);
         if (status === 'approved') {
           if (p.type === 'full_vip' || p.type === 'vip') {
-            await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: 1 }) });
+            const semExp = Date.now() + SEMESTER_MS;
+            await fetch(`${BIKAT_STUDENTS}/${p.user_id}.json`, {
+              method: 'PATCH',
+              body: JSON.stringify({ is_vip: 1, vip_expires_at: semExp })
+            });
           } else if (p.type === 'subject_vip' && p.subject) {
             const exp = Date.now() + ONE_MONTH_MS;
             await fetch(`${BIKAT_STUDENTS}/${p.user_id}/subject_vips/${encodeURIComponent(p.subject)}.json`, {
@@ -4353,7 +5706,11 @@
     }
 
     async function eduAdminToggleVip(uid, newVal) {
-      await fetch(`${BIKAT_STUDENTS}/${uid}.json`, { method: 'PATCH', body: JSON.stringify({ is_vip: newVal }) });
+      const semExp = newVal == 1 ? (Date.now() + SEMESTER_MS) : 0;
+      await fetch(`${BIKAT_STUDENTS}/${uid}.json`, {
+        method: 'PATCH',
+        body: JSON.stringify({ is_vip: newVal, vip_expires_at: semExp })
+      });
       await eduLoadAllData();
     }
 
@@ -4365,29 +5722,46 @@
         document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('navEduAdmin').style.display = 'flex';
       }
-      trackUser();
+      // Track user lightly without blocking initial UI render
+      setTimeout(() => trackUser(), 600);
 
       const startParam = getStartParam();
       if (startParam && startParam.startsWith('p_')) {
         // Direct product link -> skip hub, open Shop & product popup
         document.getElementById('hubScreen').style.display = 'none';
         switchAppMode('shop');
-        await loadAllData();
         const pId = startParam.substring(2);
         if (products.some(p => p.id === pId)) openModal(pId);
       } else if (startParam && startParam.startsWith('ref_')) {
-        // BIKAT referral link -> skip hub, open Education & credit referrer
+        // BIKAT referral link -> skip hub, open Education & credit referrer (don't waste bandwidth on Shop)
         const refId = startParam.substring(4);
         document.getElementById('hubScreen').style.display = 'none';
-        switchAppMode('edu');
+        currentAppMode = 'edu';
+        document.getElementById('mode-shop').classList.remove('active');
+        document.getElementById('mode-edu').classList.add('active');
+        document.getElementById('navBarShop').classList.remove('active');
+        document.getElementById('navBarEdu').classList.add('active');
+        document.getElementById('modeBtnShop').className = 'mode-pill';
+        document.getElementById('modeBtnEdu').className = 'mode-pill edu-active';
+        document.getElementById('headerTitle').innerText = 'BIKAT Education';
+        document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
+        requestAnimationFrame(() => updateNavIndicator('navBarEdu'));
         await eduLoadAllData(refId);
-        loadAllData();
       } else if (startParam && startParam.startsWith('ch_')) {
         // Direct BIKAT Chapter link -> skip hub, open Education & jump straight to that chapter
         const targetQId = startParam.substring(3);
         document.getElementById('hubScreen').style.display = 'none';
-        switchAppMode('edu');
-        await eduLoadAllData();
+        currentAppMode = 'edu';
+        document.getElementById('mode-shop').classList.remove('active');
+        document.getElementById('mode-edu').classList.add('active');
+        document.getElementById('navBarShop').classList.remove('active');
+        document.getElementById('navBarEdu').classList.add('active');
+        document.getElementById('modeBtnShop').className = 'mode-pill';
+        document.getElementById('modeBtnEdu').className = 'mode-pill edu-active';
+        document.getElementById('headerTitle').innerText = 'BIKAT Education';
+        document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
+        requestAnimationFrame(() => updateNavIndicator('navBarEdu'));
+        await eduLoadAllData(null, true);
         const foundQ = bikatQuestions.find(q => q.id === targetQId || q.custom_id === targetQId);
         if (foundQ) {
           const qCat = foundQ.content_category || 'chapter';
@@ -4400,16 +5774,15 @@
             eduNav = { level: foundQ.level, stream: foundQ.stream || 'Natural', subject: foundQ.subject, chapter: foundQ.chapter, practice: 1, mode: 'chapter' };
             eduSelectChapter(foundQ.chapter);
           }
+        } else {
+          eduRenderInitialQuizView();
         }
-        loadAllData();
       } else if (startParam === 'edu') {
         document.getElementById('hubScreen').style.display = 'none';
         switchAppMode('edu');
-        await eduLoadAllData();
-        loadAllData();
       } else {
-        // Show Hub Screen so user picks Shop or Education, while loading shop data in background
-        loadAllData();
+        // Show Hub Screen immediately so newcomer sees Welcome cards in 0ms; load chosen mode on tap!
+        shopHydrateFromCache();
       }
     }
 
