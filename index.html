@@ -7850,7 +7850,9 @@
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         if (!giftAudioCtx) giftAudioCtx = new AudioCtx();
-        if (giftAudioCtx.state === 'suspended') giftAudioCtx.resume();
+        if (giftAudioCtx.state === 'suspended') {
+          giftAudioCtx.resume();
+        }
 
         const notes = [
           [261.63, 0.32], [261.63, 0.22], [293.66, 0.52], [261.63, 0.52], [349.23, 0.52], [329.63, 0.92],
@@ -7891,8 +7893,19 @@
     }
 
     function giftToggleMusic() {
-      if (giftMusicPlaying) giftStopMusic();
-      else giftStartMusic((giftCurrentData && (giftCurrentData.musicUrl || giftCurrentData.music)) || 'music_box');
+      if (!giftAudioCtx) {
+        giftStartMusic((giftCurrentData && (giftCurrentData.musicUrl || giftCurrentData.music)) || 'music_box');
+        return;
+      }
+      if (giftAudioCtx.state === 'running') {
+        giftAudioCtx.suspend();
+        giftMusicPlaying = false;
+        document.getElementById('giftMusicToggleBtn').innerText = '🔊 Resume Music';
+      } else {
+        giftAudioCtx.resume();
+        giftMusicPlaying = true;
+        document.getElementById('giftMusicToggleBtn').innerText = '⏸ Pause Music';
+      }
     }
 
     // =========================================================================
