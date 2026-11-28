@@ -911,6 +911,314 @@
       border: 2px solid currentColor; border-top-color: transparent;
       animation: miniSpin 0.7s linear infinite; flex-shrink: 0;
     }
+
+    /* =========================================================================
+       VIRTUAL GIFT STUDIO (3RD SERVICE + CINEMATIC 3D BIRTHDAY GIFT BOX)
+       ========================================================================= */
+    .hub-card.gift-card { border-left: 4px solid #EC4899; }
+    .hub-card.gift-card .hub-icon-box { background: linear-gradient(135deg, #9D174D, #EC4899, #F59E0B); }
+    .mode-switcher.three-modes { grid-template-columns: 1fr 1fr 1fr; }
+    .mode-pill.gift-active { background: white; color: #BE185D; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    body[data-theme="dark"] .mode-pill.gift-active { background: #1E293B; color: #F472B6; }
+
+    .gift-studio-hero {
+      background: linear-gradient(135deg, #4C0519 0%, #9D174D 55%, #DB2777 100%);
+      color: white; border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px;
+      box-shadow: 0 10px 26px rgba(157, 23, 77, 0.28);
+    }
+    .gift-tpl-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px;
+    }
+    .gift-tpl-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+      padding: 10px 6px; text-align: center; cursor: pointer; font-size: 0.74rem; font-weight: 800;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .gift-tpl-card:active { transform: scale(0.96); }
+    .gift-tpl-card.selected {
+      border-color: #EC4899; background: rgba(236, 72, 153, 0.12);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.22);
+    }
+    .gift-swatch {
+      width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 5px;
+      border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+    }
+    .gift-photo-thumbs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .gift-thumb-wrap {
+      position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden;
+      border: 1.5px solid var(--border); background: var(--surface);
+    }
+    .gift-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .gift-thumb-del {
+      position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(239,68,68,0.92); color: white; border: none; font-size: 10px;
+      font-weight: 800; cursor: pointer; line-height: 1;
+    }
+
+    /* FULL-SCREEN RECIPIENT 3D BIRTHDAY EXPERIENCE OVERLAY */
+    .gift-stage-overlay {
+      position: fixed; inset: 0; z-index: 100050;
+      background: radial-gradient(circle at 50% 25%, #2E1065 0%, #0F0722 52%, #05020D 100%);
+      color: #F8FAFC; overflow-y: auto; overflow-x: hidden;
+      display: none; flex-direction: column; align-items: center;
+      padding: 18px 16px calc(32px + env(safe-area-inset-bottom, 0px));
+    }
+    .gift-stage-overlay.theme-royal_gold {
+      background: radial-gradient(circle at 50% 25%, #3B1D0E 0%, #160A04 55%, #070301 100%);
+    }
+    .gift-stage-overlay.theme-emerald_star {
+      background: radial-gradient(circle at 50% 25%, #064E3B 0%, #041F1A 55%, #020D0B 100%);
+    }
+    .gift-stars-bg {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(2px 2px at 18% 16%, rgba(255,255,255,0.75) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 78% 22%, rgba(253,224,71,0.85) 50%, transparent 100%),
+        radial-gradient(2px 2px at 32% 68%, rgba(244,114,182,0.75) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 84% 74%, rgba(255,255,255,0.7) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 54% 40%, rgba(167,243,208,0.75) 50%, transparent 100%),
+        radial-gradient(2px 2px at 12% 84%, rgba(253,224,71,0.65) 50%, transparent 100%);
+      animation: starTwinkle 4s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle {
+      0% { opacity: 0.55; }
+      100% { opacity: 1; }
+    }
+    .gift-confetti-canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 3;
+    }
+    .gift-top-controls {
+      position: relative; z-index: 4; width: 100%; max-width: 460px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .gift-glass-pill {
+      background: rgba(255,255,255,0.12); color: #F8FAFC;
+      border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(10px);
+      padding: 7px 13px; border-radius: 999px; font-size: 0.76rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s, background 0.15s;
+    }
+    .gift-glass-pill:active { transform: scale(0.95); background: rgba(255,255,255,0.22); }
+
+    .gift-center-stage {
+      position: relative; z-index: 2; width: 100%; max-width: 440px;
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; padding: 12px 4px;
+    }
+    .gift-pre-badge {
+      display: inline-block; padding: 5px 14px; border-radius: 999px;
+      background: rgba(251, 191, 36, 0.16); border: 1px solid rgba(251, 191, 36, 0.42);
+      color: #FDE68A; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+    .gift-recipient-title {
+      font-size: 1.72rem; font-weight: 900; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 55%, #F9A8D4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 6px; line-height: 1.2;
+    }
+    .gift-subtitle {
+      font-size: 0.88rem; color: rgba(248, 250, 252, 0.82); margin-bottom: 24px;
+    }
+
+    /* CSS 3D REALISTIC GIFT BOX */
+    .gift-3d-scene {
+      width: 190px; height: 190px; margin: 14px auto 26px;
+      perspective: 950px; position: relative; cursor: pointer;
+    }
+    .gift-box-glow {
+      position: absolute; inset: 12px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.55) 0%, rgba(236, 72, 153, 0.25) 55%, transparent 75%);
+      filter: blur(18px); transform: scale(0.85); opacity: 0.65;
+      transition: transform 0.7s ease, opacity 0.7s ease;
+      pointer-events: none;
+    }
+    .gift-3d-scene.opened .gift-box-glow {
+      transform: scale(1.75); opacity: 1;
+    }
+    .gift-3d-cube {
+      width: 150px; height: 130px; position: relative; margin: 36px auto 0;
+      transform-style: preserve-3d;
+      transform: rotateX(-16deg) rotateY(-28deg);
+      animation: giftFloat 3.2s ease-in-out infinite;
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes giftFloat {
+      0%, 100% { transform: rotateX(-16deg) rotateY(-28deg) translateY(0px); }
+      50% { transform: rotateX(-13deg) rotateY(-20deg) translateY(-10px); }
+    }
+    .gift-3d-scene.shaking .gift-3d-cube {
+      animation: giftShake 0.55s ease-in-out;
+    }
+    @keyframes giftShake {
+      0%, 100% { transform: rotateX(-16deg) rotateY(-28deg) scale(1); }
+      25% { transform: rotateX(-16deg) rotateY(-36deg) rotateZ(-4deg) scale(1.05); }
+      50% { transform: rotateX(-16deg) rotateY(-18deg) rotateZ(4deg) scale(1.07); }
+      75% { transform: rotateX(-16deg) rotateY(-32deg) rotateZ(-2deg) scale(1.04); }
+    }
+    .gift-3d-scene.opened .gift-3d-cube {
+      animation: none;
+      transform: rotateX(-20deg) rotateY(-24deg) translateY(18px) scale(0.92);
+    }
+
+    /* Box Base Faces (Crimson & Gold Default) */
+    .g-face {
+      position: absolute; width: 150px; height: 130px;
+      background: linear-gradient(145deg, #E11D48, #9F1239);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: inset 0 0 22px rgba(0,0,0,0.28);
+    }
+    .gift-stage-overlay.theme-royal_gold .g-face {
+      background: linear-gradient(145deg, #1E293B, #0F172A);
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+    .gift-stage-overlay.theme-emerald_star .g-face {
+      background: linear-gradient(145deg, #059669, #064E3B);
+    }
+    .g-front  { transform: translateZ(75px); }
+    .g-back   { transform: rotateY(180deg) translateZ(75px); }
+    .g-right  { transform: rotateY(90deg) translateZ(75px); filter: brightness(0.88); }
+    .g-left   { transform: rotateY(-90deg) translateZ(75px); filter: brightness(0.94); }
+    .g-bottom {
+      width: 150px; height: 150px; top: -10px;
+      transform: rotateX(-90deg) translateZ(65px);
+      background: #4C0519; box-shadow: 0 24px 36px rgba(0,0,0,0.65);
+    }
+    /* Vertical & Horizontal Metallic Gold Ribbons on Base */
+    .g-face::before {
+      content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #D97706, #FDE047, #D97706);
+      box-shadow: 0 0 8px rgba(253, 224, 71, 0.35);
+    }
+
+    /* 3D Box Lid */
+    .gift-lid {
+      position: absolute; width: 162px; height: 34px; left: -6px; top: -22px;
+      transform-style: preserve-3d;
+      transform-origin: 50% 100% -81px;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+    }
+    .gift-3d-scene.opened .gift-lid {
+      transform: rotateX(122deg) translateY(-18px) translateZ(14px);
+    }
+    .g-lid-face {
+      position: absolute; width: 162px; height: 34px;
+      background: linear-gradient(145deg, #F43F5E, #BE123C);
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+    .gift-stage-overlay.theme-royal_gold .g-lid-face {
+      background: linear-gradient(145deg, #334155, #1E293B);
+    }
+    .gift-stage-overlay.theme-emerald_star .g-lid-face {
+      background: linear-gradient(145deg, #10B981, #047857);
+    }
+    .g-lid-front  { transform: translateZ(81px); }
+    .g-lid-back   { transform: rotateY(180deg) translateZ(81px); }
+    .g-lid-right  { transform: rotateY(90deg) translateZ(81px); filter: brightness(0.88); }
+    .g-lid-left   { transform: rotateY(-90deg) translateZ(81px); filter: brightness(0.94); }
+    .g-lid-top {
+      position: absolute; width: 162px; height: 162px; top: -64px; left: 0;
+      transform: rotateX(90deg) translateZ(17px);
+      background: linear-gradient(135deg, #FB7185, #E11D48);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .gift-stage-overlay.theme-royal_gold .g-lid-top { background: linear-gradient(135deg, #475569, #1E293B); }
+    .gift-stage-overlay.theme-emerald_star .g-lid-top { background: linear-gradient(135deg, #34D399, #059669); }
+    .g-lid-face::before, .g-lid-top::before {
+      content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #D97706, #FDE047, #D97706);
+    }
+    .g-lid-top::after {
+      content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 24px;
+      transform: translateY(-50%);
+      background: linear-gradient(180deg, #D97706, #FDE047, #D97706);
+    }
+    /* 3D Ribbon Bow on Top */
+    .gift-bow {
+      position: absolute; top: -24px; left: 50%; transform: translateX(-50%) translateZ(20px);
+      display: flex; gap: 4px; pointer-events: none;
+    }
+    .gift-bow span {
+      width: 28px; height: 20px; border-radius: 50% 50% 12% 50%;
+      background: linear-gradient(135deg, #FDE047, #D97706);
+      border: 1.5px solid #FEF08A; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transform: rotate(-18deg);
+    }
+    .gift-bow span:last-child {
+      border-radius: 50% 50% 50% 12%; transform: rotate(18deg);
+    }
+
+    .btn-open-gift {
+      background: linear-gradient(135deg, #F59E0B 0%, #EC4899 100%);
+      color: white; border: none; padding: 15px 30px; border-radius: 999px;
+      font-size: 1rem; font-weight: 900; letter-spacing: 0.02em; cursor: pointer;
+      box-shadow: 0 10px 28px rgba(236, 72, 153, 0.48), 0 0 0 4px rgba(251, 191, 36, 0.22);
+      animation: pulseGiftBtn 2s infinite;
+    }
+    .btn-open-gift:active { transform: scale(0.95); }
+    @keyframes pulseGiftBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    /* REVEALED BIRTHDAY CARD + PHOTO SLIDESHOW + MESSAGE */
+    .gift-reveal-panel {
+      display: none; width: 100%; max-width: 440px; z-index: 3;
+      animation: giftRevealUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes giftRevealUp {
+      from { opacity: 0; transform: translateY(34px) scale(0.94); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .gift-reveal-card {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-radius: 24px; padding: 18px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+      text-align: center;
+    }
+    .gift-gallery-frame {
+      position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 290px;
+      border-radius: 18px; overflow: hidden; margin: 12px 0;
+      background: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(253, 224, 71, 0.35);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    }
+    .gift-gallery-frame img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: opacity 0.35s ease, transform 0.5s ease;
+    }
+    .gift-slide-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(15, 23, 42, 0.58); color: white;
+      border: 1px solid rgba(255,255,255,0.28); font-size: 1rem; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .gift-slide-dots {
+      display: flex; justify-content: center; gap: 6px; margin-bottom: 12px;
+    }
+    .gift-slide-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);
+      transition: width 0.2s, background 0.2s; cursor: pointer;
+    }
+    .gift-slide-dot.active {
+      width: 20px; border-radius: 999px; background: #FBBF24;
+    }
+    .gift-letter-box {
+      background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(253, 224, 71, 0.28);
+      border-radius: 16px; padding: 15px 14px; margin: 10px 0 14px;
+      font-size: 0.96rem; line-height: 1.65; color: #F8FAFC;
+      white-space: pre-wrap; text-align: left;
+    }
+    .gift-sender-sig {
+      font-size: 0.88rem; font-weight: 800; color: #FDE68A; margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -950,6 +1258,15 @@
           </div>
           <span class="hub-arrow">➔</span>
         </button>
+
+        <button class="hub-card gift-card" onclick="enterAppMode('gift')">
+          <div class="hub-icon-box">🎁</div>
+          <div class="hub-card-body">
+            <h2>Virtual Gift Studio</h2>
+            <p>Interactive 3D digital birthday surprises with custom photos, music & heartfelt messages.</p>
+          </div>
+          <span class="hub-arrow">➔</span>
+        </button>
       </div>
     </div>
 
@@ -973,9 +1290,10 @@
         <button class="btn-hub-home" onclick="openHubScreen()">🏠 Hub</button>
       </div>
     </div>
-    <div class="mode-switcher">
+    <div class="mode-switcher three-modes">
       <button class="mode-pill active" id="modeBtnShop" onclick="switchAppMode('shop')">🛍️ Shop</button>
       <button class="mode-pill" id="modeBtnEdu" onclick="switchAppMode('edu')">📚 Education</button>
+      <button class="mode-pill" id="modeBtnGift" onclick="switchAppMode('gift')">🎁 Gift Studio</button>
     </div>
   </header>
 
@@ -1686,6 +2004,194 @@
     </div>
   </div>
 
+    <!-- =========================================================
+         MODE 3: VIRTUAL GIFT STUDIO (ADMIN-MANAGED + DEMO PREVIEW)
+         ========================================================= -->
+    <div id="mode-gift" class="app-mode">
+      <div class="gift-studio-hero">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div>
+            <span style="display:inline-block; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:999px; font-size:0.68rem; font-weight:800;">✨ 3D Birthday Experience</span>
+            <h2 style="font-size:1.15rem; font-weight:900; margin-top:6px;">🎁 Virtual Gift Studio</h2>
+            <p style="font-size:0.78rem; opacity:0.9; margin-top:2px;">Personalized 3D interactive birthday surprises for your loved ones.</p>
+          </div>
+          <button type="button" class="btn-action" style="width:auto; padding:8px 12px; background:rgba(255,255,255,0.2); color:white; font-size:0.75rem;" onclick="giftOpenSampleDemo()">🎬 Demo</button>
+        </div>
+      </div>
+
+      <!-- NON-ADMIN PUBLIC VIEW (No access to gift creation dashboard) -->
+      <div id="giftPublicShowcase" class="section-card" style="text-align:center;">
+        <div style="font-size:2.4rem; margin-bottom:6px;">🎂</div>
+        <h3 style="color:var(--text); margin-bottom:6px;">Send a 3D Virtual Birthday Surprise!</h3>
+        <p style="font-size:0.82rem; color:var(--gray); line-height:1.55; margin-bottom:14px;">
+          Want to surprise a friend or loved one with a custom 3D animated birthday gift box, photo gallery, music, and personal letter? Contact the Wolkite Digital Hub Admin to order yours!
+        </p>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-action btn-edu" style="flex:1;" onclick="giftOpenSampleDemo()">✨ Try 3D Gift Demo</button>
+          <a class="btn-action btn-tg" style="flex:1;" href="https://t.me/sorataju1?text=ሰላም%20Admin!%20የ3D%20Virtual%20Birthday%20Gift%20ማዘዝ%20እፈልጋለሁ" target="_blank">💬 Request Gift</a>
+        </div>
+      </div>
+
+      <!-- ADMIN-ONLY GIFT STUDIO DASHBOARD -->
+      <div id="giftAdminDashboard" style="display:none;">
+        <div class="section-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 id="giftFormHeading" style="font-size:0.98rem; color:#BE185D; margin:0;">➕ Create New 3D Birthday Gift</h3>
+            <button type="button" id="giftCancelEditBtn" class="btn-back-sm" style="display:none;" onclick="giftResetForm()">✖ Cancel Edit</button>
+          </div>
+
+          <form id="giftCreatorForm" onsubmit="giftSaveGift(event)">
+            <div class="form-group">
+              <label>🎂 Recipient Name (የተቀባዩ ስም) *</label>
+              <input type="text" id="giftRecipientInput" placeholder="ምሳሌ: Sara / ሳራ" maxlength="60" required>
+            </div>
+
+            <div class="form-group">
+              <label>💝 Sender Name (የላኪው ስም) *</label>
+              <input type="text" id="giftSenderInput" placeholder="ምሳሌ: From Your Best Friend" maxlength="60" required>
+            </div>
+
+            <div class="form-group">
+              <label>🎨 3D Birthday Template Theme</label>
+              <div class="gift-tpl-grid" id="giftTemplateGrid">
+                <div class="gift-tpl-card selected" data-tpl="crimson_gold" onclick="giftSelectTemplate('crimson_gold', this)">
+                  <div class="gift-swatch" style="background:linear-gradient(135deg,#E11D48,#F59E0B);"></div>
+                  Crimson & Gold
+                </div>
+                <div class="gift-tpl-card" data-tpl="royal_gold" onclick="giftSelectTemplate('royal_gold', this)">
+                  <div class="gift-swatch" style="background:linear-gradient(135deg,#1E293B,#FBBF24);"></div>
+                  Midnight Gold
+                </div>
+                <div class="gift-tpl-card" data-tpl="emerald_star" onclick="giftSelectTemplate('emerald_star', this)">
+                  <div class="gift-swatch" style="background:linear-gradient(135deg,#059669,#34D399);"></div>
+                  Emerald Star
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>💌 Personalized Birthday Message *</label>
+              <textarea id="giftMessageInput" rows="4" placeholder="መልካም ልደት! ይህ ልዩ ቀንህ በደስታና በስኬት የተሞላ ይሁን..." maxlength="1500" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>📸 Upload Photos (1 to 5 images — auto-compressed & optimized)</label>
+              <input type="file" id="giftPhotosFileInput" accept="image/*" multiple onchange="giftHandlePhotoFiles(event)">
+              <div id="giftPhotoThumbs" class="gift-photo-thumbs"></div>
+              <small id="giftPhotoHint" style="display:block; font-size:0.72rem; color:var(--gray); margin-top:4px;">0 / 5 photos selected</small>
+            </div>
+
+            <div class="form-group">
+              <label>🎵 Background Music (Optional)</label>
+              <select id="giftMusicSelect">
+                <option value="music_box">🎼 Gentle Birthday Music Box (Recommended)</option>
+                <option value="piano_chime">🎹 Warm Celebration Chimes</option>
+                <option value="none">🔇 No Music</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text); border:1px solid var(--border);" onclick="giftPreviewCurrentForm()">👁 Preview Gift</button>
+              <button type="submit" id="giftPublishBtn" class="btn-action" style="flex:1.4; background:linear-gradient(135deg,#BE185D,#EC4899); color:white;">🚀 Publish & Generate Link</button>
+            </div>
+          </form>
+
+          <!-- Generated Shareable Link Box -->
+          <div id="giftGeneratedLinkBox" style="display:none; margin-top:14px; background:var(--gold-bg); border:1.5px solid var(--gold); border-radius:12px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:800; color:var(--gold); margin-bottom:6px;">✅ Gift Published! Unique Shareable Link:</div>
+            <div class="copy-box" style="margin-top:0;">
+              <input type="text" id="giftGeneratedUrlInput" readonly>
+              <button type="button" class="btn-action btn-edu" style="width:auto; padding:8px 12px;" onclick="giftCopyLink(document.getElementById('giftGeneratedUrlInput').value)">📋 Copy</button>
+            </div>
+            <button type="button" class="btn-action btn-tg" style="margin-top:8px;" onclick="giftShareTelegramLink(document.getElementById('giftGeneratedUrlInput').value, document.getElementById('giftRecipientInput').value)">📤 Share on Telegram</button>
+          </div>
+        </div>
+
+        <!-- Manage Existing Gifts -->
+        <div class="section-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-size:0.95rem; color:var(--text); margin:0;">📦 Manage Existing Gifts</h3>
+            <button type="button" class="btn-back-sm" onclick="giftLoadAdminList()">🔄 Refresh</button>
+          </div>
+          <div id="giftAdminListContainer">
+            <p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading gifts...</p>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /mode-gift -->
+
+  <!-- =========================================================
+       CINEMATIC 3D VIRTUAL BIRTHDAY GIFT EXPERIENCE OVERLAY
+       ========================================================= -->
+  <div id="giftExperienceOverlay" class="gift-stage-overlay">
+    <div class="gift-stars-bg"></div>
+    <canvas id="giftConfettiCanvas" class="gift-confetti-canvas"></canvas>
+
+    <div class="gift-top-controls">
+      <button type="button" class="gift-glass-pill" id="giftMusicToggleBtn" style="display:none;" onclick="giftToggleMusic()">🔊 Play Music</button>
+      <span id="giftPreviewBadge" style="display:none; background:rgba(245,158,11,0.28); color:#FDE68A; padding:5px 10px; border-radius:999px; font-size:0.7rem; font-weight:800;">👁 PREVIEW MODE</span>
+      <button type="button" class="gift-glass-pill" style="margin-left:auto;" onclick="giftExitExperience()">✕ Close</button>
+    </div>
+
+    <!-- Loading / Error Screen -->
+    <div id="giftStatusScreen" class="gift-center-stage" style="display:none;"></div>
+
+    <!-- Stage 1: Closed 3D Gift Box -->
+    <div id="giftClosedStage" class="gift-center-stage" style="display:none;">
+      <span class="gift-pre-badge">✨ SPECIAL BIRTHDAY SURPRISE ✨</span>
+      <h1 class="gift-recipient-title" id="giftStageRecipientName">Happy Birthday!</h1>
+      <p class="gift-subtitle" id="giftStageSubtext">A little surprise is waiting inside for you...</p>
+
+      <div class="gift-3d-scene" id="gift3dScene" onclick="giftOpenBoxAnimation()">
+        <div class="gift-box-glow"></div>
+        <div class="gift-3d-cube">
+          <div class="g-face g-front"></div>
+          <div class="g-face g-back"></div>
+          <div class="g-face g-right"></div>
+          <div class="g-face g-left"></div>
+          <div class="g-face g-bottom"></div>
+          <div class="gift-lid">
+            <div class="g-lid-face g-lid-front"></div>
+            <div class="g-lid-face g-lid-back"></div>
+            <div class="g-lid-face g-lid-right"></div>
+            <div class="g-lid-face g-lid-left"></div>
+            <div class="g-lid-top"></div>
+            <div class="gift-bow"><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-open-gift" id="giftOpenBtn" onclick="giftOpenBoxAnimation()">🎁 Open Your Gift</button>
+    </div>
+
+    <!-- Stage 2: Opened Gift Reveal (Photos + Birthday Letter + Celebration) -->
+    <div id="giftRevealStage" class="gift-reveal-panel">
+      <div class="gift-reveal-card">
+        <span class="gift-pre-badge" style="margin-bottom:6px;">🎉 HAPPY BIRTHDAY! 🎉</span>
+        <h2 class="gift-recipient-title" id="giftRevealHeading" style="font-size:1.5rem;">Happy Birthday!</h2>
+
+        <!-- Photo Gallery Slideshow -->
+        <div id="giftGallerySection" style="display:none;">
+          <div class="gift-gallery-frame">
+            <img id="giftSlideImg" src="" alt="Birthday Memory">
+            <button type="button" class="gift-slide-nav" id="giftPrevSlideBtn" style="left:8px;" onclick="giftStepSlide(-1)">‹</button>
+            <button type="button" class="gift-slide-nav" id="giftNextSlideBtn" style="right:8px;" onclick="giftStepSlide(1)">›</button>
+          </div>
+          <div class="gift-slide-dots" id="giftSlideDots"></div>
+        </div>
+
+        <!-- Personalized Birthday Message -->
+        <div class="gift-letter-box" id="giftRevealMessage"></div>
+        <div class="gift-sender-sig" id="giftRevealSender"></div>
+
+        <div style="display:flex; gap:8px; margin-top:16px;">
+          <button type="button" class="gift-glass-pill" style="flex:1; padding:10px;" onclick="giftReplayBox()">🎁 Replay Box</button>
+          <button type="button" class="gift-glass-pill" style="flex:1; padding:10px; background:rgba(251,191,36,0.22); border-color:rgba(251,191,36,0.45);" onclick="giftLaunchConfettiBurst()">🎊 Celebrate More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- INTERACTIVE QUICK GUIDE / TUTORIAL MODAL -->
   <div id="guideModal" class="modal">
     <div class="modal-content">
@@ -1845,9 +2351,11 @@
       if (tg.initDataUnsafe?.start_param) return tg.initDataUnsafe.start_param;
       try {
         const qs = new URLSearchParams(window.location.search);
+        if (qs.get('gift')) return 'gift_' + qs.get('gift');
         if (qs.get('tgWebAppStartParam')) return qs.get('tgWebAppStartParam');
         if (qs.get('startapp')) return qs.get('startapp');
         const hashQs = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        if (hashQs.get('gift')) return 'gift_' + hashQs.get('gift');
         if (hashQs.get('tgWebAppStartParam')) return hashQs.get('tgWebAppStartParam');
       } catch(e) {}
       return null;
@@ -1867,25 +2375,35 @@
       currentAppMode = mode;
       document.getElementById('mode-shop').classList.toggle('active', mode === 'shop');
       document.getElementById('mode-edu').classList.toggle('active', mode === 'edu');
+      const modeGiftEl = document.getElementById('mode-gift');
+      if (modeGiftEl) modeGiftEl.classList.toggle('active', mode === 'gift');
       document.getElementById('navBarShop').classList.toggle('active', mode === 'shop');
       document.getElementById('navBarEdu').classList.toggle('active', mode === 'edu');
 
       const btnShop = document.getElementById('modeBtnShop');
       const btnEdu = document.getElementById('modeBtnEdu');
+      const btnGift = document.getElementById('modeBtnGift');
       btnShop.className = 'mode-pill' + (mode === 'shop' ? ' active' : '');
       btnEdu.className = 'mode-pill' + (mode === 'edu' ? ' edu-active' : '');
+      if (btnGift) btnGift.className = 'mode-pill' + (mode === 'gift' ? ' gift-active' : '');
 
       if (mode === 'shop') {
         document.getElementById('headerTitle').innerText = 'Wolkite Shop';
         document.getElementById('headerSub').innerText = 'Wolkite University Student Marketplace';
         if (!shopDataLoaded) loadAllData();
-      } else {
+      } else if (mode === 'edu') {
         document.getElementById('headerTitle').innerText = 'BIKAT Education';
         document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
         if (!eduDataLoaded) eduLoadAllData();
+      } else if (mode === 'gift') {
+        document.getElementById('headerTitle').innerText = 'Virtual Gift Studio';
+        document.getElementById('headerSub').innerText = '3D Digital Birthday Experiences';
+        giftInitStudioView();
       }
       requestAnimationFrame(() => {
-        updateNavIndicator(mode === 'shop' ? 'navBarShop' : 'navBarEdu');
+        if (mode === 'shop' || mode === 'edu') {
+          updateNavIndicator(mode === 'shop' ? 'navBarShop' : 'navBarEdu');
+        }
       });
       window.scrollTo(0, 0);
     }
@@ -2559,12 +3077,15 @@
 
     let eduDataLoaded = false;
     let eduQuestionsLoaded = false;
+    let eduQuestionsFetching = null;
     let eduAllStudentsLoaded = false;
     let eduPaymentsLoaded = false;
     let eduFeedbacksLoaded = false;
 
     let bikatStudents = {};
     let bikatQuestions = [];
+    let bikatCatalog = {}; // Lightweight metadata index (~10-20 KB total instead of downloading thousands of questions at startup!)
+    let eduChapterCache = {}; // Per-chapter/exam question cache so opened chapters load once and stay instant
     let bikatPayments = {};
     let bikatAnnouncements = {};
     let bikatExamControls = {};
@@ -2629,12 +3150,56 @@
         </div>`).join('');
     }
 
+    const BIKAT_CATALOG = `${DB_BASE}/bikat/catalog`;
+
+    function eduRebuildCatalogFromQuestions(qsArr) {
+      const catMap = {};
+      (qsArr || []).forEach(q => {
+        const cat = q.content_category || 'chapter';
+        const lev = q.level || 'All';
+        const str = q.stream || 'All';
+        const sub = q.subject || 'Weekly Exam';
+        const ch = q.chapter || '';
+        if (!ch) return;
+        const k = eduSafeKey(`${cat}__${lev}__${str}__${sub}__${ch}`);
+        if (!catMap[k]) {
+          catMap[k] = {
+            cat, level: lev, stream: str, subject: sub, chapter: ch,
+            count: 0, paidCount: 0, firstId: q.id || q.custom_id || ''
+          };
+        }
+        catMap[k].count += 1;
+        if ((q.question_type || 'free') === 'paid') catMap[k].paidCount += 1;
+      });
+      bikatCatalog = catMap;
+      return catMap;
+    }
+
+    async function eduSyncCatalogToFirebase() {
+      if (!eduQuestionsLoaded || bikatQuestions.length === 0) return;
+      const catMap = eduRebuildCatalogFromQuestions(bikatQuestions);
+      try {
+        await fetch(`${BIKAT_CATALOG}.json`, { method: 'PUT', body: JSON.stringify(catMap) });
+        eduSaveLocalCache();
+      } catch(e) {}
+    }
+
+    function eduGetCatalogEntries() {
+      if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+        return Object.values(eduRebuildCatalogFromQuestions(bikatQuestions));
+      }
+      return Object.values(bikatCatalog || {});
+    }
+
     function eduSaveLocalCache() {
       try {
         if (myStudent) localStorage.setItem(`bikat_cache_stu_${currentUser.id}`, JSON.stringify(myStudent));
         localStorage.setItem('bikat_cache_ann', JSON.stringify(bikatAnnouncements));
         localStorage.setItem('bikat_cache_ec', JSON.stringify(bikatExamControls));
-        if (bikatQuestions.length > 0 && bikatQuestions.length <= 2500) {
+        if (bikatCatalog && Object.keys(bikatCatalog).length > 0) {
+          localStorage.setItem('bikat_cache_catalog', JSON.stringify(bikatCatalog));
+        }
+        if (eduQuestionsLoaded && bikatQuestions.length > 0 && bikatQuestions.length <= 1200) {
           const slimQs = bikatQuestions.map(q => {
             const copy = { ...q };
             delete copy.comments;
@@ -2651,14 +3216,17 @@
         const cStu = localStorage.getItem(`bikat_cache_stu_${currentUser.id}`);
         const cAnn = localStorage.getItem('bikat_cache_ann');
         const cEc = localStorage.getItem('bikat_cache_ec');
+        const cCat = localStorage.getItem('bikat_cache_catalog');
         const cQs = localStorage.getItem('bikat_cache_qs');
         if (cAnn) bikatAnnouncements = JSON.parse(cAnn) || {};
         if (cEc) bikatExamControls = JSON.parse(cEc) || {};
+        if (cCat) bikatCatalog = JSON.parse(cCat) || {};
         if (cQs) {
           const parsedQs = JSON.parse(cQs);
           if (Array.isArray(parsedQs) && parsedQs.length > 0) {
             bikatQuestions = parsedQs;
             eduQuestionsLoaded = true;
+            eduRebuildCatalogFromQuestions(bikatQuestions);
           }
         }
         if (cStu) {
@@ -2670,6 +3238,64 @@
         }
       } catch(e) {}
       return hydratedAny;
+    }
+
+    // Fetch ONLY the selected chapter's questions on-demand via Firebase query (tiny & fast!)
+    // Falls back gracefully if Firebase .indexOn rule isn't added yet.
+    async function eduFetchChapterQuestionsOnDemand(level, stream, subject, chapter, category = 'chapter') {
+      if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+        return eduGetFilteredQuestions(level, stream, subject, chapter, category);
+      }
+      const cacheKey = `${category}|${level}|${stream}|${subject}|${chapter}`;
+      if (eduChapterCache[cacheKey] && eduChapterCache[cacheKey].length > 0) {
+        return eduChapterCache[cacheKey];
+      }
+      try {
+        const qUrl = `${BIKAT_QUESTIONS}.json?orderBy=${encodeURIComponent('"chapter"')}&equalTo=${encodeURIComponent(JSON.stringify(chapter))}`;
+        const res = await fetch(qUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object' && !data.error) {
+            const list = Object.keys(data).map(k => ({ id: k, ...data[k] })).filter(q => {
+              const qCat = q.content_category || 'chapter';
+              if (category && qCat !== category) return false;
+              if (level && level !== 'All' && q.level !== level) return false;
+              if (!eduStreamMatches(q.stream, stream)) return false;
+              if (subject && q.subject !== subject) return false;
+              return true;
+            });
+            if (list.length > 0) {
+              eduChapterCache[cacheKey] = list;
+              const existingIds = new Set(bikatQuestions.map(x => x.id));
+              list.forEach(item => { if (!existingIds.has(item.id)) bikatQuestions.push(item); });
+              return list;
+            }
+          }
+        }
+      } catch(e) {}
+      await eduEnsureAllQuestionsLoaded();
+      return eduGetFilteredQuestions(level, stream, subject, chapter, category);
+    }
+
+    async function eduEnsureAllQuestionsLoaded(force = false) {
+      if (eduQuestionsLoaded && !force) return bikatQuestions;
+      if (eduQuestionsFetching && !force) return eduQuestionsFetching;
+      eduQuestionsFetching = (async () => {
+        try {
+          const resQ = await fetch(`${BIKAT_QUESTIONS}.json`);
+          const rawQ = (await resQ.json()) || {};
+          bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
+          eduQuestionsLoaded = true;
+          eduRebuildCatalogFromQuestions(bikatQuestions);
+          eduSaveLocalCache();
+          if (Number(currentUser.id) === ADMIN_ID && bikatQuestions.length > 0) {
+            fetch(`${BIKAT_CATALOG}.json`, { method: 'PUT', body: JSON.stringify(bikatCatalog) }).catch(() => {});
+          }
+        } catch(e) {}
+        eduQuestionsFetching = null;
+        return bikatQuestions;
+      })();
+      return eduQuestionsFetching;
     }
 
     async function eduEnsureAllStudentsLoaded(force = false) {
@@ -2731,6 +3357,7 @@
       if (viewId === 'edu-admin' && Number(currentUser.id) === ADMIN_ID) {
         eduRenderAdmin();
         Promise.all([
+          eduEnsureAllQuestionsLoaded(true),
           eduEnsureAllStudentsLoaded(true),
           eduEnsurePaymentsLoaded(true),
           eduEnsureFeedbacksLoaded(true)
@@ -2784,25 +3411,31 @@
       eduRenderHero();
       eduRenderLatestNotification();
       eduCheckPausedQuiz();
+      const hasCatalog = eduGetCatalogEntries().length > 0;
       if (!skipInitialStageRender) {
-        if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+        if (hasCatalog) {
           eduRenderInitialQuizView();
         } else {
           eduShowQuizSkeletons();
         }
       }
 
-      // Stage 1: Lightweight personal profile + announcements + exam controls (~2 KB total!)
-      eduSetLoadStatus('ደረጃ 1/2: መገለጫ እና ማስታወቂያ በመጫን ላይ...');
+      // Stage 1: Lightweight personal profile + announcements + exam controls + subject catalog (~15 KB total -> opens in <1s!)
+      eduSetLoadStatus('መረጃዎችን በመጫን ላይ...');
       try {
-        const [resMe, resA, resEC] = await Promise.all([
+        const [resMe, resA, resEC, resCat] = await Promise.all([
           fetch(`${BIKAT_STUDENTS}/${currentUser.id}.json`),
           fetch(`${BIKAT_ANNOUNCEMENTS}.json`),
-          fetch(`${BIKAT_EXAM_CONTROLS}.json`)
+          fetch(`${BIKAT_EXAM_CONTROLS}.json`),
+          fetch(`${BIKAT_CATALOG}.json`)
         ]);
         const serverMe = await resMe.json();
         bikatAnnouncements = (await resA.json()) || {};
         bikatExamControls = (await resEC.json()) || {};
+        const serverCat = await resCat.json();
+        if (serverCat && typeof serverCat === 'object' && Object.keys(serverCat).length > 0) {
+          bikatCatalog = serverCat;
+        }
 
         if (!serverMe) {
           // Brand-new student registration
@@ -2831,34 +3464,28 @@
       eduRenderHero();
       eduRenderLatestNotification();
       eduCheckPausedQuiz();
-      if (!skipInitialStageRender) {
-        const parsed = eduParseLevelStream(myStudent?.education_level);
-        if (!parsed) {
-          eduShowLevelPicker();
-        } else if (eduQuestionsLoaded && bikatQuestions.length > 0) {
+
+      // If catalog exists on server, render subjects/chapters IMMEDIATELY without downloading the huge question bank!
+      if (eduGetCatalogEntries().length > 0) {
+        eduSetLoadStatus(null);
+        if (!skipInitialStageRender && !eduActiveQuiz) {
+          eduRenderInitialQuizView();
+        }
+      } else {
+        // First-time bootstrap if catalog hasn't been created yet
+        eduSetLoadStatus('የትምህርት ዝርዝር በመጫን ላይ...');
+        await eduEnsureAllQuestionsLoaded();
+        eduSetLoadStatus(null);
+        if (!skipInitialStageRender && !eduActiveQuiz) {
           eduRenderInitialQuizView();
         }
       }
 
-      // Stage 2: Load Questions Bank
-      eduSetLoadStatus('ደረጃ 2/2: ጥያቄዎች በመጫን ላይ...');
-      try {
-        const resQ = await fetch(`${BIKAT_QUESTIONS}.json`);
-        const rawQ = (await resQ.json()) || {};
-        bikatQuestions = Object.keys(rawQ).map(k => ({ id: k, ...rawQ[k] }));
-        eduQuestionsLoaded = true;
-        eduSaveLocalCache();
-      } catch(e) {}
-
-      eduSetLoadStatus(null);
-      if (!skipInitialStageRender && !eduActiveQuiz) {
-        eduRenderInitialQuizView();
-      }
-
-      // Stage 3: Background prefetch of leaderboard/admin only AFTER main UI is completely ready
+      // Stage 2: Background silent prefetch only for Admin (students load only the chapter they tap!)
       setTimeout(() => {
         if (Number(currentUser.id) === ADMIN_ID) {
           Promise.all([
+            eduEnsureAllQuestionsLoaded(true),
             eduEnsureAllStudentsLoaded(true),
             eduEnsurePaymentsLoaded(true),
             eduEnsureFeedbacksLoaded(true)
@@ -3344,19 +3971,19 @@
     }
 
     function eduGetWeeklyExams(filterLevel = null, filterStream = null) {
-      const weeklyQs = bikatQuestions.filter(q => {
-        if (q.content_category !== 'weekly_exam') return false;
-        if (filterLevel && q.level && q.level !== 'All' && q.level !== filterLevel) return false;
-        if (filterStream && !eduStreamMatches(q.stream, filterStream)) return false;
+      const entries = eduGetCatalogEntries().filter(e => {
+        if (e.cat !== 'weekly_exam') return false;
+        if (filterLevel && e.level && e.level !== 'All' && e.level !== filterLevel) return false;
+        if (filterStream && !eduStreamMatches(e.stream, filterStream)) return false;
         return true;
       });
-      const map = {};
-      weeklyQs.forEach(q => {
-        const key = `${q.level || 'All'}|${q.stream || 'All'}|${q.chapter}`;
-        if (!map[key]) map[key] = { level: q.level || 'All', stream: q.stream || 'All', title: q.chapter, questions: [] };
-        map[key].questions.push(q);
-      });
-      return Object.values(map);
+      return entries.map(e => ({
+        level: e.level || 'All',
+        stream: e.stream || 'All',
+        title: e.chapter,
+        count: e.count || 0,
+        firstId: e.firstId || ''
+      }));
     }
 
     function eduBuildWeeklyExamsHtml(filterLevel = null, filterStream = null) {
@@ -3385,7 +4012,7 @@
           const tag = (ex.level === 'All') ? 'ሁሉም' : `${ex.level}${strTag}`;
           return `<button class="edu-list-btn" style="margin-bottom:8px;" onclick="eduOpenWeeklyExam('${escAttr(ex.level)}', '${escAttr(ex.stream)}', '${escAttr(ex.title)}')">
             <div>
-              <div>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.questions.length} ጥያቄ • ${escHtml(tag)})</small></div>
+              <div>🔥 ${escHtml(ex.title)} <small style="color:var(--gray);">(${ex.count || 0} ጥያቄ • ${escHtml(tag)})</small></div>
               <div style="font-size:0.72rem; margin-top:3px;">${statusTag}</div>
             </div>
             <span>➔</span>
@@ -3518,14 +4145,13 @@
     function eduShowSubjects() {
       eduSetStepper(2);
       const stage = document.getElementById('eduQuizStage');
-      const qs = bikatQuestions.filter(q => {
-        const qCat = q.content_category || 'chapter';
-        if (qCat === 'weekly_exam') return false;
-        if (q.level !== eduNav.level) return false;
-        if (!eduStreamMatches(q.stream, eduNav.stream)) return false;
+      const entries = eduGetCatalogEntries().filter(e => {
+        if (e.cat === 'weekly_exam') return false;
+        if (e.level !== eduNav.level) return false;
+        if (!eduStreamMatches(e.stream, eduNav.stream)) return false;
         return true;
       });
-      const subjects = [...new Set(qs.map(q => q.subject))];
+      const subjects = [...new Set(entries.map(e => e.subject))];
       const title = `${eduNav.level} - ${eduNav.stream}`;
       const weeklyExams = eduGetWeeklyExams(eduNav.level, eduNav.stream);
 
@@ -3553,10 +4179,13 @@
       eduSetStepper(3);
       eduNav.subject = subject;
       const stage = document.getElementById('eduQuizStage');
-      const chapterQs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'chapter');
-      const examQs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
-      const chapCount = new Set(chapterQs.map(q => q.chapter)).size;
-      const examCount = new Set(examQs.map(q => q.chapter)).size;
+      const subEntries = eduGetCatalogEntries().filter(e =>
+        e.level === eduNav.level &&
+        eduStreamMatches(e.stream, eduNav.stream) &&
+        e.subject === subject
+      );
+      const chapCount = new Set(subEntries.filter(e => e.cat === 'chapter').map(e => e.chapter)).size;
+      const examCount = new Set(subEntries.filter(e => e.cat === 'subject_exam').map(e => e.chapter)).size;
       const invSlots = eduGetAvailableInviteSlots(myStudent);
       const inviteBanner = (invSlots > 0 && !eduHasFullSubjectAccess(subject))
         ? `<div class="section-card" style="background:var(--gold-bg); border-color:var(--gold); text-align:center;">
@@ -3590,8 +4219,19 @@
       eduNav.subject = subject;
       eduNav.mode = 'chapter';
       const stage = document.getElementById('eduQuizStage');
-      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'chapter');
-      const chapters = [...new Set(qs.map(q => q.chapter))];
+      const entries = eduGetCatalogEntries().filter(e =>
+        e.cat === 'chapter' &&
+        e.level === eduNav.level &&
+        eduStreamMatches(e.stream, eduNav.stream) &&
+        e.subject === subject
+      );
+      const chapAgg = {};
+      entries.forEach(e => {
+        if (!chapAgg[e.chapter]) chapAgg[e.chapter] = { count: 0, paidCount: 0 };
+        chapAgg[e.chapter].count += (e.count || 0);
+        chapAgg[e.chapter].paidCount += (e.paidCount || 0);
+      });
+      const chapters = Object.keys(chapAgg);
 
       let html = `
         <div class="edu-back-row">
@@ -3603,11 +4243,11 @@
         html += `<div class="section-card" style="text-align:center;"><p style="font-size:0.84rem; color:var(--gray);">ለዚህ ትምህርት እስካሁን የምዕራፍ ጥያቄ አልገባም።</p></div>`;
       } else {
         chapters.forEach(chap => {
-          const chQs = qs.filter(q => q.chapter === chap);
-          const hasPaid = chQs.some(q => q.question_type === 'paid');
+          const info = chapAgg[chap];
+          const hasPaid = info.paidCount > 0;
           const chapAccess = eduHasChapterAccess(subject, chap, eduNav.level, eduNav.stream, false);
           const icon = !hasPaid ? '' : (chapAccess ? '🔓' : '🔒');
-          html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${chQs.length} Qs)</small></span><span>${icon} ➔</span></button>`;
+          html += `<button class="edu-list-btn" onclick="eduSelectChapter('${escAttr(chap)}')"><span>📑 ${escHtml(chap)} <small style="color:var(--gray);">(${info.count} Qs)</small></span><span>${icon} ➔</span></button>`;
         });
       }
       stage.innerHTML = html;
@@ -3617,8 +4257,19 @@
       eduNav.subject = subject;
       eduNav.mode = 'subject_exam';
       const stage = document.getElementById('eduQuizStage');
-      const qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, subject, null, 'subject_exam');
-      const exams = [...new Set(qs.map(q => q.chapter))];
+      const entries = eduGetCatalogEntries().filter(e =>
+        e.cat === 'subject_exam' &&
+        e.level === eduNav.level &&
+        eduStreamMatches(e.stream, eduNav.stream) &&
+        e.subject === subject
+      );
+      const examAgg = {};
+      entries.forEach(e => {
+        if (!examAgg[e.chapter]) examAgg[e.chapter] = { count: 0, paidCount: 0 };
+        examAgg[e.chapter].count += (e.count || 0);
+        examAgg[e.chapter].paidCount += (e.paidCount || 0);
+      });
+      const exams = Object.keys(examAgg);
       const hasFullSub = eduHasFullSubjectAccess(subject);
 
       let html = `
@@ -3631,10 +4282,10 @@
         html += `<div class="section-card" style="text-align:center;"><p style="font-size:0.84rem; color:var(--gray);">ለዚህ ትምህርት እስካሁን Mid / Final ፈተና አልገባም።</p></div>`;
       } else {
         exams.forEach(exName => {
-          const exQs = qs.filter(q => q.chapter === exName);
-          const hasPaid = exQs.some(q => q.question_type === 'paid');
+          const info = examAgg[exName];
+          const hasPaid = info.paidCount > 0;
           const icon = !hasPaid ? '' : (hasFullSub ? '🔓' : '🔒');
-          html += `<button class="edu-list-btn" onclick="eduSelectSubjectExam('${escAttr(exName)}')"><span>📝 ${escHtml(exName)} <small style="color:var(--gray);">(${exQs.length} Qs)</small></span><span>${icon} ➔</span></button>`;
+          html += `<button class="edu-list-btn" onclick="eduSelectSubjectExam('${escAttr(exName)}')"><span>📝 ${escHtml(exName)} <small style="color:var(--gray);">(${info.count} Qs)</small></span><span>${icon} ➔</span></button>`;
         });
       }
       stage.innerHTML = html;
@@ -3669,12 +4320,13 @@
         </div>`;
     }
 
-    function eduSelectSubjectExam(examName) {
+    async function eduSelectSubjectExam(examName) {
       eduNav.chapter = examName;
       eduNav.mode = 'subject_exam';
       const stage = document.getElementById('eduQuizStage');
+      stage.innerHTML = `<div class="stage-load-pill"><span class="mini-spinner"></span><span>${escHtml(examName)} በመጫን ላይ...</span></div>`;
       const hasAccess = eduHasFullSubjectAccess(eduNav.subject);
-      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, examName, 'subject_exam');
+      let qs = await eduFetchChapterQuestionsOnDemand(eduNav.level, eduNav.stream, eduNav.subject, examName, 'subject_exam');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0) {
@@ -3697,9 +4349,10 @@
         </div>`;
     }
 
-    function eduOpenWeeklyExam(level, stream, title) {
+    async function eduOpenWeeklyExam(level, stream, title) {
       eduNav = { level, stream, subject: 'Weekly Exam', chapter: title, practice: 1, mode: 'weekly_exam' };
       const stage = document.getElementById('eduQuizStage');
+      stage.innerHTML = `<div class="stage-load-pill"><span class="mini-spinner"></span><span>${escHtml(title)} በመጫን ላይ...</span></div>`;
       const meta = eduGetWeeklyExamMeta(level, stream, title);
       const attempt = eduGetWeeklyExamAttempt(meta.key);
       const endTime = meta.started_at + (meta.duration_min * 60 * 1000);
@@ -3707,12 +4360,7 @@
       const isWaiting = meta.status === 'waiting' || !meta.started_at;
 
       const hasAccess = (Number(currentUser.id) === ADMIN_ID || eduIsFullSemesterVip(myStudent));
-      let qs = bikatQuestions.filter(q =>
-        q.content_category === 'weekly_exam' &&
-        (q.level || 'All') === level &&
-        (q.stream || 'All') === stream &&
-        q.chapter === title
-      );
+      let qs = await eduFetchChapterQuestionsOnDemand(level, stream, 'Weekly Exam', title, 'weekly_exam');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0 && !attempt) {
@@ -4072,12 +4720,13 @@
       }
     }
 
-    function eduSelectChapter(chapter) {
+    async function eduSelectChapter(chapter) {
       eduNav.chapter = chapter;
       eduNav.mode = 'chapter';
       const stage = document.getElementById('eduQuizStage');
+      stage.innerHTML = `<div class="stage-load-pill"><span class="mini-spinner"></span><span>${escHtml(chapter)} ጥያቄዎች በመጫን ላይ...</span></div>`;
       const hasAccess = eduHasChapterAccess(eduNav.subject, chapter, eduNav.level, eduNav.stream, true);
-      let qs = eduGetFilteredQuestions(eduNav.level, eduNav.stream, eduNav.subject, chapter, 'chapter');
+      let qs = await eduFetchChapterQuestionsOnDemand(eduNav.level, eduNav.stream, eduNav.subject, chapter, 'chapter');
       if (!hasAccess) qs = qs.filter(q => (q.question_type || 'free') === 'free');
 
       if (qs.length === 0) {
@@ -5338,6 +5987,7 @@
         document.getElementById('eaLastSavedBox').style.display = 'block';
 
         document.getElementById('eduStQuestions').innerText = bikatQuestions.length;
+        eduSyncCatalogToFirebase();
       } catch(err) { notifyUser("ስህተት ተፈጥሯል!"); }
       finally { btn.innerText = "➕ Save & Continue"; btn.disabled = false; }
     }
@@ -5679,9 +6329,11 @@
       if (!found) { notifyUser(`❌ ጥያቄ ${target} አልተገኘም!`); return; }
       if (!confirm(`ጥያቄ ${target} ይጥፋ?`)) return;
       await fetch(`${BIKAT_QUESTIONS}/${found.id}.json`, { method: 'DELETE' });
+      bikatQuestions = bikatQuestions.filter(q => q.id !== found.id);
+      await eduSyncCatalogToFirebase();
       document.getElementById('eaDeleteIdInput').value = '';
       notifyUser(`✅ ጥያቄ ${target} ጠፍቷል!`);
-      await eduLoadAllData();
+      eduRenderAdmin();
     }
 
     async function eduAdminCycleChapterStream(cat, lev, str, sub, ch) {
@@ -5714,7 +6366,7 @@
           })
         ));
         toUpdate.forEach(q => { q.stream = nextStream; });
-        eduSaveLocalCache();
+        await eduSyncCatalogToFirebase();
         notifyUser(`✅ ${toUpdate.length} ጥያቄዎች ወደ ${nextLabel} ተቀይረዋል!`);
         eduRenderAdmin();
       } catch(e) {
@@ -5732,18 +6384,21 @@
           body: JSON.stringify({ question_type: newType })
         });
       }
+      toUpdate.forEach(q => { q.question_type = newType; });
+      await eduSyncCatalogToFirebase();
       notifyUser(`✅ ${toUpdate.length} ጥያቄዎች ወደ ${label} ተቀይረዋል!`);
-      await eduLoadAllData();
+      eduRenderAdmin();
     }
 
     async function eduAdminDeleteChapter(cat, lev, str, sub, ch) {
       if (!confirm(`የ ${sub} - ${ch} ጥያቄዎች በሙሉ ይጥፉ?`)) return;
       const toDel = bikatQuestions.filter(q => (q.content_category || 'chapter') === cat && q.level === lev && q.stream === str && q.subject === sub && q.chapter === ch);
-      for (const q of toDel) {
-        await fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, { method: 'DELETE' });
-      }
+      await Promise.all(toDel.map(q => fetch(`${BIKAT_QUESTIONS}/${q.id}.json`, { method: 'DELETE' })));
+      const delIds = new Set(toDel.map(q => q.id));
+      bikatQuestions = bikatQuestions.filter(q => !delIds.has(q.id));
+      await eduSyncCatalogToFirebase();
       notifyUser(`✅ ${toDel.length} ጥያቄዎች ጠፍተዋል!`);
-      await eduLoadAllData();
+      eduRenderAdmin();
     }
 
     async function eduAdminPromptStartWeekly(lev, str, title, currentMin) {
@@ -5780,6 +6435,609 @@
         body: JSON.stringify({ is_vip: newVal, vip_expires_at: semExp })
       });
       await eduLoadAllData();
+    }
+
+    // =========================================================================
+    // PART 3: VIRTUAL GIFT STUDIO (ADMIN CREATOR + 3D BIRTHDAY EXPERIENCE)
+    // =========================================================================
+    const FIREBASE_GIFTS = `${DB_BASE}/virtual_gifts`;
+    const STORAGE_BUCKET = "wolkite-shop.appspot.com";
+
+    let giftSelectedTemplate = 'crimson_gold';
+    let giftFormPhotos = []; // Array of compressed DataURLs or HTTPS URLs (1..5)
+    let giftEditingId = null;
+    let giftAdminCache = {};
+
+    let giftCurrentData = null;
+    let giftCurrentSlideIdx = 0;
+    let giftSlideTimer = null;
+    let giftIsPreviewMode = false;
+    let giftAudioCtx = null;
+    let giftMusicPlaying = false;
+    let giftMusicInterval = null;
+    let giftConfettiAnimId = null;
+
+    function giftGenerateUniqueId() {
+      const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+      let out = 'g_';
+      for (let i = 0; i < 8; i++) out += chars[Math.floor(Math.random() * chars.length)];
+      return out;
+    }
+
+    function giftBuildShareUrl(giftId) {
+      return `${BOT_APP_LINK}?startapp=gift_${giftId}`;
+    }
+
+    function giftInitStudioView() {
+      const isAdmin = Number(currentUser.id) === ADMIN_ID;
+      const pubEl = document.getElementById('giftPublicShowcase');
+      const admEl = document.getElementById('giftAdminDashboard');
+      if (pubEl) pubEl.style.display = isAdmin ? 'none' : 'block';
+      if (admEl) admEl.style.display = isAdmin ? 'block' : 'none';
+      if (isAdmin) giftLoadAdminList();
+    }
+
+    function giftSelectTemplate(tpl, el) {
+      giftSelectedTemplate = tpl;
+      document.querySelectorAll('#giftTemplateGrid .gift-tpl-card').forEach(c => c.classList.remove('selected'));
+      if (el) el.classList.add('selected');
+    }
+
+    function giftRenderFormPhotoThumbs() {
+      const box = document.getElementById('giftPhotoThumbs');
+      const hint = document.getElementById('giftPhotoHint');
+      if (!box) return;
+      box.innerHTML = giftFormPhotos.map((src, idx) => `
+        <div class="gift-thumb-wrap">
+          <img src="${src}" alt="Photo ${idx + 1}">
+          <button type="button" class="gift-thumb-del" onclick="giftRemoveFormPhoto(${idx})">×</button>
+        </div>`).join('');
+      if (hint) hint.innerText = `${giftFormPhotos.length} / 5 photos selected`;
+    }
+
+    function giftRemoveFormPhoto(idx) {
+      giftFormPhotos.splice(idx, 1);
+      giftRenderFormPhotoThumbs();
+    }
+
+    function giftCompressImageFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) return reject(new Error('Invalid image'));
+        if (file.size > 12 * 1024 * 1024) return reject(new Error('Image too large (max 12MB)'));
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxDim = 560;
+            let w = img.width, h = img.height;
+            if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            let webp = '';
+            try { webp = canvas.toDataURL('image/webp', 0.72); } catch(e) {}
+            if (webp && webp.startsWith('data:image/webp')) resolve(webp);
+            else resolve(canvas.toDataURL('image/jpeg', 0.70));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function giftHandlePhotoFiles(e) {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+      const slotsLeft = 5 - giftFormPhotos.length;
+      if (slotsLeft <= 0) {
+        notifyUser('Maximum 5 photos allowed per gift.');
+        e.target.value = '';
+        return;
+      }
+      const chosen = files.slice(0, slotsLeft);
+      for (const f of chosen) {
+        try {
+          const optimized = await giftCompressImageFile(f);
+          giftFormPhotos.push(optimized);
+        } catch(err) {
+          notifyUser('Could not process one of the images. Please choose a valid JPG/PNG/WebP photo.');
+        }
+      }
+      e.target.value = '';
+      giftRenderFormPhotoThumbs();
+    }
+
+    // Uploads compressed image to Firebase Storage if enabled; falls back seamlessly to lightweight compressed payload
+    async function giftUploadPhotoToStorageOrInline(giftId, index, dataUrl) {
+      if (!dataUrl.startsWith('data:')) return dataUrl;
+      try {
+        const parts = dataUrl.split(',');
+        const mime = parts[0].match(/:(.*?);/)[1] || 'image/jpeg';
+        const ext = mime.includes('webp') ? 'webp' : 'jpg';
+        const bin = atob(parts[1]);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        const blob = new Blob([arr], { type: mime });
+        const path = encodeURIComponent(`virtual_gifts/${giftId}/photo_${index}.${ext}`);
+        const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o?uploadType=media&name=${path}`;
+        const res = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': mime },
+          body: blob
+        });
+        if (res.ok) {
+          const meta = await res.json();
+          if (meta && meta.downloadTokens) {
+            return `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${path}?alt=media&token=${meta.downloadTokens}`;
+          }
+        }
+      } catch(e) {}
+      return dataUrl;
+    }
+
+    function giftResetForm() {
+      giftEditingId = null;
+      giftFormPhotos = [];
+      document.getElementById('giftCreatorForm').reset();
+      giftSelectTemplate('crimson_gold', document.querySelector('#giftTemplateGrid .gift-tpl-card[data-tpl="crimson_gold"]'));
+      giftRenderFormPhotoThumbs();
+      document.getElementById('giftFormHeading').innerText = '➕ Create New 3D Birthday Gift';
+      document.getElementById('giftCancelEditBtn').style.display = 'none';
+      document.getElementById('giftPublishBtn').innerText = '🚀 Publish & Generate Link';
+    }
+
+    async function giftSaveGift(e) {
+      e.preventDefault();
+      if (Number(currentUser.id) !== ADMIN_ID) {
+        notifyUser('Unauthorized: Admin access only.');
+        return;
+      }
+      const recipientName = document.getElementById('giftRecipientInput').value.trim();
+      const senderName = document.getElementById('giftSenderInput').value.trim();
+      const message = document.getElementById('giftMessageInput').value.trim();
+      const music = document.getElementById('giftMusicSelect').value;
+
+      if (!recipientName || !senderName || !message) {
+        notifyUser('Please fill in Recipient Name, Sender Name, and Message.');
+        return;
+      }
+      if (giftFormPhotos.length === 0) {
+        notifyUser('Please upload at least 1 photo (up to 5 photos).');
+        return;
+      }
+
+      const btn = document.getElementById('giftPublishBtn');
+      const origTxt = btn.innerText;
+      btn.innerText = '⏳ Publishing Gift...';
+      btn.disabled = true;
+
+      const giftId = giftEditingId || giftGenerateUniqueId();
+      try {
+        const finalPhotos = [];
+        for (let i = 0; i < giftFormPhotos.length; i++) {
+          const url = await giftUploadPhotoToStorageOrInline(giftId, i + 1, giftFormPhotos[i]);
+          finalPhotos.push(url);
+        }
+
+        const payload = {
+          giftId,
+          template: giftSelectedTemplate,
+          recipientName,
+          senderName,
+          message,
+          photos: finalPhotos,
+          music: music === 'none' ? null : music,
+          status: 'published',
+          createdBy: currentUser.id,
+          createdAt: (giftEditingId && giftAdminCache[giftId]?.createdAt) || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        const res = await fetch(`${FIREBASE_GIFTS}/${giftId}.json`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Save failed');
+
+        giftAdminCache[giftId] = payload;
+        const shareUrl = giftBuildShareUrl(giftId);
+        document.getElementById('giftGeneratedUrlInput').value = shareUrl;
+        document.getElementById('giftGeneratedLinkBox').style.display = 'block';
+        notifyUser(`🎉 Birthday Gift for ${recipientName} is published!`);
+        giftResetForm();
+        document.getElementById('giftGeneratedLinkBox').style.display = 'block';
+        giftLoadAdminList();
+      } catch(err) {
+        notifyUser('Error saving gift. Please check your connection and try again.');
+      } finally {
+        btn.innerText = origTxt;
+        btn.disabled = false;
+      }
+    }
+
+    async function giftLoadAdminList() {
+      const box = document.getElementById('giftAdminListContainer');
+      if (!box || Number(currentUser.id) !== ADMIN_ID) return;
+      box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading gifts...</p>';
+      try {
+        const res = await fetch(`${FIREBASE_GIFTS}.json`);
+        const data = (await res.json()) || {};
+        giftAdminCache = data;
+        const list = Object.values(data).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        if (list.length === 0) {
+          box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center; padding:10px;">No birthday gifts created yet.</p>';
+          return;
+        }
+        box.innerHTML = list.map(g => {
+          const thumb = (g.photos && g.photos[0]) ? g.photos[0] : '';
+          const link = giftBuildShareUrl(g.giftId);
+          return `
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:8px;">
+              <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+                ${thumb ? `<img src="${thumb}" style="width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0;">` : `<div style="width:48px; height:48px; border-radius:10px; background:#EC4899; color:white; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">🎁</div>`}
+                <div style="flex:1; min-width:0;">
+                  <strong style="font-size:0.88rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎂 ${escHtml(g.recipientName)}</strong>
+                  <small style="color:var(--gray);">From: ${escHtml(g.senderName)} • ${(g.photos || []).length} photos • 🟢 ${escHtml(g.status || 'published')}</small>
+                </div>
+              </div>
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button type="button" class="btn-back-sm" style="background:var(--edu-accent); color:white;" onclick="giftPreviewById('${escAttr(g.giftId)}')">👁 Preview</button>
+                <button type="button" class="btn-back-sm" style="background:var(--secondary); color:white;" onclick="giftCopyLink('${escAttr(link)}')">📋 Copy Link</button>
+                <button type="button" class="btn-back-sm" style="background:var(--blue); color:white;" onclick="giftEditById('${escAttr(g.giftId)}')">✏️ Edit</button>
+                <button type="button" class="btn-back-sm" style="background:var(--danger); color:white;" onclick="giftDeleteById('${escAttr(g.giftId)}')">🗑 Delete</button>
+              </div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        box.innerHTML = '<p style="font-size:0.8rem; color:var(--danger); text-align:center;">Failed to load gifts.</p>';
+      }
+    }
+
+    function giftEditById(giftId) {
+      const g = giftAdminCache[giftId];
+      if (!g) return;
+      giftEditingId = giftId;
+      document.getElementById('giftRecipientInput').value = g.recipientName || '';
+      document.getElementById('giftSenderInput').value = g.senderName || '';
+      document.getElementById('giftMessageInput').value = g.message || '';
+      document.getElementById('giftMusicSelect').value = g.music || 'none';
+      const tplCard = document.querySelector(`#giftTemplateGrid .gift-tpl-card[data-tpl="${g.template || 'crimson_gold'}"]`);
+      giftSelectTemplate(g.template || 'crimson_gold', tplCard);
+      giftFormPhotos = Array.isArray(g.photos) ? [...g.photos] : [];
+      giftRenderFormPhotoThumbs();
+      document.getElementById('giftFormHeading').innerText = `✏️ Edit Gift (${g.recipientName})`;
+      document.getElementById('giftCancelEditBtn').style.display = 'inline-block';
+      document.getElementById('giftPublishBtn').innerText = '💾 Update Gift';
+      document.getElementById('mode-gift').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function giftDeleteById(giftId) {
+      if (Number(currentUser.id) !== ADMIN_ID) return;
+      if (!confirm('Delete this birthday gift permanently?')) return;
+      try {
+        await fetch(`${FIREBASE_GIFTS}/${giftId}.json`, { method: 'DELETE' });
+        delete giftAdminCache[giftId];
+        notifyUser('Gift deleted.');
+        giftLoadAdminList();
+      } catch(e) {
+        notifyUser('Error deleting gift.');
+      }
+    }
+
+    function giftCopyLink(url) {
+      if (!url) return;
+      try {
+        navigator.clipboard.writeText(url);
+        notifyUser('📋 Gift link copied! Ready to share.');
+      } catch(e) {
+        const tmp = document.createElement('input');
+        tmp.value = url; document.body.appendChild(tmp); tmp.select();
+        document.execCommand('copy'); document.body.removeChild(tmp);
+        notifyUser('📋 Gift link copied!');
+      }
+    }
+
+    function giftShareTelegramLink(url, recipientName) {
+      const txt = `🎂✨ Happy Birthday ${recipientName || ''}! Someone prepared a special 3D birthday gift for you. Tap below to open it 👇`;
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(txt)}`;
+      if (tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
+    }
+
+    function giftPreviewCurrentForm() {
+      const recipientName = document.getElementById('giftRecipientInput').value.trim() || 'Birthday Star';
+      const senderName = document.getElementById('giftSenderInput').value.trim() || 'Wolkite Digital Hub';
+      const message = document.getElementById('giftMessageInput').value.trim() || 'Wishing you a joyful, unforgettable birthday filled with happiness and success!';
+      const music = document.getElementById('giftMusicSelect').value;
+      giftLaunchExperience({
+        giftId: 'preview',
+        template: giftSelectedTemplate,
+        recipientName,
+        senderName,
+        message,
+        photos: giftFormPhotos,
+        music: music === 'none' ? null : music
+      }, true);
+    }
+
+    function giftPreviewById(giftId) {
+      const g = giftAdminCache[giftId];
+      if (g) giftLaunchExperience(g, true);
+    }
+
+    function giftOpenSampleDemo() {
+      giftLaunchExperience({
+        giftId: 'demo',
+        template: 'crimson_gold',
+        recipientName: currentUser.first_name || 'Dear Friend',
+        senderName: 'Wolkite Digital Hub',
+        message: 'Happy Birthday! May this special day bring endless joy, good health, and bright achievements in everything you do. Celebrate big today! 🎂✨',
+        photos: [],
+        music: 'music_box'
+      }, true);
+    }
+
+    async function openRecipientGiftById(giftId) {
+      const overlay = document.getElementById('giftExperienceOverlay');
+      const statusEl = document.getElementById('giftStatusScreen');
+      const closedEl = document.getElementById('giftClosedStage');
+      const revealEl = document.getElementById('giftRevealStage');
+
+      overlay.className = 'gift-stage-overlay';
+      overlay.style.display = 'flex';
+      closedEl.style.display = 'none';
+      revealEl.style.display = 'none';
+      document.getElementById('giftPreviewBadge').style.display = 'none';
+      document.getElementById('giftMusicToggleBtn').style.display = 'none';
+
+      statusEl.innerHTML = `
+        <div class="mini-spinner" style="width:28px; height:28px; border-width:3px; color:#FBBF24; margin-bottom:12px;"></div>
+        <p style="font-size:0.92rem; color:#FDE68A; font-weight:700;">Preparing your birthday surprise...</p>`;
+      statusEl.style.display = 'flex';
+
+      try {
+        const res = await fetch(`${FIREBASE_GIFTS}/${encodeURIComponent(giftId)}.json`);
+        const gift = await res.json();
+        if (!gift || gift.status === 'deleted') {
+          statusEl.innerHTML = `
+            <div style="font-size:2.8rem; margin-bottom:10px;">🎁</div>
+            <h2 style="font-size:1.25rem; margin-bottom:8px;">Gift Not Found</h2>
+            <p style="font-size:0.84rem; color:rgba(248,250,252,0.78); max-width:300px; margin-bottom:18px;">
+              This birthday gift link may have expired or been removed by the sender.
+            </p>
+            <button type="button" class="gift-glass-pill" onclick="giftExitExperience()">Go to Wolkite Digital Hub</button>`;
+          return;
+        }
+        statusEl.style.display = 'none';
+        giftLaunchExperience(gift, false);
+      } catch(e) {
+        statusEl.innerHTML = `
+          <div style="font-size:2.5rem; margin-bottom:10px;">📡</div>
+          <h2 style="font-size:1.15rem; margin-bottom:8px;">Connection Issue</h2>
+          <p style="font-size:0.82rem; color:rgba(248,250,252,0.78); margin-bottom:16px;">Please check your internet and try again.</p>
+          <button type="button" class="btn-open-gift" style="padding:10px 22px; font-size:0.88rem;" onclick="openRecipientGiftById('${escAttr(giftId)}')">🔄 Retry</button>`;
+      }
+    }
+
+    function giftLaunchExperience(gift, isPreview = false) {
+      giftCurrentData = gift;
+      giftIsPreviewMode = isPreview;
+      giftStopMusic();
+      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
+
+      const overlay = document.getElementById('giftExperienceOverlay');
+      const tpl = gift.template || 'crimson_gold';
+      overlay.className = 'gift-stage-overlay' + (tpl !== 'crimson_gold' ? ` theme-${tpl}` : '');
+      overlay.style.display = 'flex';
+
+      document.getElementById('giftStatusScreen').style.display = 'none';
+      document.getElementById('giftRevealStage').style.display = 'none';
+      document.getElementById('giftPreviewBadge').style.display = isPreview ? 'inline-block' : 'none';
+
+      const scene = document.getElementById('gift3dScene');
+      scene.classList.remove('opened', 'shaking');
+
+      document.getElementById('giftStageRecipientName').innerText = `For ${gift.recipientName || 'You'} 🎂`;
+      document.getElementById('giftStageSubtext').innerText = 'A little surprise for you... Tap the box to open!';
+      document.getElementById('giftClosedStage').style.display = 'flex';
+
+      const musicBtn = document.getElementById('giftMusicToggleBtn');
+      if (gift.music) {
+        musicBtn.style.display = 'inline-block';
+        musicBtn.innerText = '🔊 Play Music';
+      } else {
+        musicBtn.style.display = 'none';
+      }
+    }
+
+    function giftOpenBoxAnimation() {
+      const scene = document.getElementById('gift3dScene');
+      if (scene.classList.contains('opened')) return;
+      scene.classList.add('shaking');
+
+      // Start music on user tap if enabled
+      if (giftCurrentData && giftCurrentData.music && !giftMusicPlaying) {
+        giftStartMusic(giftCurrentData.music);
+      }
+
+      setTimeout(() => {
+        scene.classList.remove('shaking');
+        scene.classList.add('opened');
+        giftLaunchConfettiBurst();
+      }, 420);
+
+      setTimeout(() => {
+        document.getElementById('giftClosedStage').style.display = 'none';
+        giftRenderRevealedContent();
+      }, 1250);
+    }
+
+    function giftReplayBox() {
+      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
+      document.getElementById('giftRevealStage').style.display = 'none';
+      const scene = document.getElementById('gift3dScene');
+      scene.classList.remove('opened', 'shaking');
+      document.getElementById('giftClosedStage').style.display = 'flex';
+    }
+
+    function giftRenderRevealedContent() {
+      if (!giftCurrentData) return;
+      const g = giftCurrentData;
+      document.getElementById('giftRevealHeading').innerText = `Happy Birthday, ${g.recipientName}!`;
+      document.getElementById('giftRevealMessage').innerText = g.message || '';
+      document.getElementById('giftRevealSender').innerText = `With warm wishes, ${g.senderName} 💝`;
+
+      const photos = Array.isArray(g.photos) ? g.photos.filter(Boolean) : [];
+      const galSec = document.getElementById('giftGallerySection');
+      if (photos.length > 0) {
+        galSec.style.display = 'block';
+        giftCurrentSlideIdx = 0;
+        const showNav = photos.length > 1 ? 'flex' : 'none';
+        document.getElementById('giftPrevSlideBtn').style.display = showNav;
+        document.getElementById('giftNextSlideBtn').style.display = showNav;
+        document.getElementById('giftSlideDots').innerHTML = photos.map((_, i) =>
+          `<span class="gift-slide-dot ${i === 0 ? 'active' : ''}" onclick="giftGoToSlide(${i})"></span>`
+        ).join('');
+        giftGoToSlide(0);
+        if (photos.length > 1) {
+          giftSlideTimer = setInterval(() => giftStepSlide(1), 4000);
+        }
+      } else {
+        galSec.style.display = 'none';
+      }
+
+      document.getElementById('giftRevealStage').style.display = 'block';
+    }
+
+    function giftGoToSlide(idx) {
+      if (!giftCurrentData || !Array.isArray(giftCurrentData.photos)) return;
+      const photos = giftCurrentData.photos.filter(Boolean);
+      if (photos.length === 0) return;
+      giftCurrentSlideIdx = (idx + photos.length) % photos.length;
+      const imgEl = document.getElementById('giftSlideImg');
+      imgEl.style.opacity = '0.25';
+      setTimeout(() => {
+        imgEl.src = photos[giftCurrentSlideIdx];
+        imgEl.style.opacity = '1';
+      }, 130);
+      document.querySelectorAll('#giftSlideDots .gift-slide-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === giftCurrentSlideIdx);
+      });
+    }
+
+    function giftStepSlide(delta) {
+      giftGoToSlide(giftCurrentSlideIdx + delta);
+    }
+
+    function giftExitExperience() {
+      giftStopMusic();
+      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
+      if (giftConfettiAnimId) { cancelAnimationFrame(giftConfettiAnimId); giftConfettiAnimId = null; }
+      document.getElementById('giftExperienceOverlay').style.display = 'none';
+      if (!giftIsPreviewMode) {
+        openHubScreen();
+      }
+    }
+
+    // Lightweight Zero-Dependency Web Audio Birthday Chime
+    function giftStartMusic(style = 'music_box') {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!giftAudioCtx) giftAudioCtx = new AudioCtx();
+        if (giftAudioCtx.state === 'suspended') giftAudioCtx.resume();
+
+        // Happy Birthday melody notes (Hz) & durations (sec)
+        const notes = [
+          [261.63, 0.32], [261.63, 0.22], [293.66, 0.52], [261.63, 0.52], [349.23, 0.52], [329.63, 0.92],
+          [261.63, 0.32], [261.63, 0.22], [293.66, 0.52], [261.63, 0.52], [392.00, 0.52], [349.23, 0.92],
+          [261.63, 0.32], [261.63, 0.22], [523.25, 0.52], [440.00, 0.52], [349.23, 0.42], [329.63, 0.42], [293.66, 0.85],
+          [466.16, 0.32], [466.16, 0.22], [440.00, 0.52], [349.23, 0.52], [392.00, 0.52], [349.23, 1.05]
+        ];
+
+        const playSequence = () => {
+          if (!giftMusicPlaying || !giftAudioCtx) return;
+          let t = giftAudioCtx.currentTime + 0.05;
+          notes.forEach(([freq, dur]) => {
+            const osc = giftAudioCtx.createOscillator();
+            const gain = giftAudioCtx.createGain();
+            osc.type = style === 'piano_chime' ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.exponentialRampToValueAtTime(0.11, t + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+            osc.connect(gain);
+            gain.connect(giftAudioCtx.destination);
+            osc.start(t);
+            osc.stop(t + dur + 0.02);
+            t += dur + 0.06;
+          });
+        };
+
+        giftMusicPlaying = true;
+        document.getElementById('giftMusicToggleBtn').innerText = '⏸ Pause Music';
+        playSequence();
+        giftMusicInterval = setInterval(playSequence, 13200);
+      } catch(e) {}
+    }
+
+    function giftStopMusic() {
+      giftMusicPlaying = false;
+      if (giftMusicInterval) { clearInterval(giftMusicInterval); giftMusicInterval = null; }
+      const btn = document.getElementById('giftMusicToggleBtn');
+      if (btn) btn.innerText = '🔊 Play Music';
+    }
+
+    function giftToggleMusic() {
+      if (giftMusicPlaying) giftStopMusic();
+      else giftStartMusic((giftCurrentData && giftCurrentData.music) || 'music_box');
+    }
+
+    // Lightweight Canvas Confetti Burst
+    function giftLaunchConfettiBurst() {
+      const canvas = document.getElementById('giftConfettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const colors = ['#FBBF24', '#EC4899', '#38BDF8', '#34D399', '#A78BFA', '#F87171'];
+      const pieces = Array.from({ length: 75 }, () => ({
+        x: canvas.width * (0.2 + Math.random() * 0.6),
+        y: canvas.height * 0.45,
+        vx: (Math.random() - 0.5) * 9,
+        vy: -4 - Math.random() * 7,
+        size: 5 + Math.random() * 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.2
+      }));
+
+      if (giftConfettiAnimId) cancelAnimationFrame(giftConfettiAnimId);
+      let frames = 0;
+      const step = () => {
+        frames++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.24;
+          p.rot += p.vrot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        });
+        if (frames < 140) {
+          giftConfettiAnimId = requestAnimationFrame(step);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      };
+      giftConfettiAnimId = requestAnimationFrame(step);
     }
 
     // =========================================================================
@@ -5830,6 +7088,7 @@
         document.getElementById('headerSub').innerText = 'Remedial • Freshman Quiz & Free Notes';
         requestAnimationFrame(() => updateNavIndicator('navBarEdu'));
         await eduLoadAllData(null, true);
+        await eduEnsureAllQuestionsLoaded();
         const foundQ = bikatQuestions.find(q => q.id === targetQId || q.custom_id === targetQId);
         if (foundQ) {
           const qCat = foundQ.content_category || 'chapter';
@@ -5855,6 +7114,13 @@
       } else if (startParam === 'edu') {
         document.getElementById('hubScreen').style.display = 'none';
         switchAppMode('edu');
+      } else if (startParam && startParam.startsWith('gift_')) {
+        const targetGiftId = startParam.substring(5);
+        document.getElementById('hubScreen').style.display = 'none';
+        await openRecipientGiftById(targetGiftId);
+      } else if (startParam === 'gift') {
+        document.getElementById('hubScreen').style.display = 'none';
+        switchAppMode('gift');
       } else {
         // Show Hub Screen immediately so newcomer sees Welcome cards in 0ms; load chosen mode on tap!
         shopHydrateFromCache();
