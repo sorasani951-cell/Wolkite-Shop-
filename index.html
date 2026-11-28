@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Wolkite Shop & BIKAT Education</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       /* Default: Modern White Theme */
@@ -913,7 +917,7 @@
     }
 
     /* =========================================================================
-       VIRTUAL GIFT STUDIO (3RD SERVICE + CINEMATIC 3D BIRTHDAY GIFT BOX)
+       VIRTUAL GIFT STUDIO — 3D THREE.JS ENGINE + 10 TEMPLATES + ADMIN BUILDER
        ========================================================================= */
     .hub-card.gift-card { border-left: 4px solid #EC4899; }
     .hub-card.gift-card .hub-icon-box { background: linear-gradient(135deg, #9D174D, #EC4899, #F59E0B); }
@@ -922,32 +926,75 @@
     body[data-theme="dark"] .mode-pill.gift-active { background: #1E293B; color: #F472B6; }
 
     .gift-studio-hero {
-      background: linear-gradient(135deg, #4C0519 0%, #9D174D 55%, #DB2777 100%);
+      background: linear-gradient(135deg, #0F172A 0%, #311042 52%, #9D174D 100%);
       color: white; border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px;
-      box-shadow: 0 10px 26px rgba(157, 23, 77, 0.28);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.28);
+      border: 1px solid rgba(255,255,255,0.12);
     }
-    .gift-tpl-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px;
+
+    /* Admin Builder Stepper */
+    .vgs-stepper {
+      display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+      background: var(--surface); padding: 5px; border-radius: 14px; margin-bottom: 14px;
+      border: 1px solid var(--border);
     }
-    .gift-tpl-card {
-      background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
-      padding: 10px 6px; text-align: center; cursor: pointer; font-size: 0.74rem; font-weight: 800;
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    .vgs-stepper::-webkit-scrollbar { display: none; }
+    .vgs-step-pill {
+      flex: 1; min-width: 68px; padding: 7px 6px; border-radius: 10px; border: none;
+      background: transparent; color: var(--gray); font-size: 0.7rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: 0.18s;
     }
-    .gift-tpl-card:active { transform: scale(0.96); }
-    .gift-tpl-card.selected {
-      border-color: #EC4899; background: rgba(236, 72, 153, 0.12);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.22);
+    .vgs-step-pill.active {
+      background: var(--card-bg); color: #BE185D; box-shadow: var(--shadow-sm); font-weight: 800;
     }
-    .gift-swatch {
-      width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 5px;
-      border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+    body[data-theme="dark"] .vgs-step-pill.active { color: #F472B6; }
+
+    /* 10 Template Cards Grid */
+    .vgs-tpl-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;
     }
-    .gift-photo-thumbs {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    .vgs-tpl-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
+      overflow: hidden; cursor: pointer; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      display: flex; flex-direction: column;
     }
+    .vgs-tpl-card:active { transform: scale(0.97); }
+    .vgs-tpl-card.selected {
+      border-color: #EC4899; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.24);
+    }
+    .vgs-tpl-banner {
+      height: 62px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.7rem; position: relative; color: white;
+    }
+    .vgs-tpl-tag {
+      position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.45);
+      color: #FDE68A; font-size: 0.58rem; font-weight: 800; padding: 2px 6px; border-radius: 999px;
+    }
+    .vgs-tpl-body { padding: 9px 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .vgs-tpl-title { font-size: 0.78rem; font-weight: 800; color: var(--text); line-height: 1.25; }
+    .vgs-tpl-desc { font-size: 0.67rem; color: var(--gray); margin: 4px 0 8px; line-height: 1.3; }
+    .vgs-tpl-btns { display: flex; gap: 5px; }
+    .vgs-tpl-btns button {
+      flex: 1; padding: 5px 4px; border-radius: 8px; border: none; font-size: 0.68rem; font-weight: 800; cursor: pointer;
+    }
+
+    /* Occasion Grid */
+    .vgs-occ-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;
+    }
+    .vgs-occ-card {
+      background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 700; color: var(--text); transition: 0.15s;
+    }
+    .vgs-occ-card.selected {
+      border-color: #EC4899; background: rgba(236, 72, 153, 0.12); color: #BE185D;
+    }
+    body[data-theme="dark"] .vgs-occ-card.selected { color: #F472B6; }
+
+    .gift-photo-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     .gift-thumb-wrap {
-      position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden;
+      position: relative; width: 66px; height: 66px; border-radius: 10px; overflow: hidden;
       border: 1.5px solid var(--border); background: var(--surface);
     }
     .gift-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
@@ -957,207 +1004,47 @@
       font-weight: 800; cursor: pointer; line-height: 1;
     }
 
-    /* FULL-SCREEN RECIPIENT 3D BIRTHDAY EXPERIENCE OVERLAY */
-    .gift-stage-overlay {
+    /* =========================================================================
+       FULL-SCREEN 3D THREE.JS RECIPIENT VIEWPORT & INTERACTIVE HUD
+       ========================================================================= */
+    .vgs-viewport-overlay {
       position: fixed; inset: 0; z-index: 100050;
-      background: radial-gradient(circle at 50% 25%, #2E1065 0%, #0F0722 52%, #05020D 100%);
-      color: #F8FAFC; overflow-y: auto; overflow-x: hidden;
-      display: none; flex-direction: column; align-items: center;
-      padding: 18px 16px calc(32px + env(safe-area-inset-bottom, 0px));
+      background: #05020D; color: #F8FAFC;
+      display: none; flex-direction: column; overflow: hidden;
+      user-select: none; -webkit-user-select: none;
     }
-    .gift-stage-overlay.theme-royal_gold {
-      background: radial-gradient(circle at 50% 25%, #3B1D0E 0%, #160A04 55%, #070301 100%);
+    #vgsThreeCanvasHost {
+      position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+      touch-action: none;
     }
-    .gift-stage-overlay.theme-emerald_star {
-      background: radial-gradient(circle at 50% 25%, #064E3B 0%, #041F1A 55%, #020D0B 100%);
-    }
-    .gift-stars-bg {
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background-image:
-        radial-gradient(2px 2px at 18% 16%, rgba(255,255,255,0.75) 50%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 78% 22%, rgba(253,224,71,0.85) 50%, transparent 100%),
-        radial-gradient(2px 2px at 32% 68%, rgba(244,114,182,0.75) 50%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 84% 74%, rgba(255,255,255,0.7) 50%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 54% 40%, rgba(167,243,208,0.75) 50%, transparent 100%),
-        radial-gradient(2px 2px at 12% 84%, rgba(253,224,71,0.65) 50%, transparent 100%);
-      animation: starTwinkle 4s ease-in-out infinite alternate;
-    }
-    @keyframes starTwinkle {
-      0% { opacity: 0.55; }
-      100% { opacity: 1; }
-    }
-    .gift-confetti-canvas {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 3;
-    }
-    .gift-top-controls {
-      position: relative; z-index: 4; width: 100%; max-width: 460px;
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      margin-bottom: 10px;
-    }
-    .gift-glass-pill {
-      background: rgba(255,255,255,0.12); color: #F8FAFC;
-      border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(10px);
-      padding: 7px 13px; border-radius: 999px; font-size: 0.76rem; font-weight: 700;
-      cursor: pointer; transition: transform 0.15s, background 0.15s;
-    }
-    .gift-glass-pill:active { transform: scale(0.95); background: rgba(255,255,255,0.22); }
+    #vgsThreeCanvasHost canvas { display: block; width: 100% !important; height: 100% !important; }
 
-    .gift-center-stage {
-      position: relative; z-index: 2; width: 100%; max-width: 440px;
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; text-align: center; padding: 12px 4px;
+    /* Stage 1 Entrance Overlay (Glassmorphic over 3D Gift Box) */
+    .vgs-entrance-hud {
+      position: absolute; inset: 0; z-index: 4;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: 58px 20px calc(38px + env(safe-area-inset-bottom, 0px));
+      background: radial-gradient(circle at 50% 45%, rgba(15, 7, 34, 0.18) 0%, rgba(5, 2, 13, 0.76) 100%);
+      pointer-events: none; text-align: center;
     }
+    .vgs-entrance-top, .vgs-entrance-bottom { pointer-events: auto; max-width: 420px; width: 100%; }
     .gift-pre-badge {
       display: inline-block; padding: 5px 14px; border-radius: 999px;
-      background: rgba(251, 191, 36, 0.16); border: 1px solid rgba(251, 191, 36, 0.42);
-      color: #FDE68A; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em;
-      margin-bottom: 10px;
+      background: rgba(251, 191, 36, 0.18); border: 1px solid rgba(251, 191, 36, 0.45);
+      color: #FDE68A; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em;
+      margin-bottom: 8px; backdrop-filter: blur(8px);
     }
     .gift-recipient-title {
-      font-size: 1.72rem; font-weight: 900; letter-spacing: -0.02em;
+      font-size: 1.75rem; font-weight: 900; letter-spacing: -0.02em;
       background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 55%, #F9A8D4 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 6px; line-height: 1.2;
+      line-height: 1.2; text-shadow: 0 4px 24px rgba(0,0,0,0.45);
     }
-    .gift-subtitle {
-      font-size: 0.88rem; color: rgba(248, 250, 252, 0.82); margin-bottom: 24px;
-    }
-
-    /* CSS 3D REALISTIC GIFT BOX */
-    .gift-3d-scene {
-      width: 190px; height: 190px; margin: 14px auto 26px;
-      perspective: 950px; position: relative; cursor: pointer;
-    }
-    .gift-box-glow {
-      position: absolute; inset: 12px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(251, 191, 36, 0.55) 0%, rgba(236, 72, 153, 0.25) 55%, transparent 75%);
-      filter: blur(18px); transform: scale(0.85); opacity: 0.65;
-      transition: transform 0.7s ease, opacity 0.7s ease;
-      pointer-events: none;
-    }
-    .gift-3d-scene.opened .gift-box-glow {
-      transform: scale(1.75); opacity: 1;
-    }
-    .gift-3d-cube {
-      width: 150px; height: 130px; position: relative; margin: 36px auto 0;
-      transform-style: preserve-3d;
-      transform: rotateX(-16deg) rotateY(-28deg);
-      animation: giftFloat 3.2s ease-in-out infinite;
-      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    @keyframes giftFloat {
-      0%, 100% { transform: rotateX(-16deg) rotateY(-28deg) translateY(0px); }
-      50% { transform: rotateX(-13deg) rotateY(-20deg) translateY(-10px); }
-    }
-    .gift-3d-scene.shaking .gift-3d-cube {
-      animation: giftShake 0.55s ease-in-out;
-    }
-    @keyframes giftShake {
-      0%, 100% { transform: rotateX(-16deg) rotateY(-28deg) scale(1); }
-      25% { transform: rotateX(-16deg) rotateY(-36deg) rotateZ(-4deg) scale(1.05); }
-      50% { transform: rotateX(-16deg) rotateY(-18deg) rotateZ(4deg) scale(1.07); }
-      75% { transform: rotateX(-16deg) rotateY(-32deg) rotateZ(-2deg) scale(1.04); }
-    }
-    .gift-3d-scene.opened .gift-3d-cube {
-      animation: none;
-      transform: rotateX(-20deg) rotateY(-24deg) translateY(18px) scale(0.92);
-    }
-
-    /* Box Base Faces (Crimson & Gold Default) */
-    .g-face {
-      position: absolute; width: 150px; height: 130px;
-      background: linear-gradient(145deg, #E11D48, #9F1239);
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: inset 0 0 22px rgba(0,0,0,0.28);
-    }
-    .gift-stage-overlay.theme-royal_gold .g-face {
-      background: linear-gradient(145deg, #1E293B, #0F172A);
-      border-color: rgba(251, 191, 36, 0.35);
-    }
-    .gift-stage-overlay.theme-emerald_star .g-face {
-      background: linear-gradient(145deg, #059669, #064E3B);
-    }
-    .g-front  { transform: translateZ(75px); }
-    .g-back   { transform: rotateY(180deg) translateZ(75px); }
-    .g-right  { transform: rotateY(90deg) translateZ(75px); filter: brightness(0.88); }
-    .g-left   { transform: rotateY(-90deg) translateZ(75px); filter: brightness(0.94); }
-    .g-bottom {
-      width: 150px; height: 150px; top: -10px;
-      transform: rotateX(-90deg) translateZ(65px);
-      background: #4C0519; box-shadow: 0 24px 36px rgba(0,0,0,0.65);
-    }
-    /* Vertical & Horizontal Metallic Gold Ribbons on Base */
-    .g-face::before {
-      content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, #D97706, #FDE047, #D97706);
-      box-shadow: 0 0 8px rgba(253, 224, 71, 0.35);
-    }
-
-    /* 3D Box Lid */
-    .gift-lid {
-      position: absolute; width: 162px; height: 34px; left: -6px; top: -22px;
-      transform-style: preserve-3d;
-      transform-origin: 50% 100% -81px;
-      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
-    }
-    .gift-3d-scene.opened .gift-lid {
-      transform: rotateX(122deg) translateY(-18px) translateZ(14px);
-    }
-    .g-lid-face {
-      position: absolute; width: 162px; height: 34px;
-      background: linear-gradient(145deg, #F43F5E, #BE123C);
-      border: 1px solid rgba(255,255,255,0.22);
-    }
-    .gift-stage-overlay.theme-royal_gold .g-lid-face {
-      background: linear-gradient(145deg, #334155, #1E293B);
-    }
-    .gift-stage-overlay.theme-emerald_star .g-lid-face {
-      background: linear-gradient(145deg, #10B981, #047857);
-    }
-    .g-lid-front  { transform: translateZ(81px); }
-    .g-lid-back   { transform: rotateY(180deg) translateZ(81px); }
-    .g-lid-right  { transform: rotateY(90deg) translateZ(81px); filter: brightness(0.88); }
-    .g-lid-left   { transform: rotateY(-90deg) translateZ(81px); filter: brightness(0.94); }
-    .g-lid-top {
-      position: absolute; width: 162px; height: 162px; top: -64px; left: 0;
-      transform: rotateX(90deg) translateZ(17px);
-      background: linear-gradient(135deg, #FB7185, #E11D48);
-      border: 1px solid rgba(255,255,255,0.25);
-    }
-    .gift-stage-overlay.theme-royal_gold .g-lid-top { background: linear-gradient(135deg, #475569, #1E293B); }
-    .gift-stage-overlay.theme-emerald_star .g-lid-top { background: linear-gradient(135deg, #34D399, #059669); }
-    .g-lid-face::before, .g-lid-top::before {
-      content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, #D97706, #FDE047, #D97706);
-    }
-    .g-lid-top::after {
-      content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 24px;
-      transform: translateY(-50%);
-      background: linear-gradient(180deg, #D97706, #FDE047, #D97706);
-    }
-    /* 3D Ribbon Bow on Top */
-    .gift-bow {
-      position: absolute; top: -24px; left: 50%; transform: translateX(-50%) translateZ(20px);
-      display: flex; gap: 4px; pointer-events: none;
-    }
-    .gift-bow span {
-      width: 28px; height: 20px; border-radius: 50% 50% 12% 50%;
-      background: linear-gradient(135deg, #FDE047, #D97706);
-      border: 1.5px solid #FEF08A; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transform: rotate(-18deg);
-    }
-    .gift-bow span:last-child {
-      border-radius: 50% 50% 50% 12%; transform: rotate(18deg);
-    }
-
     .btn-open-gift {
       background: linear-gradient(135deg, #F59E0B 0%, #EC4899 100%);
-      color: white; border: none; padding: 15px 30px; border-radius: 999px;
+      color: white; border: none; padding: 15px 32px; border-radius: 999px;
       font-size: 1rem; font-weight: 900; letter-spacing: 0.02em; cursor: pointer;
-      box-shadow: 0 10px 28px rgba(236, 72, 153, 0.48), 0 0 0 4px rgba(251, 191, 36, 0.22);
+      box-shadow: 0 10px 28px rgba(236, 72, 153, 0.52), 0 0 0 4px rgba(251, 191, 36, 0.24);
       animation: pulseGiftBtn 2s infinite;
     }
     .btn-open-gift:active { transform: scale(0.95); }
@@ -1166,60 +1053,67 @@
       50% { transform: scale(1.04); }
     }
 
-    /* REVEALED BIRTHDAY CARD + PHOTO SLIDESHOW + MESSAGE */
-    .gift-reveal-panel {
-      display: none; width: 100%; max-width: 440px; z-index: 3;
-      animation: giftRevealUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    /* Top Bar inside 3D Viewport */
+    .vgs-top-bar {
+      position: absolute; top: 12px; left: 12px; right: 12px; z-index: 6;
+      display: flex; justify-content: space-between; align-items: center; gap: 6px;
+      pointer-events: none;
     }
-    @keyframes giftRevealUp {
-      from { opacity: 0; transform: translateY(34px) scale(0.94); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    .vgs-top-bar > * { pointer-events: auto; }
+    .gift-glass-pill {
+      background: rgba(15, 23, 42, 0.62); color: #F8FAFC;
+      border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 7px 12px; border-radius: 999px; font-size: 0.74rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s, background 0.15s;
     }
-    .gift-reveal-card {
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.20);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      border-radius: 24px; padding: 18px 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
-      text-align: center;
+    .gift-glass-pill:active { transform: scale(0.95); background: rgba(255,255,255,0.22); }
+
+    /* Stage 3 & 4 Interactive Room Dock (Bottom Controls inside 3D Room) */
+    .vgs-room-dock {
+      position: absolute; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      left: 12px; right: 12px; max-width: 520px; margin: 0 auto; z-index: 6;
+      display: none; flex-direction: column; gap: 8px; pointer-events: none;
     }
-    .gift-gallery-frame {
-      position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 290px;
-      border-radius: 18px; overflow: hidden; margin: 12px 0;
-      background: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(253, 224, 71, 0.35);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    .vgs-room-dock > * { pointer-events: auto; }
+    .vgs-room-banner {
+      background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(12px); border-radius: 16px; padding: 9px 14px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
-    .gift-gallery-frame img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: opacity 0.35s ease, transform 0.5s ease;
+    .vgs-dock-actions {
+      display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
     }
-    .gift-slide-nav {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(15, 23, 42, 0.58); color: white;
-      border: 1px solid rgba(255,255,255,0.28); font-size: 1rem; font-weight: 800;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    .vgs-dock-actions::-webkit-scrollbar { display: none; }
+    .vgs-dock-btn {
+      flex: 1; min-width: 72px; background: rgba(15, 23, 42, 0.74); color: white;
+      border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(12px);
+      border-radius: 14px; padding: 9px 8px; font-size: 0.72rem; font-weight: 800;
+      cursor: pointer; text-align: center; white-space: nowrap;
     }
-    .gift-slide-dots {
-      display: flex; justify-content: center; gap: 6px; margin-bottom: 12px;
+    .vgs-dock-btn.highlight {
+      background: linear-gradient(135deg, rgba(236,72,153,0.85), rgba(245,158,11,0.85));
+      border-color: rgba(253, 224, 71, 0.55);
     }
-    .gift-slide-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);
-      transition: width 0.2s, background 0.2s; cursor: pointer;
+
+    /* Pop-up Modal inside 3D World (Fullscreen Photo, Letter, Video, Final Signature) */
+    .vgs-world-modal {
+      position: absolute; inset: 0; z-index: 10;
+      background: rgba(5, 2, 13, 0.78); backdrop-filter: blur(12px);
+      display: none; align-items: center; justify-content: center; padding: 18px;
     }
-    .gift-slide-dot.active {
-      width: 20px; border-radius: 999px; background: #FBBF24;
+    .vgs-world-card {
+      background: rgba(21, 31, 50, 0.94); border: 1px solid rgba(253, 224, 71, 0.32);
+      border-radius: 22px; padding: 20px 16px; width: 100%; max-width: 420px;
+      max-height: 84vh; overflow-y: auto; text-align: center; color: #F8FAFC;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65); animation: modalPop 0.22s ease;
     }
-    .gift-letter-box {
-      background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(253, 224, 71, 0.28);
-      border-radius: 16px; padding: 15px 14px; margin: 10px 0 14px;
-      font-size: 0.96rem; line-height: 1.65; color: #F8FAFC;
-      white-space: pre-wrap; text-align: left;
+    .vgs-letter-paper {
+      background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(253, 224, 71, 0.25);
+      border-radius: 16px; padding: 16px; margin: 12px 0;
+      font-size: 0.96rem; line-height: 1.68; text-align: left; white-space: pre-wrap;
     }
-    .gift-sender-sig {
-      font-size: 0.88rem; font-weight: 800; color: #FDE68A; margin-top: 6px;
-    }
-  </style>
+    </style>
 </head>
 <body>
 
@@ -2005,190 +1899,287 @@
   </div>
 
     <!-- =========================================================
-         MODE 3: VIRTUAL GIFT STUDIO (ADMIN-MANAGED + DEMO PREVIEW)
+         MODE 3: VIRTUAL GIFT STUDIO (10 3D ENVIRONMENTS + MULTI-OCCASION)
          ========================================================= -->
     <div id="mode-gift" class="app-mode">
       <div class="gift-studio-hero">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
           <div>
-            <span style="display:inline-block; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:999px; font-size:0.68rem; font-weight:800;">✨ 3D Birthday Experience</span>
+            <span style="display:inline-block; background:rgba(255,255,255,0.16); padding:3px 10px; border-radius:999px; font-size:0.68rem; font-weight:800;">🏛️ Walk Into a Memory • 3D Studio</span>
             <h2 style="font-size:1.15rem; font-weight:900; margin-top:6px;">🎁 Virtual Gift Studio</h2>
-            <p style="font-size:0.78rem; opacity:0.9; margin-top:2px;">Personalized 3D interactive birthday surprises for your loved ones.</p>
+            <p style="font-size:0.76rem; opacity:0.9; margin-top:2px;">10 Interactive 3D Rooms • Multi-Occasion • Custom Photo Frames & Letters</p>
           </div>
-          <button type="button" class="btn-action" style="width:auto; padding:8px 12px; background:rgba(255,255,255,0.2); color:white; font-size:0.75rem;" onclick="giftOpenSampleDemo()">🎬 Demo</button>
+          <button type="button" class="btn-action" style="width:auto; padding:8px 12px; background:rgba(255,255,255,0.2); color:white; font-size:0.75rem;" onclick="vgsOpenSampleDemo()">🎬 3D Demo</button>
         </div>
       </div>
 
-      <!-- NON-ADMIN PUBLIC VIEW (No access to gift creation dashboard) -->
+      <!-- PUBLIC NON-ADMIN VIEW (Zero access to Admin Builder or gift database list) -->
       <div id="giftPublicShowcase" class="section-card" style="text-align:center;">
-        <div style="font-size:2.4rem; margin-bottom:6px;">🎂</div>
-        <h3 style="color:var(--text); margin-bottom:6px;">Send a 3D Virtual Birthday Surprise!</h3>
+        <div style="font-size:2.5rem; margin-bottom:6px;">🏛️✨</div>
+        <h3 style="color:var(--text); margin-bottom:6px;">Walk Into a 3D Memory</h3>
         <p style="font-size:0.82rem; color:var(--gray); line-height:1.55; margin-bottom:14px;">
-          Want to surprise a friend or loved one with a custom 3D animated birthday gift box, photo gallery, music, and personal letter? Contact the Wolkite Digital Hub Admin to order yours!
+          Surprise someone special with a custom 3D virtual room featuring framed photos on the walls, interactive birthday candles, music, and a personal letter. Contact the Wolkite Digital Hub Admin to order!
         </p>
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn-action btn-edu" style="flex:1;" onclick="giftOpenSampleDemo()">✨ Try 3D Gift Demo</button>
-          <a class="btn-action btn-tg" style="flex:1;" href="https://t.me/sorataju1?text=ሰላም%20Admin!%20የ3D%20Virtual%20Birthday%20Gift%20ማዘዝ%20እፈልጋለሁ" target="_blank">💬 Request Gift</a>
+          <button type="button" class="btn-action btn-edu" style="flex:1;" onclick="vgsOpenSampleDemo()">✨ Enter 3D Demo Room</button>
+          <a class="btn-action btn-tg" style="flex:1;" href="https://t.me/sorataju1?text=ሰላም%20Admin!%20የ3D%20Virtual%20Gift%20Room%20ማዘዝ%20እፈልጋለሁ" target="_blank">💬 Request Custom Gift</a>
         </div>
       </div>
 
-      <!-- ADMIN-ONLY GIFT STUDIO DASHBOARD -->
+      <!-- ADMIN-ONLY VIRTUAL GIFT BUILDER & MANAGEMENT DASHBOARD -->
       <div id="giftAdminDashboard" style="display:none;">
-        <div class="section-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h3 id="giftFormHeading" style="font-size:0.98rem; color:#BE185D; margin:0;">➕ Create New 3D Birthday Gift</h3>
-            <button type="button" id="giftCancelEditBtn" class="btn-back-sm" style="display:none;" onclick="giftResetForm()">✖ Cancel Edit</button>
-          </div>
+        <!-- Admin Top Mode Switch: Builder vs Manage Dashboard -->
+        <div class="profile-tabs" style="margin-bottom:12px;">
+          <div class="p-tab active" id="vgsMainTabBuilder" onclick="vgsSwitchAdminMainTab('builder', this)">🎨 3D Gift Builder</div>
+          <div class="p-tab" id="vgsMainTabManage" onclick="vgsSwitchAdminMainTab('manage', this)">📦 Manage Gifts</div>
+        </div>
 
-          <form id="giftCreatorForm" onsubmit="giftSaveGift(event)">
-            <div class="form-group">
-              <label>🎂 Recipient Name (የተቀባዩ ስም) *</label>
-              <input type="text" id="giftRecipientInput" placeholder="ምሳሌ: Sara / ሳራ" maxlength="60" required>
+        <!-- TAB A: 7-STEP 3D GIFT BUILDER -->
+        <div id="vgsBuilderPanel">
+          <div class="section-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 id="giftFormHeading" style="font-size:0.96rem; color:#BE185D; margin:0;">✨ Create New 3D Virtual Gift</h3>
+              <button type="button" id="giftCancelEditBtn" class="btn-back-sm" style="display:none;" onclick="vgsResetBuilder()">✖ Cancel Edit</button>
             </div>
 
-            <div class="form-group">
-              <label>💝 Sender Name (የላኪው ስም) *</label>
-              <input type="text" id="giftSenderInput" placeholder="ምሳሌ: From Your Best Friend" maxlength="60" required>
+            <!-- 6-Step Wizard Navigation -->
+            <div class="vgs-stepper" id="vgsBuilderStepper">
+              <button type="button" class="vgs-step-pill active" onclick="vgsGoBuilderStep(1)">1. Occasion</button>
+              <button type="button" class="vgs-step-pill" onclick="vgsGoBuilderStep(2)">2. 3D Room</button>
+              <button type="button" class="vgs-step-pill" onclick="vgsGoBuilderStep(3)">3. Details</button>
+              <button type="button" class="vgs-step-pill" onclick="vgsGoBuilderStep(4)">4. Photos</button>
+              <button type="button" class="vgs-step-pill" onclick="vgsGoBuilderStep(5)">5. Style</button>
+              <button type="button" class="vgs-step-pill" onclick="vgsGoBuilderStep(6)">6. Publish</button>
             </div>
 
-            <div class="form-group">
-              <label>🎨 3D Birthday Template Theme</label>
-              <div class="gift-tpl-grid" id="giftTemplateGrid">
-                <div class="gift-tpl-card selected" data-tpl="crimson_gold" onclick="giftSelectTemplate('crimson_gold', this)">
-                  <div class="gift-swatch" style="background:linear-gradient(135deg,#E11D48,#F59E0B);"></div>
-                  Crimson & Gold
-                </div>
-                <div class="gift-tpl-card" data-tpl="royal_gold" onclick="giftSelectTemplate('royal_gold', this)">
-                  <div class="gift-swatch" style="background:linear-gradient(135deg,#1E293B,#FBBF24);"></div>
-                  Midnight Gold
-                </div>
-                <div class="gift-tpl-card" data-tpl="emerald_star" onclick="giftSelectTemplate('emerald_star', this)">
-                  <div class="gift-swatch" style="background:linear-gradient(135deg,#059669,#34D399);"></div>
-                  Emerald Star
-                </div>
+            <!-- STEP 1: MULTI-OCCASION SELECTION -->
+            <div id="vgsStep1" class="vgs-step-pane">
+              <label style="font-size:0.82rem; font-weight:800; color:var(--text);">Step 1 — Select Occasion (Independent of 3D Room)</label>
+              <div class="vgs-occ-grid" id="vgsOccasionGrid"></div>
+              <div class="form-group" id="vgsCustomOccasionWrap" style="display:none; margin-top:10px;">
+                <label>Custom Occasion Title</label>
+                <input type="text" id="vgsCustomOccasionInput" placeholder="e.g., Promotion, Eid Mubarak, Engagement..." maxlength="50">
+              </div>
+              <button type="button" class="btn-action btn-edu" style="margin-top:12px;" onclick="vgsGoBuilderStep(2)">Next: Choose 3D Environment ➔</button>
+            </div>
+
+            <!-- STEP 2: 10 REALISTIC 3D ENVIRONMENT TEMPLATES -->
+            <div id="vgsStep2" class="vgs-step-pane" style="display:none;">
+              <label style="font-size:0.82rem; font-weight:800; color:var(--text);">Step 2 — Select 3D Environment Template (10 Rooms)</label>
+              <div class="vgs-tpl-grid" id="vgsTemplateCardsGrid"></div>
+              <div style="display:flex; gap:8px; margin-top:12px;">
+                <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text);" onclick="vgsGoBuilderStep(1)">⬅ Back</button>
+                <button type="button" class="btn-action btn-edu" style="flex:1.4;" onclick="vgsGoBuilderStep(3)">Next: Recipient Info ➔</button>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>💌 Personalized Birthday Message *</label>
-              <textarea id="giftMessageInput" rows="4" placeholder="መልካም ልደት! ይህ ልዩ ቀንህ በደስታና በስኬት የተሞላ ይሁን..." maxlength="1500" required></textarea>
+            <!-- STEP 3: RECIPIENT INFORMATION -->
+            <div id="vgsStep3" class="vgs-step-pane" style="display:none;">
+              <div class="form-group">
+                <label>Recipient Name (የተቀባዩ ስም) *</label>
+                <input type="text" id="giftRecipientInput" placeholder="e.g., Sara / ሳራ" maxlength="60">
+              </div>
+              <div class="form-group">
+                <label>Sender Name (የላኪው ስም) *</label>
+                <input type="text" id="giftSenderInput" placeholder="e.g., From Your Best Friend" maxlength="60">
+              </div>
+              <div class="form-group">
+                <label>Gift Title (በክፍሉ ውስጥ የሚታይ ርዕስ)</label>
+                <input type="text" id="vgsGiftTitleInput" placeholder="e.g., Happy 21st Birthday, Sara!" maxlength="80">
+              </div>
+              <div class="form-group">
+                <label>Special Date (Optional)</label>
+                <input type="text" id="vgsSpecialDateInput" placeholder="e.g., November 28, 2026" maxlength="40">
+              </div>
+              <div class="form-group">
+                <label>Personal Letter / Message *</label>
+                <textarea id="giftMessageInput" rows="4" placeholder="Write a heartfelt message that opens inside the 3D room..." maxlength="2000"></textarea>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text);" onclick="vgsGoBuilderStep(2)">⬅ Back</button>
+                <button type="button" class="btn-action btn-edu" style="flex:1.4;" onclick="vgsGoBuilderStep(4)">Next: Upload Memories ➔</button>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label>📸 Upload Photos (1 to 5 images — auto-compressed & optimized)</label>
-              <input type="file" id="giftPhotosFileInput" accept="image/*" multiple onchange="giftHandlePhotoFiles(event)">
-              <div id="giftPhotoThumbs" class="gift-photo-thumbs"></div>
-              <small id="giftPhotoHint" style="display:block; font-size:0.72rem; color:var(--gray); margin-top:4px;">0 / 5 photos selected</small>
+            <!-- STEP 4: UPLOAD MEMORIES (1-6 PHOTOS + OPTIONAL VIDEO LINK) -->
+            <div id="vgsStep4" class="vgs-step-pane" style="display:none;">
+              <div class="form-group">
+                <label>📸 Wall Gallery Photos (1 to 6 images — auto-optimized to WebP)</label>
+                <input type="file" id="giftPhotosFileInput" accept="image/*" multiple onchange="giftHandlePhotoFiles(event)">
+                <div id="giftPhotoThumbs" class="gift-photo-thumbs"></div>
+                <small id="giftPhotoHint" style="display:block; font-size:0.72rem; color:var(--gray); margin-top:4px;">0 / 6 photos selected (displayed on 3D gallery wall frames)</small>
+              </div>
+              <div class="form-group">
+                <label>🎬 Optional Video Message URL (MP4 / Direct Link - Optional)</label>
+                <input type="url" id="vgsVideoUrlInput" placeholder="https://... (optional personal video message)">
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text);" onclick="vgsGoBuilderStep(3)">⬅ Back</button>
+                <button type="button" class="btn-action btn-edu" style="flex:1.4;" onclick="vgsGoBuilderStep(5)">Next: Room Customization ➔</button>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label>🎵 Background Music (Optional)</label>
-              <select id="giftMusicSelect">
-                <option value="music_box">🎼 Gentle Birthday Music Box (Recommended)</option>
-                <option value="piano_chime">🎹 Warm Celebration Chimes</option>
-                <option value="none">🔇 No Music</option>
-              </select>
+            <!-- STEP 5: CUSTOMIZATION & ATMOSPHERE -->
+            <div id="vgsStep5" class="vgs-step-pane" style="display:none;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group">
+                  <label>🖼️ Photo Frame Style</label>
+                  <select id="vgsFrameStyleSelect">
+                    <option value="royal_gold">👑 Royal Gold</option>
+                    <option value="modern_black">🖤 Modern Matte Black</option>
+                    <option value="classic_wood">🪵 Warm Oak Wood</option>
+                    <option value="neon_glow">💜 Neon Luminous</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>💡 Room Lighting Mood</label>
+                  <select id="vgsLightingSelect">
+                    <option value="warm">🕯️ Warm Romantic</option>
+                    <option value="bright">☀️ Bright Gallery</option>
+                    <option value="dramatic">✨ Dramatic Spotlight</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group">
+                  <label>🎵 Background Music</label>
+                  <select id="giftMusicSelect">
+                    <option value="music_box">🎼 Gentle Music Box</option>
+                    <option value="piano_chime">🎹 Celebration Chimes</option>
+                    <option value="romantic_harp">🎻 Romantic Soft Harp</option>
+                    <option value="disco_beat">🕺 Retro Synth Pulse</option>
+                    <option value="none">🔇 No Music</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>⏳ Link Expiration</label>
+                  <select id="vgsExpirySelect">
+                    <option value="never">♾️ Never Expires</option>
+                    <option value="7">7 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="90">90 Days</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>✨ Extra Room Decorations & Effects</label>
+                <div style="display:flex; gap:12px; flex-wrap:wrap; font-size:0.78rem;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="vgsOptParticles" checked> Floating Sparkles / Petals</label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="vgsOptAutoTour" checked> Gentle Camera Orbit</label>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text);" onclick="vgsGoBuilderStep(4)">⬅ Back</button>
+                <button type="button" class="btn-action btn-edu" style="flex:1.4;" onclick="vgsGoBuilderStep(6)">Next: Preview & Publish ➔</button>
+              </div>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:10px;">
-              <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text); border:1px solid var(--border);" onclick="giftPreviewCurrentForm()">👁 Preview Gift</button>
-              <button type="submit" id="giftPublishBtn" class="btn-action" style="flex:1.4; background:linear-gradient(135deg,#BE185D,#EC4899); color:white;">🚀 Publish & Generate Link</button>
-            </div>
-          </form>
+            <!-- STEP 6 & 7: INTERACTIVE 3D PREVIEW & PUBLISH WITH QR CODE -->
+            <div id="vgsStep6" class="vgs-step-pane" style="display:none;">
+              <div id="vgsBuilderSummaryBox" style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; font-size:0.8rem; line-height:1.6; margin-bottom:12px;"></div>
+              <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <button type="button" class="btn-action" style="flex:1; background:var(--surface); color:var(--text); border:1px solid var(--border);" onclick="vgsPreviewCurrentForm()">👁 Live 3D Preview</button>
+                <button type="button" id="giftPublishBtn" class="btn-action" style="flex:1.4; background:linear-gradient(135deg,#BE185D,#EC4899); color:white;" onclick="vgsPublishGift()">🚀 Publish & Generate Link</button>
+              </div>
+              <button type="button" class="btn-back-sm" onclick="vgsGoBuilderStep(5)">⬅ Back to Customization</button>
 
-          <!-- Generated Shareable Link Box -->
-          <div id="giftGeneratedLinkBox" style="display:none; margin-top:14px; background:var(--gold-bg); border:1.5px solid var(--gold); border-radius:12px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:800; color:var(--gold); margin-bottom:6px;">✅ Gift Published! Unique Shareable Link:</div>
-            <div class="copy-box" style="margin-top:0;">
-              <input type="text" id="giftGeneratedUrlInput" readonly>
-              <button type="button" class="btn-action btn-edu" style="width:auto; padding:8px 12px;" onclick="giftCopyLink(document.getElementById('giftGeneratedUrlInput').value)">📋 Copy</button>
+              <!-- Published Share Link + QR Code Output -->
+              <div id="giftGeneratedLinkBox" style="display:none; margin-top:14px; background:var(--gold-bg); border:1.5px solid var(--gold); border-radius:14px; padding:14px; text-align:center;">
+                <div style="font-size:0.82rem; font-weight:800; color:var(--gold); margin-bottom:6px;">✅ 3D Virtual Gift Published!</div>
+                <div id="vgsQrCodeBox" style="display:inline-block; background:white; padding:10px; border-radius:12px; margin:6px auto 10px;"></div>
+                <div class="copy-box" style="margin-top:0;">
+                  <input type="text" id="giftGeneratedUrlInput" readonly>
+                  <button type="button" class="btn-action btn-edu" style="width:auto; padding:8px 12px;" onclick="giftCopyLink(document.getElementById('giftGeneratedUrlInput').value)">📋 Copy</button>
+                </div>
+                <button type="button" class="btn-action btn-tg" style="margin-top:8px;" onclick="giftShareTelegramLink(document.getElementById('giftGeneratedUrlInput').value, document.getElementById('giftRecipientInput').value)">📤 Share on Telegram</button>
+              </div>
             </div>
-            <button type="button" class="btn-action btn-tg" style="margin-top:8px;" onclick="giftShareTelegramLink(document.getElementById('giftGeneratedUrlInput').value, document.getElementById('giftRecipientInput').value)">📤 Share on Telegram</button>
           </div>
         </div>
 
-        <!-- Manage Existing Gifts -->
-        <div class="section-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="font-size:0.95rem; color:var(--text); margin:0;">📦 Manage Existing Gifts</h3>
-            <button type="button" class="btn-back-sm" onclick="giftLoadAdminList()">🔄 Refresh</button>
-          </div>
-          <div id="giftAdminListContainer">
-            <p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading gifts...</p>
+        <!-- TAB B: ADMIN GIFT MANAGEMENT DASHBOARD -->
+        <div id="vgsManagePanel" style="display:none;">
+          <div class="section-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 style="font-size:0.95rem; color:var(--text); margin:0;">📊 Virtual Gift Analytics & Records</h3>
+              <button type="button" class="btn-back-sm" onclick="giftLoadAdminList()">🔄 Refresh</button>
+            </div>
+            <div class="analytics-grid">
+              <div class="stat-box"><div class="stat-num" id="vgsStatTotal">0</div><div class="stat-title">Total Gifts</div></div>
+              <div class="stat-box"><div class="stat-num" id="vgsStatActive" style="color:var(--secondary);">0</div><div class="stat-title">Active</div></div>
+              <div class="stat-box"><div class="stat-num" id="vgsStatExpired" style="color:var(--warning);">0</div><div class="stat-title">Expired</div></div>
+              <div class="stat-box"><div class="stat-num" id="vgsStatDisabled" style="color:var(--danger);">0</div><div class="stat-title">Disabled</div></div>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <input type="text" id="vgsAdminSearchInput" placeholder="🔍 Search by recipient name or gift ID..." oninput="vgsRenderAdminFilteredList()">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px;">
+              <select id="vgsAdminFilterOccasion" onchange="vgsRenderAdminFilteredList()" style="padding:8px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:0.76rem;">
+                <option value="all">All Occasions</option>
+              </select>
+              <select id="vgsAdminFilterTemplate" onchange="vgsRenderAdminFilteredList()" style="padding:8px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:0.76rem;">
+                <option value="all">All 10 Templates</option>
+              </select>
+            </div>
+            <div id="giftAdminListContainer">
+              <p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading gifts...</p>
+            </div>
           </div>
         </div>
       </div>
     </div> <!-- /mode-gift -->
 
   <!-- =========================================================
-       CINEMATIC 3D VIRTUAL BIRTHDAY GIFT EXPERIENCE OVERLAY
+       3D THREE.JS RECIPIENT EXPERIENCE VIEWPORT & INTERACTIVE HUD
        ========================================================= -->
-  <div id="giftExperienceOverlay" class="gift-stage-overlay">
-    <div class="gift-stars-bg"></div>
-    <canvas id="giftConfettiCanvas" class="gift-confetti-canvas"></canvas>
+  <div id="giftExperienceOverlay" class="vgs-viewport-overlay">
+    <!-- WebGL Three.js Canvas Host -->
+    <div id="vgsThreeCanvasHost"></div>
 
-    <div class="gift-top-controls">
-      <button type="button" class="gift-glass-pill" id="giftMusicToggleBtn" style="display:none;" onclick="giftToggleMusic()">🔊 Play Music</button>
-      <span id="giftPreviewBadge" style="display:none; background:rgba(245,158,11,0.28); color:#FDE68A; padding:5px 10px; border-radius:999px; font-size:0.7rem; font-weight:800;">👁 PREVIEW MODE</span>
-      <button type="button" class="gift-glass-pill" style="margin-left:auto;" onclick="giftExitExperience()">✕ Close</button>
+    <!-- Top Floating Controls -->
+    <div class="vgs-top-bar">
+      <button type="button" class="gift-glass-pill" id="giftMusicToggleBtn" style="display:none;" onclick="giftToggleMusic()">🔊 Music</button>
+      <span id="giftPreviewBadge" style="display:none; background:rgba(245,158,11,0.32); color:#FDE68A; padding:5px 10px; border-radius:999px; font-size:0.68rem; font-weight:800;">👁 PREVIEW</span>
+      <button type="button" class="gift-glass-pill" id="vgsResetCamBtn" style="display:none;" onclick="vgsResetCameraView()">🎥 Reset View</button>
+      <button type="button" class="gift-glass-pill" style="margin-left:auto;" onclick="giftExitExperience()">✕ Exit</button>
     </div>
 
-    <!-- Loading / Error Screen -->
-    <div id="giftStatusScreen" class="gift-center-stage" style="display:none;"></div>
+    <!-- Loading / Error / Expired Screen -->
+    <div id="giftStatusScreen" class="vgs-entrance-hud" style="display:none; justify-content:center; z-index:8; background:rgba(5,2,13,0.92);"></div>
 
-    <!-- Stage 1: Closed 3D Gift Box -->
-    <div id="giftClosedStage" class="gift-center-stage" style="display:none;">
-      <span class="gift-pre-badge">✨ SPECIAL BIRTHDAY SURPRISE ✨</span>
-      <h1 class="gift-recipient-title" id="giftStageRecipientName">Happy Birthday!</h1>
-      <p class="gift-subtitle" id="giftStageSubtext">A little surprise is waiting inside for you...</p>
-
-      <div class="gift-3d-scene" id="gift3dScene" onclick="giftOpenBoxAnimation()">
-        <div class="gift-box-glow"></div>
-        <div class="gift-3d-cube">
-          <div class="g-face g-front"></div>
-          <div class="g-face g-back"></div>
-          <div class="g-face g-right"></div>
-          <div class="g-face g-left"></div>
-          <div class="g-face g-bottom"></div>
-          <div class="gift-lid">
-            <div class="g-lid-face g-lid-front"></div>
-            <div class="g-lid-face g-lid-back"></div>
-            <div class="g-lid-face g-lid-right"></div>
-            <div class="g-lid-face g-lid-left"></div>
-            <div class="g-lid-top"></div>
-            <div class="gift-bow"><span></span><span></span></div>
-          </div>
-        </div>
+    <!-- Stage 1: Gift Entrance HUD (Over 3D Floating Gift Box) -->
+    <div id="giftClosedStage" class="vgs-entrance-hud" style="display:none;">
+      <div class="vgs-entrance-top">
+        <span class="gift-pre-badge" id="vgsEntranceOccasionBadge">✨ A SPECIAL GIFT FOR YOU ✨</span>
+        <h1 class="gift-recipient-title" id="giftStageRecipientName">For You</h1>
+        <p style="font-size:0.84rem; color:rgba(248,250,252,0.84); margin-top:4px;" id="giftStageSubtext">Tap the 3D gift box or button below to walk inside your memory</p>
       </div>
-
-      <button type="button" class="btn-open-gift" id="giftOpenBtn" onclick="giftOpenBoxAnimation()">🎁 Open Your Gift</button>
+      <div class="vgs-entrance-bottom">
+        <button type="button" class="btn-open-gift" id="giftOpenBtn" onclick="vgsTriggerRevealSequence()">🎁 Open Your Gift</button>
+      </div>
     </div>
 
-    <!-- Stage 2: Opened Gift Reveal (Photos + Birthday Letter + Celebration) -->
-    <div id="giftRevealStage" class="gift-reveal-panel">
-      <div class="gift-reveal-card">
-        <span class="gift-pre-badge" style="margin-bottom:6px;">🎉 HAPPY BIRTHDAY! 🎉</span>
-        <h2 class="gift-recipient-title" id="giftRevealHeading" style="font-size:1.5rem;">Happy Birthday!</h2>
-
-        <!-- Photo Gallery Slideshow -->
-        <div id="giftGallerySection" style="display:none;">
-          <div class="gift-gallery-frame">
-            <img id="giftSlideImg" src="" alt="Birthday Memory">
-            <button type="button" class="gift-slide-nav" id="giftPrevSlideBtn" style="left:8px;" onclick="giftStepSlide(-1)">‹</button>
-            <button type="button" class="gift-slide-nav" id="giftNextSlideBtn" style="right:8px;" onclick="giftStepSlide(1)">›</button>
-          </div>
-          <div class="gift-slide-dots" id="giftSlideDots"></div>
+    <!-- Stage 3 & 4: Inside 3D Room Interactive Dock -->
+    <div id="vgsRoomDock" class="vgs-room-dock">
+      <div class="vgs-room-banner">
+        <div style="text-align:left; min-width:0;">
+          <div id="vgsRoomBannerTitle" style="font-size:0.84rem; font-weight:800; color:#FDE68A; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Happy Celebration!</div>
+          <div style="font-size:0.68rem; color:rgba(248,250,252,0.78);">Drag to look around • Pinch to zoom • Tap any wall photo</div>
         </div>
-
-        <!-- Personalized Birthday Message -->
-        <div class="gift-letter-box" id="giftRevealMessage"></div>
-        <div class="gift-sender-sig" id="giftRevealSender"></div>
-
-        <div style="display:flex; gap:8px; margin-top:16px;">
-          <button type="button" class="gift-glass-pill" style="flex:1; padding:10px;" onclick="giftReplayBox()">🎁 Replay Box</button>
-          <button type="button" class="gift-glass-pill" style="flex:1; padding:10px; background:rgba(251,191,36,0.22); border-color:rgba(251,191,36,0.45);" onclick="giftLaunchConfettiBurst()">🎊 Celebrate More</button>
-        </div>
+        <span id="vgsRoomTplBadge" style="font-size:0.66rem; background:rgba(255,255,255,0.14); padding:4px 8px; border-radius:8px; white-space:nowrap;">3D Room</span>
       </div>
+      <div class="vgs-dock-actions">
+        <button type="button" class="vgs-dock-btn highlight" onclick="vgsOpenWorldModal('letter')">💌 Read Letter</button>
+        <button type="button" class="vgs-dock-btn" id="vgsDockPhotosBtn" onclick="vgsOpenWorldModal('photos')">🖼️ Gallery</button>
+        <button type="button" class="vgs-dock-btn" id="vgsDockCakeBtn" style="display:none;" onclick="vgsBlowBirthdayCandles()">🎂 Blow Candles</button>
+        <button type="button" class="vgs-dock-btn" id="vgsDockVideoBtn" style="display:none;" onclick="vgsOpenWorldModal('video')">🎬 Video</button>
+        <button type="button" class="vgs-dock-btn" onclick="vgsOpenWorldModal('final')">✨ Finale</button>
+      </div>
+    </div>
+
+    <!-- Interactive In-World Modal (Fullscreen Photo Viewer, Letter, Video, Final Screen) -->
+    <div id="vgsWorldModal" class="vgs-world-modal" onclick="if(event.target===this) vgsCloseWorldModal()">
+      <div class="vgs-world-card" id="vgsWorldModalBody"></div>
     </div>
   </div>
 
@@ -6438,29 +6429,78 @@
     }
 
     // =========================================================================
-    // PART 3: VIRTUAL GIFT STUDIO (ADMIN CREATOR + 3D BIRTHDAY EXPERIENCE)
+    // PART 3: VIRTUAL GIFT STUDIO — MODULAR THREE.JS ENGINE & 10 3D ENVIRONMENTS
     // =========================================================================
     const FIREBASE_GIFTS = `${DB_BASE}/virtual_gifts`;
     const STORAGE_BUCKET = "wolkite-shop.appspot.com";
 
-    let giftSelectedTemplate = 'crimson_gold';
-    let giftFormPhotos = []; // Array of compressed DataURLs or HTTPS URLs (1..5)
+    const VGS_OCCASIONS = [
+      { id: 'birthday',       icon: '🎂', label: 'Birthday',       defaultTitle: 'Happy Birthday!' },
+      { id: 'anniversary',    icon: '💍', label: 'Anniversary',    defaultTitle: 'Happy Anniversary!' },
+      { id: 'valentines',     icon: '🌹', label: "Valentine's Day",defaultTitle: 'Happy Valentine’s Day!' },
+      { id: 'graduation',     icon: '🎓', label: 'Graduation',     defaultTitle: 'Congratulations Graduate!' },
+      { id: 'friendship',     icon: '🤝', label: 'Friendship',     defaultTitle: 'To My Best Friend!' },
+      { id: 'thank_you',      icon: '💐', label: 'Thank You',      defaultTitle: 'Thank You So Much!' },
+      { id: 'congratulations',icon: '🏆', label: 'Congratulations',defaultTitle: 'Huge Congratulations!' },
+      { id: 'welcome',        icon: '🏡', label: 'Welcome',        defaultTitle: 'Warmest Welcome!' },
+      { id: 'just_because',   icon: '✨', label: 'Just Because',   defaultTitle: 'A Little Surprise For You' },
+      { id: 'custom',         icon: '🎁', label: 'Custom Occasion',defaultTitle: 'A Special Memory For You' }
+    ];
+
+    const VGS_TEMPLATES = [
+      { id: 'modern_gallery',     num: '01', name: 'Modern Memory Gallery',   icon: '🏛️', grad: 'linear-gradient(135deg,#334155,#94A3B8)', desc: 'White museum walls, hardwood floor, soft gallery spotlights & framed memories.' },
+      { id: 'birthday_room',      num: '02', name: 'Cozy Birthday Room',      icon: '🎂', grad: 'linear-gradient(135deg,#BE123C,#F59E0B)', desc: 'Warm celebration room with interactive 3D birthday cake, lit candles & balloons.' },
+      { id: 'neon_lounge',        num: '03', name: 'Neon Celebration Lounge', icon: '💜', grad: 'linear-gradient(135deg,#4C1D95,#EC4899)', desc: 'Cyber-lounge with pink/cyan neon tubes, dark mirror floor & glowing frames.' },
+      { id: 'royal_hall',         num: '04', name: 'Royal Golden Hall',       icon: '👑', grad: 'linear-gradient(135deg,#78350F,#FBBF24)', desc: 'Marble & gold pillars, red carpet runner, chandelier glow & ornate gold frames.' },
+      { id: 'enchanted_garden',   num: '05', name: 'Enchanted Garden',        icon: '🌿', grad: 'linear-gradient(135deg,#065F46,#34D399)', desc: 'Lush flower garden pavilion, stone pathway, fairy lights & animated butterflies.' },
+      { id: 'rose_suite',         num: '06', name: 'Romantic Rose Suite',     icon: '🌹', grad: 'linear-gradient(135deg,#881337,#FB7185)', desc: 'Velvet suite filled with red/pink roses, glowing candles & floating heart sculpture.' },
+      { id: 'memory_cinema',      num: '07', name: 'Memory Lane Cinema',      icon: '🎬', grad: 'linear-gradient(135deg,#1E1B4B,#4338CA)', desc: 'Private VIP theater with giant illuminated screen, plush seats & wall posters.' },
+      { id: 'starry_observatory', num: '08', name: 'Starry Night Observatory',icon: '🔭', grad: 'linear-gradient(135deg,#090D16,#3B82F6)', desc: 'Glass dome under a rotating Milky Way sky, glowing crescent moon & nebula.' },
+      { id: 'ocean_dream',        num: '09', name: 'Ocean Dream',             icon: '🐠', grad: 'linear-gradient(135deg,#0E7490,#22D3EE)', desc: 'Underwater glass sanctuary with coral reefs, caustic blue light & swimming fish.' },
+      { id: 'disco_hall',         num: '10', name: 'Retro Disco Hall',        icon: '🪩', grad: 'linear-gradient(135deg,#701A75,#F43F5E)', desc: 'Mirrored disco ball, illuminated checker dance floor & sweeping party beams.' }
+    ];
+
+    // Builder & Admin State
+    let vgsSelectedOccasion = 'birthday';
+    let vgsSelectedTemplate = 'modern_gallery';
+    let giftFormPhotos = [];
     let giftEditingId = null;
     let giftAdminCache = {};
 
+    // Recipient / 3D Engine State
     let giftCurrentData = null;
-    let giftCurrentSlideIdx = 0;
-    let giftSlideTimer = null;
     let giftIsPreviewMode = false;
+    let giftCurrentSlideIdx = 0;
     let giftAudioCtx = null;
     let giftMusicPlaying = false;
     let giftMusicInterval = null;
-    let giftConfettiAnimId = null;
+
+    // Shared Three.js Engine State
+    const VGS_ENGINE = {
+      renderer: null,
+      scene: null,
+      camera: null,
+      controls: null,
+      rafId: null,
+      clock: null,
+      raycaster: null,
+      pointer: null,
+      worldGroup: null,
+      entranceBoxGroup: null,
+      entranceLidPivot: null,
+      frameMeshes: [],
+      animatedItems: [],
+      candleFlames: [],
+      candlesLit: true,
+      disposables: [],
+      webglSupported: true,
+      inRoom: false
+    };
 
     function giftGenerateUniqueId() {
       const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
       let out = 'g_';
-      for (let i = 0; i < 8; i++) out += chars[Math.floor(Math.random() * chars.length)];
+      for (let i = 0; i < 10; i++) out += chars[Math.floor(Math.random() * chars.length)];
       return out;
     }
 
@@ -6474,13 +6514,91 @@
       const admEl = document.getElementById('giftAdminDashboard');
       if (pubEl) pubEl.style.display = isAdmin ? 'none' : 'block';
       if (admEl) admEl.style.display = isAdmin ? 'block' : 'none';
-      if (isAdmin) giftLoadAdminList();
+      if (isAdmin) {
+        vgsRenderBuilderSelectors();
+        giftLoadAdminList();
+      }
     }
 
-    function giftSelectTemplate(tpl, el) {
-      giftSelectedTemplate = tpl;
-      document.querySelectorAll('#giftTemplateGrid .gift-tpl-card').forEach(c => c.classList.remove('selected'));
-      if (el) el.classList.add('selected');
+    function vgsSwitchAdminMainTab(tab, btn) {
+      document.querySelectorAll('#giftAdminDashboard > .profile-tabs .p-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.getElementById('vgsBuilderPanel').style.display = tab === 'builder' ? 'block' : 'none';
+      document.getElementById('vgsManagePanel').style.display = tab === 'manage' ? 'block' : 'none';
+      if (tab === 'manage') giftLoadAdminList();
+    }
+
+    function vgsRenderBuilderSelectors() {
+      const occGrid = document.getElementById('vgsOccasionGrid');
+      if (occGrid) {
+        occGrid.innerHTML = VGS_OCCASIONS.map(o => `
+          <div class="vgs-occ-card ${vgsSelectedOccasion === o.id ? 'selected' : ''}" onclick="vgsSelectOccasion('${o.id}')">
+            <span style="font-size:1.25rem;">${o.icon}</span>
+            <span>${escHtml(o.label)}</span>
+          </div>`).join('');
+      }
+      const tplGrid = document.getElementById('vgsTemplateCardsGrid');
+      if (tplGrid) {
+        tplGrid.innerHTML = VGS_TEMPLATES.map(t => `
+          <div class="vgs-tpl-card ${vgsSelectedTemplate === t.id ? 'selected' : ''}" onclick="vgsSelectTemplate('${t.id}')">
+            <div class="vgs-tpl-banner" style="background:${t.grad};">
+              <span>${t.icon}</span>
+              <span class="vgs-tpl-tag">#${t.num}</span>
+            </div>
+            <div class="vgs-tpl-body">
+              <div>
+                <div class="vgs-tpl-title">${escHtml(t.name)}</div>
+                <div class="vgs-tpl-desc">${escHtml(t.desc)}</div>
+              </div>
+              <div class="vgs-tpl-btns">
+                <button type="button" style="background:var(--card-bg); color:var(--text); border:1px solid var(--border);" onclick="event.stopPropagation(); vgsQuickPreviewTemplate('${t.id}')">👁 Preview</button>
+                <button type="button" style="background:${vgsSelectedTemplate === t.id ? '#EC4899' : 'var(--edu-accent)'}; color:white;" onclick="event.stopPropagation(); vgsSelectTemplate('${t.id}')">${vgsSelectedTemplate === t.id ? '✓ Selected' : 'Select'}</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+      // Populate Admin Manage filters
+      const occFilter = document.getElementById('vgsAdminFilterOccasion');
+      if (occFilter && occFilter.options.length <= 1) {
+        VGS_OCCASIONS.forEach(o => { occFilter.innerHTML += `<option value="${o.id}">${o.icon} ${o.label}</option>`; });
+      }
+      const tplFilter = document.getElementById('vgsAdminFilterTemplate');
+      if (tplFilter && tplFilter.options.length <= 1) {
+        VGS_TEMPLATES.forEach(t => { tplFilter.innerHTML += `<option value="${t.id}">#${t.num} ${t.name}</option>`; });
+      }
+    }
+
+    function vgsSelectOccasion(occId) {
+      vgsSelectedOccasion = occId;
+      document.getElementById('vgsCustomOccasionWrap').style.display = occId === 'custom' ? 'block' : 'none';
+      vgsRenderBuilderSelectors();
+    }
+
+    function vgsSelectTemplate(tplId) {
+      vgsSelectedTemplate = tplId;
+      vgsRenderBuilderSelectors();
+    }
+
+    function vgsGoBuilderStep(stepNum) {
+      for (let i = 1; i <= 6; i++) {
+        const pane = document.getElementById(`vgsStep${i}`);
+        if (pane) pane.style.display = (i === stepNum) ? 'block' : 'none';
+      }
+      document.querySelectorAll('#vgsBuilderStepper .vgs-step-pill').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === stepNum);
+      });
+      if (stepNum === 6) {
+        const occObj = VGS_OCCASIONS.find(o => o.id === vgsSelectedOccasion) || VGS_OCCASIONS[0];
+        const tplObj = VGS_TEMPLATES.find(t => t.id === vgsSelectedTemplate) || VGS_TEMPLATES[0];
+        const rec = document.getElementById('giftRecipientInput').value.trim() || '(Not set)';
+        const snd = document.getElementById('giftSenderInput').value.trim() || '(Not set)';
+        document.getElementById('vgsBuilderSummaryBox').innerHTML = `
+          <div><b>Occasion:</b> ${occObj.icon} ${escHtml(occObj.label)}</div>
+          <div><b>3D Room:</b> ${tplObj.icon} ${escHtml(tplObj.name)} (#${tplObj.num})</div>
+          <div><b>Recipient:</b> ${escHtml(rec)} • <b>From:</b> ${escHtml(snd)}</div>
+          <div><b>Wall Photos:</b> ${giftFormPhotos.length} uploaded</div>
+        `;
+      }
     }
 
     function giftRenderFormPhotoThumbs() {
@@ -6492,7 +6610,7 @@
           <img src="${src}" alt="Photo ${idx + 1}">
           <button type="button" class="gift-thumb-del" onclick="giftRemoveFormPhoto(${idx})">×</button>
         </div>`).join('');
-      if (hint) hint.innerText = `${giftFormPhotos.length} / 5 photos selected`;
+      if (hint) hint.innerText = `${giftFormPhotos.length} / 6 photos selected`;
     }
 
     function giftRemoveFormPhoto(idx) {
@@ -6503,13 +6621,13 @@
     function giftCompressImageFile(file) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith('image/')) return reject(new Error('Invalid image'));
-        if (file.size > 12 * 1024 * 1024) return reject(new Error('Image too large (max 12MB)'));
+        if (file.size > 15 * 1024 * 1024) return reject(new Error('Max 15MB'));
         const reader = new FileReader();
         reader.onload = (ev) => {
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxDim = 560;
+            const maxDim = 512; // Power-of-two friendly for crisp WebGL textures & tiny size
             let w = img.width, h = img.height;
             if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
             else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -6530,27 +6648,25 @@
 
     async function giftHandlePhotoFiles(e) {
       const files = Array.from(e.target.files || []);
-      if (files.length === 0) return;
-      const slotsLeft = 5 - giftFormPhotos.length;
+      if (!files.length) return;
+      const slotsLeft = 6 - giftFormPhotos.length;
       if (slotsLeft <= 0) {
-        notifyUser('Maximum 5 photos allowed per gift.');
+        notifyUser('Maximum 6 wall photos allowed per 3D room.');
         e.target.value = '';
         return;
       }
-      const chosen = files.slice(0, slotsLeft);
-      for (const f of chosen) {
+      for (const f of files.slice(0, slotsLeft)) {
         try {
-          const optimized = await giftCompressImageFile(f);
-          giftFormPhotos.push(optimized);
+          const opt = await giftCompressImageFile(f);
+          giftFormPhotos.push(opt);
         } catch(err) {
-          notifyUser('Could not process one of the images. Please choose a valid JPG/PNG/WebP photo.');
+          notifyUser('Could not process one of the selected images.');
         }
       }
       e.target.value = '';
       giftRenderFormPhotoThumbs();
     }
 
-    // Uploads compressed image to Firebase Storage if enabled; falls back seamlessly to lightweight compressed payload
     async function giftUploadPhotoToStorageOrInline(giftId, index, dataUrl) {
       if (!dataUrl.startsWith('data:')) return dataUrl;
       try {
@@ -6578,370 +6694,1157 @@
       return dataUrl;
     }
 
-    function giftResetForm() {
-      giftEditingId = null;
-      giftFormPhotos = [];
-      document.getElementById('giftCreatorForm').reset();
-      giftSelectTemplate('crimson_gold', document.querySelector('#giftTemplateGrid .gift-tpl-card[data-tpl="crimson_gold"]'));
-      giftRenderFormPhotoThumbs();
-      document.getElementById('giftFormHeading').innerText = '➕ Create New 3D Birthday Gift';
-      document.getElementById('giftCancelEditBtn').style.display = 'none';
-      document.getElementById('giftPublishBtn').innerText = '🚀 Publish & Generate Link';
+    function vgsBuildPayloadFromBuilder(giftId) {
+      const occObj = VGS_OCCASIONS.find(o => o.id === vgsSelectedOccasion) || VGS_OCCASIONS[0];
+      const customOcc = document.getElementById('vgsCustomOccasionInput').value.trim();
+      const recipientName = document.getElementById('giftRecipientInput').value.trim() || 'Dear Friend';
+      const senderName = document.getElementById('giftSenderInput').value.trim() || 'Wolkite Digital Hub';
+      const title = document.getElementById('vgsGiftTitleInput').value.trim() || occObj.defaultTitle;
+      const specialDate = document.getElementById('vgsSpecialDateInput').value.trim();
+      const message = document.getElementById('giftMessageInput').value.trim() || 'Wishing you endless joy and unforgettable memories!';
+      const videoUrl = document.getElementById('vgsVideoUrlInput').value.trim();
+      const musicVal = document.getElementById('giftMusicSelect').value;
+      const expiryDays = document.getElementById('vgsExpirySelect').value;
+      let expiresAt = null;
+      if (expiryDays !== 'never') {
+        expiresAt = new Date(Date.now() + Number(expiryDays) * 86400000).toISOString();
+      }
+      return {
+        giftId,
+        occasion: vgsSelectedOccasion,
+        occasionLabel: vgsSelectedOccasion === 'custom' && customOcc ? customOcc : occObj.label,
+        templateId: vgsSelectedTemplate,
+        recipientName,
+        senderName,
+        title,
+        specialDate,
+        message,
+        photos: [...giftFormPhotos],
+        videoUrl: videoUrl || null,
+        musicUrl: musicVal === 'none' ? null : musicVal,
+        customization: {
+          frameStyle: document.getElementById('vgsFrameStyleSelect').value,
+          lighting: document.getElementById('vgsLightingSelect').value,
+          particles: document.getElementById('vgsOptParticles').checked,
+          autoTour: document.getElementById('vgsOptAutoTour').checked
+        },
+        status: 'active',
+        expiresAt,
+        createdBy: currentUser.id,
+        createdAt: (giftEditingId && giftAdminCache[giftId]?.createdAt) || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
     }
 
-    async function giftSaveGift(e) {
-      e.preventDefault();
+    function vgsResetBuilder() {
+      giftEditingId = null;
+      giftFormPhotos = [];
+      vgsSelectedOccasion = 'birthday';
+      vgsSelectedTemplate = 'modern_gallery';
+      ['giftRecipientInput', 'giftSenderInput', 'vgsGiftTitleInput', 'vgsSpecialDateInput', 'giftMessageInput', 'vgsVideoUrlInput', 'vgsCustomOccasionInput'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+      giftRenderFormPhotoThumbs();
+      vgsRenderBuilderSelectors();
+      document.getElementById('giftFormHeading').innerText = '✨ Create New 3D Virtual Gift';
+      document.getElementById('giftCancelEditBtn').style.display = 'none';
+      document.getElementById('giftPublishBtn').innerText = '🚀 Publish & Generate Link';
+      vgsGoBuilderStep(1);
+    }
+
+    async function vgsPublishGift() {
       if (Number(currentUser.id) !== ADMIN_ID) {
         notifyUser('Unauthorized: Admin access only.');
         return;
       }
-      const recipientName = document.getElementById('giftRecipientInput').value.trim();
-      const senderName = document.getElementById('giftSenderInput').value.trim();
-      const message = document.getElementById('giftMessageInput').value.trim();
-      const music = document.getElementById('giftMusicSelect').value;
-
-      if (!recipientName || !senderName || !message) {
-        notifyUser('Please fill in Recipient Name, Sender Name, and Message.');
+      const rec = document.getElementById('giftRecipientInput').value.trim();
+      const snd = document.getElementById('giftSenderInput').value.trim();
+      const msg = document.getElementById('giftMessageInput').value.trim();
+      if (!rec || !snd || !msg) {
+        notifyUser('Please complete Recipient Name, Sender Name, and Message in Step 3.');
+        vgsGoBuilderStep(3);
         return;
       }
       if (giftFormPhotos.length === 0) {
-        notifyUser('Please upload at least 1 photo (up to 5 photos).');
+        notifyUser('Please upload at least 1 photo in Step 4.');
+        vgsGoBuilderStep(4);
         return;
       }
 
       const btn = document.getElementById('giftPublishBtn');
-      const origTxt = btn.innerText;
-      btn.innerText = '⏳ Publishing Gift...';
+      btn.innerText = '⏳ Publishing 3D Room...';
       btn.disabled = true;
 
       const giftId = giftEditingId || giftGenerateUniqueId();
       try {
-        const finalPhotos = [];
+        const payload = vgsBuildPayloadFromBuilder(giftId);
+        const uploadedUrls = [];
         for (let i = 0; i < giftFormPhotos.length; i++) {
-          const url = await giftUploadPhotoToStorageOrInline(giftId, i + 1, giftFormPhotos[i]);
-          finalPhotos.push(url);
+          uploadedUrls.push(await giftUploadPhotoToStorageOrInline(giftId, i + 1, giftFormPhotos[i]));
         }
-
-        const payload = {
-          giftId,
-          template: giftSelectedTemplate,
-          recipientName,
-          senderName,
-          message,
-          photos: finalPhotos,
-          music: music === 'none' ? null : music,
-          status: 'published',
-          createdBy: currentUser.id,
-          createdAt: (giftEditingId && giftAdminCache[giftId]?.createdAt) || new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
+        payload.photos = uploadedUrls;
 
         const res = await fetch(`${FIREBASE_GIFTS}/${giftId}.json`, {
           method: 'PUT',
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Save failed');
+        if (!res.ok) throw new Error('Firebase save failed');
 
         giftAdminCache[giftId] = payload;
         const shareUrl = giftBuildShareUrl(giftId);
         document.getElementById('giftGeneratedUrlInput').value = shareUrl;
         document.getElementById('giftGeneratedLinkBox').style.display = 'block';
-        notifyUser(`🎉 Birthday Gift for ${recipientName} is published!`);
-        giftResetForm();
-        document.getElementById('giftGeneratedLinkBox').style.display = 'block';
-        giftLoadAdminList();
+
+        // Generate QR Code
+        const qrHost = document.getElementById('vgsQrCodeBox');
+        if (qrHost && typeof QRCode !== 'undefined') {
+          qrHost.innerHTML = '';
+          new QRCode(qrHost, { text: shareUrl, width: 132, height: 132, colorDark: '#0F172A', colorLight: '#FFFFFF' });
+        }
+
+        notifyUser(`🎉 3D Virtual Gift for ${rec} published!`);
+        giftEditingId = null;
+        document.getElementById('giftFormHeading').innerText = '✨ Create New 3D Virtual Gift';
+        document.getElementById('giftCancelEditBtn').style.display = 'none';
+        btn.innerText = '🚀 Publish & Generate Link';
       } catch(err) {
-        notifyUser('Error saving gift. Please check your connection and try again.');
+        notifyUser('Failed to publish gift. Check internet connection and Firebase Rules.');
       } finally {
-        btn.innerText = origTxt;
         btn.disabled = false;
+        if (btn.innerText.includes('Publishing')) btn.innerText = '🚀 Publish & Generate Link';
       }
     }
 
     async function giftLoadAdminList() {
       const box = document.getElementById('giftAdminListContainer');
       if (!box || Number(currentUser.id) !== ADMIN_ID) return;
-      box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading gifts...</p>';
+      box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center;">Loading 3D gifts...</p>';
       try {
         const res = await fetch(`${FIREBASE_GIFTS}.json`);
         const data = (await res.json()) || {};
         giftAdminCache = data;
-        const list = Object.values(data).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-        if (list.length === 0) {
-          box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center; padding:10px;">No birthday gifts created yet.</p>';
-          return;
-        }
-        box.innerHTML = list.map(g => {
-          const thumb = (g.photos && g.photos[0]) ? g.photos[0] : '';
-          const link = giftBuildShareUrl(g.giftId);
-          return `
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:8px;">
-              <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
-                ${thumb ? `<img src="${thumb}" style="width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0;">` : `<div style="width:48px; height:48px; border-radius:10px; background:#EC4899; color:white; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">🎁</div>`}
-                <div style="flex:1; min-width:0;">
-                  <strong style="font-size:0.88rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎂 ${escHtml(g.recipientName)}</strong>
-                  <small style="color:var(--gray);">From: ${escHtml(g.senderName)} • ${(g.photos || []).length} photos • 🟢 ${escHtml(g.status || 'published')}</small>
-                </div>
-              </div>
-              <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                <button type="button" class="btn-back-sm" style="background:var(--edu-accent); color:white;" onclick="giftPreviewById('${escAttr(g.giftId)}')">👁 Preview</button>
-                <button type="button" class="btn-back-sm" style="background:var(--secondary); color:white;" onclick="giftCopyLink('${escAttr(link)}')">📋 Copy Link</button>
-                <button type="button" class="btn-back-sm" style="background:var(--blue); color:white;" onclick="giftEditById('${escAttr(g.giftId)}')">✏️ Edit</button>
-                <button type="button" class="btn-back-sm" style="background:var(--danger); color:white;" onclick="giftDeleteById('${escAttr(g.giftId)}')">🗑 Delete</button>
-              </div>
-            </div>`;
-        }).join('');
+        vgsRenderAdminFilteredList();
       } catch(e) {
-        box.innerHTML = '<p style="font-size:0.8rem; color:var(--danger); text-align:center;">Failed to load gifts.</p>';
+        box.innerHTML = '<p style="font-size:0.8rem; color:var(--danger); text-align:center;">Error loading gifts.</p>';
       }
+    }
+
+    function vgsRenderAdminFilteredList() {
+      const box = document.getElementById('giftAdminListContainer');
+      if (!box) return;
+      const all = Object.values(giftAdminCache || {});
+      const now = Date.now();
+      let activeCnt = 0, expCnt = 0, disCnt = 0;
+      all.forEach(g => {
+        const isExp = g.expiresAt && new Date(g.expiresAt).getTime() < now;
+        if (g.status === 'disabled') disCnt++;
+        else if (isExp) expCnt++;
+        else activeCnt++;
+      });
+      document.getElementById('vgsStatTotal').innerText = all.length;
+      document.getElementById('vgsStatActive').innerText = activeCnt;
+      document.getElementById('vgsStatExpired').innerText = expCnt;
+      document.getElementById('vgsStatDisabled').innerText = disCnt;
+
+      const q = (document.getElementById('vgsAdminSearchInput')?.value || '').toLowerCase().trim();
+      const fOcc = document.getElementById('vgsAdminFilterOccasion')?.value || 'all';
+      const fTpl = document.getElementById('vgsAdminFilterTemplate')?.value || 'all';
+
+      const filtered = all.filter(g => {
+        if (fOcc !== 'all' && (g.occasion || 'birthday') !== fOcc) return false;
+        if (fTpl !== 'all' && (g.templateId || g.template || 'modern_gallery') !== fTpl) return false;
+        if (q) {
+          const matchName = String(g.recipientName || '').toLowerCase().includes(q);
+          const matchId = String(g.giftId || '').toLowerCase().includes(q);
+          if (!matchName && !matchId) return false;
+        }
+        return true;
+      }).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+      if (filtered.length === 0) {
+        box.innerHTML = '<p style="font-size:0.8rem; color:var(--gray); text-align:center; padding:12px;">No matching gifts found.</p>';
+        return;
+      }
+
+      box.innerHTML = filtered.map(g => {
+        const tplObj = VGS_TEMPLATES.find(t => t.id === (g.templateId || g.template)) || VGS_TEMPLATES[0];
+        const isExp = g.expiresAt && new Date(g.expiresAt).getTime() < now;
+        const stBadge = g.status === 'disabled' ? '🔴 Disabled' : (isExp ? '🟠 Expired' : '🟢 Active');
+        const link = giftBuildShareUrl(g.giftId);
+        const thumb = (g.photos && g.photos[0]) ? g.photos[0] : '';
+        return `
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:8px;">
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+              ${thumb ? `<img src="${thumb}" style="width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0;">` : `<div style="width:48px; height:48px; border-radius:10px; background:#EC4899; color:white; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">${tplObj.icon}</div>`}
+              <div style="flex:1; min-width:0;">
+                <strong style="font-size:0.86rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escHtml(g.recipientName)} • <small style="color:var(--gray);">${escHtml(g.giftId)}</small></strong>
+                <small style="color:var(--gray);">${tplObj.icon} ${escHtml(tplObj.name)} • ${stBadge}</small>
+              </div>
+            </div>
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+              <button type="button" class="btn-back-sm" style="background:var(--edu-accent); color:white;" onclick="giftPreviewById('${escAttr(g.giftId)}')">👁 Preview</button>
+              <button type="button" class="btn-back-sm" style="background:var(--secondary); color:white;" onclick="giftCopyLink('${escAttr(link)}')">📋 Copy</button>
+              <button type="button" class="btn-back-sm" style="background:var(--blue); color:white;" onclick="giftEditById('${escAttr(g.giftId)}')">✏️ Edit</button>
+              <button type="button" class="btn-back-sm" style="background:var(--warning); color:white;" onclick="vgsToggleDisableGift('${escAttr(g.giftId)}')">${g.status === 'disabled' ? '▶ Enable' : '⏸ Disable'}</button>
+              <button type="button" class="btn-back-sm" style="background:var(--danger); color:white;" onclick="giftDeleteById('${escAttr(g.giftId)}')">🗑</button>
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function giftEditById(giftId) {
       const g = giftAdminCache[giftId];
       if (!g) return;
       giftEditingId = giftId;
+      vgsSelectedOccasion = g.occasion || 'birthday';
+      vgsSelectedTemplate = g.templateId || g.template || 'modern_gallery';
       document.getElementById('giftRecipientInput').value = g.recipientName || '';
       document.getElementById('giftSenderInput').value = g.senderName || '';
+      document.getElementById('vgsGiftTitleInput').value = g.title || '';
+      document.getElementById('vgsSpecialDateInput').value = g.specialDate || '';
       document.getElementById('giftMessageInput').value = g.message || '';
-      document.getElementById('giftMusicSelect').value = g.music || 'none';
-      const tplCard = document.querySelector(`#giftTemplateGrid .gift-tpl-card[data-tpl="${g.template || 'crimson_gold'}"]`);
-      giftSelectTemplate(g.template || 'crimson_gold', tplCard);
+      document.getElementById('vgsVideoUrlInput').value = g.videoUrl || '';
+      document.getElementById('giftMusicSelect').value = g.musicUrl || g.music || 'none';
+      if (g.customization) {
+        document.getElementById('vgsFrameStyleSelect').value = g.customization.frameStyle || 'royal_gold';
+        document.getElementById('vgsLightingSelect').value = g.customization.lighting || 'warm';
+        document.getElementById('vgsOptParticles').checked = g.customization.particles !== false;
+        document.getElementById('vgsOptAutoTour').checked = g.customization.autoTour !== false;
+      }
       giftFormPhotos = Array.isArray(g.photos) ? [...g.photos] : [];
       giftRenderFormPhotoThumbs();
-      document.getElementById('giftFormHeading').innerText = `✏️ Edit Gift (${g.recipientName})`;
+      vgsRenderBuilderSelectors();
+      document.getElementById('giftFormHeading').innerText = `✏️ Editing: ${g.recipientName}`;
       document.getElementById('giftCancelEditBtn').style.display = 'inline-block';
-      document.getElementById('giftPublishBtn').innerText = '💾 Update Gift';
-      document.getElementById('mode-gift').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('giftPublishBtn').innerText = '💾 Save & Update Gift';
+      vgsSwitchAdminMainTab('builder', document.getElementById('vgsMainTabBuilder'));
+      vgsGoBuilderStep(1);
+    }
+
+    async function vgsToggleDisableGift(giftId) {
+      const g = giftAdminCache[giftId];
+      if (!g || Number(currentUser.id) !== ADMIN_ID) return;
+      const nextStatus = g.status === 'disabled' ? 'active' : 'disabled';
+      try {
+        await fetch(`${FIREBASE_GIFTS}/${giftId}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: nextStatus })
+        });
+        g.status = nextStatus;
+        vgsRenderAdminFilteredList();
+        notifyUser(nextStatus === 'disabled' ? 'Gift link disabled.' : 'Gift link re-enabled.');
+      } catch(e) {}
     }
 
     async function giftDeleteById(giftId) {
       if (Number(currentUser.id) !== ADMIN_ID) return;
-      if (!confirm('Delete this birthday gift permanently?')) return;
+      if (!confirm('Permanently delete this 3D gift?')) return;
       try {
         await fetch(`${FIREBASE_GIFTS}/${giftId}.json`, { method: 'DELETE' });
         delete giftAdminCache[giftId];
+        vgsRenderAdminFilteredList();
         notifyUser('Gift deleted.');
-        giftLoadAdminList();
-      } catch(e) {
-        notifyUser('Error deleting gift.');
-      }
+      } catch(e) {}
     }
 
     function giftCopyLink(url) {
       if (!url) return;
       try {
         navigator.clipboard.writeText(url);
-        notifyUser('📋 Gift link copied! Ready to share.');
+        notifyUser('📋 Unique 3D Gift URL copied!');
       } catch(e) {
         const tmp = document.createElement('input');
         tmp.value = url; document.body.appendChild(tmp); tmp.select();
         document.execCommand('copy'); document.body.removeChild(tmp);
-        notifyUser('📋 Gift link copied!');
+        notifyUser('📋 Link copied!');
       }
     }
 
     function giftShareTelegramLink(url, recipientName) {
-      const txt = `🎂✨ Happy Birthday ${recipientName || ''}! Someone prepared a special 3D birthday gift for you. Tap below to open it 👇`;
+      const txt = `🎁✨ Walk Into a 3D Memory! A special personalized 3D gift room has been created for ${recipientName || 'you'}. Tap below to enter 👇`;
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(txt)}`;
       if (tg.openTelegramLink) tg.openTelegramLink(shareUrl); else window.open(shareUrl, '_blank');
     }
 
-    function giftPreviewCurrentForm() {
-      const recipientName = document.getElementById('giftRecipientInput').value.trim() || 'Birthday Star';
-      const senderName = document.getElementById('giftSenderInput').value.trim() || 'Wolkite Digital Hub';
-      const message = document.getElementById('giftMessageInput').value.trim() || 'Wishing you a joyful, unforgettable birthday filled with happiness and success!';
-      const music = document.getElementById('giftMusicSelect').value;
-      giftLaunchExperience({
-        giftId: 'preview',
-        template: giftSelectedTemplate,
-        recipientName,
-        senderName,
-        message,
-        photos: giftFormPhotos,
-        music: music === 'none' ? null : music
-      }, true);
+    function vgsPreviewCurrentForm() {
+      const payload = vgsBuildPayloadFromBuilder('preview');
+      vgsLaunch3DExperience(payload, true);
+    }
+
+    function vgsQuickPreviewTemplate(tplId) {
+      vgsSelectTemplate(tplId);
+      const tplObj = VGS_TEMPLATES.find(t => t.id === tplId) || VGS_TEMPLATES[0];
+      const payload = vgsBuildPayloadFromBuilder('preview_' + tplId);
+      payload.templateId = tplId;
+      payload.title = `${tplObj.name} — Preview`;
+      vgsLaunch3DExperience(payload, true);
     }
 
     function giftPreviewById(giftId) {
       const g = giftAdminCache[giftId];
-      if (g) giftLaunchExperience(g, true);
+      if (g) vgsLaunch3DExperience(g, true);
     }
 
-    function giftOpenSampleDemo() {
-      giftLaunchExperience({
+    function vgsOpenSampleDemo() {
+      vgsLaunch3DExperience({
         giftId: 'demo',
-        template: 'crimson_gold',
+        occasion: 'birthday',
+        occasionLabel: 'Birthday',
+        templateId: 'birthday_room',
         recipientName: currentUser.first_name || 'Dear Friend',
         senderName: 'Wolkite Digital Hub',
-        message: 'Happy Birthday! May this special day bring endless joy, good health, and bright achievements in everything you do. Celebrate big today! 🎂✨',
+        title: 'Happy Birthday! Walk Into Your Memory',
+        specialDate: 'November 28, 2026',
+        message: 'Welcome to your personal 3D memory room! Drag your finger across the screen to look around all walls, tap any photo frame to view it fullscreen, or blow out the birthday candles below. Wishing you a year full of joy and success! 🎂✨',
         photos: [],
-        music: 'music_box'
+        musicUrl: 'music_box',
+        customization: { frameStyle: 'royal_gold', lighting: 'warm', particles: true, autoTour: true }
       }, true);
     }
 
+    // =========================================================================
+    // RECIPIENT LINK LOADER & VALIDATION
+    // =========================================================================
     async function openRecipientGiftById(giftId) {
       const overlay = document.getElementById('giftExperienceOverlay');
       const statusEl = document.getElementById('giftStatusScreen');
-      const closedEl = document.getElementById('giftClosedStage');
-      const revealEl = document.getElementById('giftRevealStage');
-
-      overlay.className = 'gift-stage-overlay';
       overlay.style.display = 'flex';
-      closedEl.style.display = 'none';
-      revealEl.style.display = 'none';
-      document.getElementById('giftPreviewBadge').style.display = 'none';
+      document.getElementById('giftClosedStage').style.display = 'none';
+      document.getElementById('vgsRoomDock').style.display = 'none';
+      document.getElementById('vgsResetCamBtn').style.display = 'none';
       document.getElementById('giftMusicToggleBtn').style.display = 'none';
+      document.getElementById('giftPreviewBadge').style.display = 'none';
 
       statusEl.innerHTML = `
-        <div class="mini-spinner" style="width:28px; height:28px; border-width:3px; color:#FBBF24; margin-bottom:12px;"></div>
-        <p style="font-size:0.92rem; color:#FDE68A; font-weight:700;">Preparing your birthday surprise...</p>`;
+        <div></div>
+        <div>
+          <div class="mini-spinner" style="width:30px; height:30px; border-width:3px; color:#FBBF24; margin:0 auto 12px;"></div>
+          <p style="font-size:0.95rem; color:#FDE68A; font-weight:800;">Building your 3D memory room...</p>
+        </div>
+        <div></div>`;
       statusEl.style.display = 'flex';
 
       try {
         const res = await fetch(`${FIREBASE_GIFTS}/${encodeURIComponent(giftId)}.json`);
         const gift = await res.json();
-        if (!gift || gift.status === 'deleted') {
+        const isExpired = gift && gift.expiresAt && new Date(gift.expiresAt).getTime() < Date.now();
+        if (!gift || gift.status === 'disabled' || gift.status === 'deleted' || isExpired) {
           statusEl.innerHTML = `
-            <div style="font-size:2.8rem; margin-bottom:10px;">🎁</div>
-            <h2 style="font-size:1.25rem; margin-bottom:8px;">Gift Not Found</h2>
-            <p style="font-size:0.84rem; color:rgba(248,250,252,0.78); max-width:300px; margin-bottom:18px;">
-              This birthday gift link may have expired or been removed by the sender.
-            </p>
-            <button type="button" class="gift-glass-pill" onclick="giftExitExperience()">Go to Wolkite Digital Hub</button>`;
+            <div></div>
+            <div>
+              <div style="font-size:3rem; margin-bottom:10px;">🏛️</div>
+              <h2 style="font-size:1.25rem; margin-bottom:8px;">${isExpired ? 'This Gift Link Has Expired' : 'Gift Not Found'}</h2>
+              <p style="font-size:0.84rem; color:rgba(248,250,252,0.78); max-width:300px; margin:0 auto 18px;">
+                ${isExpired ? 'The scheduled viewing window for this 3D memory room has ended.' : 'This gift link is invalid or has been deactivated by the sender.'}
+              </p>
+              <button type="button" class="gift-glass-pill" onclick="giftExitExperience()">Open Wolkite Digital Hub</button>
+            </div>
+            <div></div>`;
           return;
         }
         statusEl.style.display = 'none';
-        giftLaunchExperience(gift, false);
+        vgsLaunch3DExperience(gift, false);
       } catch(e) {
         statusEl.innerHTML = `
-          <div style="font-size:2.5rem; margin-bottom:10px;">📡</div>
-          <h2 style="font-size:1.15rem; margin-bottom:8px;">Connection Issue</h2>
-          <p style="font-size:0.82rem; color:rgba(248,250,252,0.78); margin-bottom:16px;">Please check your internet and try again.</p>
-          <button type="button" class="btn-open-gift" style="padding:10px 22px; font-size:0.88rem;" onclick="openRecipientGiftById('${escAttr(giftId)}')">🔄 Retry</button>`;
+          <div></div>
+          <div>
+            <div style="font-size:2.6rem; margin-bottom:10px;">📡</div>
+            <h2 style="font-size:1.15rem; margin-bottom:8px;">Slow Connection</h2>
+            <p style="font-size:0.82rem; color:rgba(248,250,252,0.78); margin-bottom:16px;">Please check your internet and retry.</p>
+            <button type="button" class="btn-open-gift" style="padding:10px 22px; font-size:0.88rem;" onclick="openRecipientGiftById('${escAttr(giftId)}')">🔄 Retry</button>
+          </div>
+          <div></div>`;
       }
     }
 
-    function giftLaunchExperience(gift, isPreview = false) {
-      giftCurrentData = gift;
-      giftIsPreviewMode = isPreview;
-      giftStopMusic();
-      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
+    // =========================================================================
+    // SHARED THREE.JS RENDERING ENGINE + 10 DISTINCT 3D ENVIRONMENT BUILDERS
+    // =========================================================================
+    function vgsTrackDisposable(obj) {
+      if (obj) VGS_ENGINE.disposables.push(obj);
+      return obj;
+    }
 
-      const overlay = document.getElementById('giftExperienceOverlay');
-      const tpl = gift.template || 'crimson_gold';
-      overlay.className = 'gift-stage-overlay' + (tpl !== 'crimson_gold' ? ` theme-${tpl}` : '');
-      overlay.style.display = 'flex';
-
-      document.getElementById('giftStatusScreen').style.display = 'none';
-      document.getElementById('giftRevealStage').style.display = 'none';
-      document.getElementById('giftPreviewBadge').style.display = isPreview ? 'inline-block' : 'none';
-
-      const scene = document.getElementById('gift3dScene');
-      scene.classList.remove('opened', 'shaking');
-
-      document.getElementById('giftStageRecipientName').innerText = `For ${gift.recipientName || 'You'} 🎂`;
-      document.getElementById('giftStageSubtext').innerText = 'A little surprise for you... Tap the box to open!';
-      document.getElementById('giftClosedStage').style.display = 'flex';
-
-      const musicBtn = document.getElementById('giftMusicToggleBtn');
-      if (gift.music) {
-        musicBtn.style.display = 'inline-block';
-        musicBtn.innerText = '🔊 Play Music';
-      } else {
-        musicBtn.style.display = 'none';
+    function vgsDisposeScene() {
+      if (VGS_ENGINE.rafId) {
+        cancelAnimationFrame(VGS_ENGINE.rafId);
+        VGS_ENGINE.rafId = null;
       }
-    }
-
-    function giftOpenBoxAnimation() {
-      const scene = document.getElementById('gift3dScene');
-      if (scene.classList.contains('opened')) return;
-      scene.classList.add('shaking');
-
-      // Start music on user tap if enabled
-      if (giftCurrentData && giftCurrentData.music && !giftMusicPlaying) {
-        giftStartMusic(giftCurrentData.music);
-      }
-
-      setTimeout(() => {
-        scene.classList.remove('shaking');
-        scene.classList.add('opened');
-        giftLaunchConfettiBurst();
-      }, 420);
-
-      setTimeout(() => {
-        document.getElementById('giftClosedStage').style.display = 'none';
-        giftRenderRevealedContent();
-      }, 1250);
-    }
-
-    function giftReplayBox() {
-      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
-      document.getElementById('giftRevealStage').style.display = 'none';
-      const scene = document.getElementById('gift3dScene');
-      scene.classList.remove('opened', 'shaking');
-      document.getElementById('giftClosedStage').style.display = 'flex';
-    }
-
-    function giftRenderRevealedContent() {
-      if (!giftCurrentData) return;
-      const g = giftCurrentData;
-      document.getElementById('giftRevealHeading').innerText = `Happy Birthday, ${g.recipientName}!`;
-      document.getElementById('giftRevealMessage').innerText = g.message || '';
-      document.getElementById('giftRevealSender').innerText = `With warm wishes, ${g.senderName} 💝`;
-
-      const photos = Array.isArray(g.photos) ? g.photos.filter(Boolean) : [];
-      const galSec = document.getElementById('giftGallerySection');
-      if (photos.length > 0) {
-        galSec.style.display = 'block';
-        giftCurrentSlideIdx = 0;
-        const showNav = photos.length > 1 ? 'flex' : 'none';
-        document.getElementById('giftPrevSlideBtn').style.display = showNav;
-        document.getElementById('giftNextSlideBtn').style.display = showNav;
-        document.getElementById('giftSlideDots').innerHTML = photos.map((_, i) =>
-          `<span class="gift-slide-dot ${i === 0 ? 'active' : ''}" onclick="giftGoToSlide(${i})"></span>`
-        ).join('');
-        giftGoToSlide(0);
-        if (photos.length > 1) {
-          giftSlideTimer = setInterval(() => giftStepSlide(1), 4000);
+      if (VGS_ENGINE.scene) {
+        while (VGS_ENGINE.scene.children.length > 0) {
+          VGS_ENGINE.scene.remove(VGS_ENGINE.scene.children[0]);
         }
-      } else {
-        galSec.style.display = 'none';
       }
-
-      document.getElementById('giftRevealStage').style.display = 'block';
+      VGS_ENGINE.disposables.forEach(d => {
+        try { if (d && typeof d.dispose === 'function') d.dispose(); } catch(e) {}
+      });
+      VGS_ENGINE.disposables = [];
+      VGS_ENGINE.frameMeshes = [];
+      VGS_ENGINE.animatedItems = [];
+      VGS_ENGINE.candleFlames = [];
+      VGS_ENGINE.worldGroup = null;
+      VGS_ENGINE.entranceBoxGroup = null;
+      VGS_ENGINE.entranceLidPivot = null;
     }
 
-    function giftGoToSlide(idx) {
-      if (!giftCurrentData || !Array.isArray(giftCurrentData.photos)) return;
-      const photos = giftCurrentData.photos.filter(Boolean);
-      if (photos.length === 0) return;
-      giftCurrentSlideIdx = (idx + photos.length) % photos.length;
-      const imgEl = document.getElementById('giftSlideImg');
-      imgEl.style.opacity = '0.25';
-      setTimeout(() => {
-        imgEl.src = photos[giftCurrentSlideIdx];
-        imgEl.style.opacity = '1';
-      }, 130);
-      document.querySelectorAll('#giftSlideDots .gift-slide-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === giftCurrentSlideIdx);
+    function vgsCreateTextCanvasTexture(mainText, subText = '', opts = {}) {
+      const canvas = document.createElement('canvas');
+      canvas.width = opts.w || 512;
+      canvas.height = opts.h || 256;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = opts.bg || '#111827';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (opts.border) {
+        ctx.strokeStyle = opts.border;
+        ctx.lineWidth = 10;
+        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+      }
+      ctx.fillStyle = opts.color || '#FDE68A';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `bold ${opts.fontSize || 34}px sans-serif`;
+      ctx.fillText(String(mainText || '').slice(0, 32), canvas.width / 2, subText ? canvas.height * 0.42 : canvas.height * 0.5);
+      if (subText) {
+        ctx.fillStyle = opts.subColor || '#E2E8F0';
+        ctx.font = `600 ${opts.subFontSize || 20}px sans-serif`;
+        ctx.fillText(String(subText).slice(0, 42), canvas.width / 2, canvas.height * 0.68);
+      }
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+      return vgsTrackDisposable(tex);
+    }
+
+    function vgsBuildPhotoFrame(photoUrl, index, frameStyle, labelFallback) {
+      const group = new THREE.Group();
+      const frameColors = {
+        royal_gold:   0xD97706,
+        modern_black: 0x1E293B,
+        classic_wood: 0x78350F,
+        neon_glow:    0xEC4899
+      };
+      const borderCol = frameColors[frameStyle] || 0xD97706;
+      const frameMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({
+        color: borderCol,
+        roughness: frameStyle === 'royal_gold' ? 0.28 : 0.55,
+        metalness: frameStyle === 'royal_gold' ? 0.78 : 0.2,
+        emissive: frameStyle === 'neon_glow' ? 0xEC4899 : 0x000000,
+        emissiveIntensity: frameStyle === 'neon_glow' ? 0.55 : 0
+      }));
+      const outerMesh = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(2.3, 1.75, 0.12)), frameMat);
+      group.add(outerMesh);
+
+      let artTex;
+      if (photoUrl) {
+        const loader = new THREE.TextureLoader();
+        loader.setCrossOrigin('anonymous');
+        artTex = vgsTrackDisposable(loader.load(photoUrl));
+      } else {
+        artTex = vgsCreateTextCanvasTexture(
+          `Memory #${index + 1}`,
+          labelFallback || 'Wolkite Digital Hub',
+          { bg: '#1E293B', color: '#FDE68A', border: '#F59E0B', fontSize: 36, subFontSize: 22 }
+        );
+      }
+      const artMat = vgsTrackDisposable(new THREE.MeshBasicMaterial({ map: artTex }));
+      const artPlane = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(2.04, 1.5)), artMat);
+      artPlane.position.z = 0.068;
+      artPlane.userData = { isPhotoFrame: true, photoIndex: index, photoUrl: photoUrl || '' };
+      group.add(artPlane);
+      VGS_ENGINE.frameMeshes.push(artPlane);
+      return group;
+    }
+
+    function vgsPopulateWallFrames(worldGroup, gift) {
+      const photos = Array.isArray(gift.photos) && gift.photos.length > 0 ? gift.photos : [null, null, null];
+      const frameStyle = gift.customization?.frameStyle || 'royal_gold';
+      // Place frames along Back Wall (z = -5.8), Left Wall (x = -5.8), and Right Wall (x = +5.8)
+      const slots = [
+        { pos: [0, 2.35, -5.82],    rotY: 0 },
+        { pos: [-2.8, 2.35, -5.82], rotY: 0 },
+        { pos: [2.8, 2.35, -5.82],  rotY: 0 },
+        { pos: [-5.82, 2.35, -2.2], rotY: Math.PI / 2 },
+        { pos: [5.82, 2.35, -2.2],  rotY: -Math.PI / 2 },
+        { pos: [-5.82, 2.35, 1.4],  rotY: Math.PI / 2 }
+      ];
+      photos.slice(0, 6).forEach((pUrl, idx) => {
+        const slot = slots[idx];
+        if (!slot) return;
+        const frame = vgsBuildPhotoFrame(pUrl, idx, frameStyle, gift.recipientName);
+        frame.position.set(...slot.pos);
+        frame.rotation.y = slot.rotY;
+        worldGroup.add(frame);
       });
     }
 
-    function giftStepSlide(delta) {
-      giftGoToSlide(giftCurrentSlideIdx + delta);
+    function vgsBuildInteractiveCake(worldGroup, occasion) {
+      const cakeGroup = new THREE.Group();
+      cakeGroup.position.set(0, 0.85, -1.6);
+
+      // Pedestal Table
+      const tableMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xF8FAFC, roughness: 0.35 }));
+      const tableTop = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(1.15, 1.15, 0.1, 24)), tableMat);
+      tableTop.position.y = -0.05;
+      const tableLeg = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(0.14, 0.35, 0.8, 16)), tableMat);
+      tableLeg.position.y = -0.45;
+      cakeGroup.add(tableTop, tableLeg);
+
+      // 2-Tier Cake
+      const tier1Mat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xF472B6, roughness: 0.45 }));
+      const tier2Mat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xFEF3C7, roughness: 0.4 }));
+      const tier1 = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(0.65, 0.65, 0.32, 24)), tier1Mat);
+      tier1.position.y = 0.16;
+      const tier2 = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(0.44, 0.44, 0.26, 24)), tier2Mat);
+      tier2.position.y = 0.45;
+      cakeGroup.add(tier1, tier2);
+
+      // 5 Candles with flickering flames
+      VGS_ENGINE.candleFlames = [];
+      VGS_ENGINE.candlesLit = true;
+      const candleMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x38BDF8 }));
+      const flameMat = vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: 0xFBBF24 }));
+      for (let i = 0; i < 5; i++) {
+        const ang = (i / 5) * Math.PI * 2;
+        const cx = Math.cos(ang) * 0.24;
+        const cz = Math.sin(ang) * 0.24;
+        const cMesh = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(0.025, 0.025, 0.18, 10)), candleMat);
+        cMesh.position.set(cx, 0.67, cz);
+        const flame = new THREE.Mesh(vgsTrackDisposable(new THREE.SphereGeometry(0.038, 10, 10)), flameMat);
+        flame.scale.set(0.75, 1.45, 0.75);
+        flame.position.set(cx, 0.79, cz);
+        cakeGroup.add(cMesh, flame);
+        VGS_ENGINE.candleFlames.push(flame);
+      }
+      worldGroup.add(cakeGroup);
+    }
+
+    function vgsBlowBirthdayCandles() {
+      if (!VGS_ENGINE.candlesLit) {
+        VGS_ENGINE.candlesLit = true;
+        VGS_ENGINE.candleFlames.forEach(f => { f.visible = true; });
+        notifyUser('🕯️ Candles relit!');
+        return;
+      }
+      VGS_ENGINE.candlesLit = false;
+      VGS_ENGINE.candleFlames.forEach(f => { f.visible = false; });
+      notifyUser('🎂✨ Wish made! Candles blown out!');
+    }
+
+    function vgsAddOccasionDecorations(worldGroup, gift) {
+      const occ = gift.occasion || 'birthday';
+      // Banner Plaque above Center Frame
+      const bannerTex = vgsCreateTextCanvasTexture(
+        gift.title || 'A Special Memory',
+        `For ${gift.recipientName || 'You'} • From ${gift.senderName || ''}`,
+        { bg: '#0F172A', color: '#FDE68A', border: '#EC4899', fontSize: 32, subFontSize: 19 }
+      );
+      const banner = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.PlaneGeometry(4.4, 1.05)),
+        vgsTrackDisposable(new THREE.MeshBasicMaterial({ map: bannerTex }))
+      );
+      banner.position.set(0, 3.85, -5.8);
+      worldGroup.add(banner);
+
+      if (occ === 'birthday') {
+        vgsBuildInteractiveCake(worldGroup, occ);
+        // Floating Balloons in corners
+        const bCols = [0xEC4899, 0xF59E0B, 0x38BDF8, 0xA855F7];
+        for (let i = 0; i < 8; i++) {
+          const bMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: bCols[i % bCols.length], roughness: 0.25, metalness: 0.15 }));
+          const balloon = new THREE.Mesh(vgsTrackDisposable(new THREE.SphereGeometry(0.34, 16, 16)), bMat);
+          balloon.scale.set(0.9, 1.15, 0.9);
+          const bx = (i % 2 === 0 ? -4.3 : 4.3) + (Math.random() - 0.5) * 1.1;
+          const bz = -4.2 + (i * 0.8);
+          balloon.position.set(bx, 3.1 + (i % 3) * 0.45, bz);
+          worldGroup.add(balloon);
+          VGS_ENGINE.animatedItems.push({ mesh: balloon, type: 'float', baseY: balloon.position.y, phase: i });
+        }
+      } else if (occ === 'graduation') {
+        // 3D Graduation Cap Pedestal
+        const ped = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.CylinderGeometry(0.75, 0.85, 1.0, 20)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x1E293B }))
+        );
+        ped.position.set(0, 0.5, -1.8);
+        const capMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x0F172A, roughness: 0.4 }));
+        const board = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(1.15, 0.07, 1.15)), capMat);
+        board.position.set(0, 1.25, -1.8);
+        board.rotation.y = Math.PI / 4;
+        const goldTassel = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.SphereGeometry(0.08, 12, 12)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xFBBF24, metalness: 0.8, roughness: 0.2 }))
+        );
+        goldTassel.position.set(0, 1.3, -1.8);
+        worldGroup.add(ped, board, goldTassel);
+        VGS_ENGINE.animatedItems.push({ mesh: board, type: 'spinY', speed: 0.6 });
+      } else if (occ === 'valentines' || occ === 'anniversary') {
+        // Glowing Floating Crystal Heart Centerpiece
+        const heartShape = new THREE.Shape();
+        heartShape.moveTo(0, 0.25);
+        heartShape.bezierCurveTo(0, 0.25, -0.05, 0, -0.25, 0);
+        heartShape.bezierCurveTo(-0.55, 0, -0.55, 0.35, -0.55, 0.35);
+        heartShape.bezierCurveTo(-0.55, 0.55, -0.35, 0.77, 0, 0.95);
+        heartShape.bezierCurveTo(0.35, 0.77, 0.55, 0.55, 0.55, 0.35);
+        heartShape.bezierCurveTo(0.55, 0.35, 0.55, 0, 0.25, 0);
+        heartShape.bezierCurveTo(0.1, 0, 0, 0.25, 0, 0.25);
+        const extrude = vgsTrackDisposable(new THREE.ExtrudeGeometry(heartShape, { depth: 0.22, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 }));
+        const hMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xE11D48, emissive: 0x9F1239, emissiveIntensity: 0.45, roughness: 0.25 }));
+        const heartMesh = new THREE.Mesh(extrude, hMat);
+        heartMesh.rotation.z = Math.PI;
+        heartMesh.position.set(0, 2.0, -2.0);
+        worldGroup.add(heartMesh);
+        VGS_ENGINE.animatedItems.push({ mesh: heartMesh, type: 'spinY', speed: 0.8 });
+      }
+    }
+
+    function vgsBuildBaseRoomShell(worldGroup, opts) {
+      const floorMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({
+        color: opts.floorColor, roughness: opts.floorRoughness ?? 0.45, metalness: opts.floorMetalness ?? 0.1
+      }));
+      const floor = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(12, 12)), floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      worldGroup.add(floor);
+
+      if (!opts.noWalls) {
+        const wallMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({
+          color: opts.wallColor, roughness: opts.wallRoughness ?? 0.7, side: THREE.DoubleSide
+        }));
+        const backWall = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(12, 5.2)), wallMat);
+        backWall.position.set(0, 2.6, -6);
+        const leftWall = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(12, 5.2)), wallMat);
+        leftWall.rotation.y = Math.PI / 2;
+        leftWall.position.set(-6, 2.6, 0);
+        const rightWall = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(12, 5.2)), wallMat);
+        rightWall.rotation.y = -Math.PI / 2;
+        rightWall.position.set(6, 2.6, 0);
+        worldGroup.add(backWall, leftWall, rightWall);
+      }
+
+      if (!opts.noCeiling) {
+        const ceilMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: opts.ceilColor || opts.wallColor, roughness: 0.8 }));
+        const ceil = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(12, 12)), ceilMat);
+        ceil.rotation.x = Math.PI / 2;
+        ceil.position.y = 5.2;
+        worldGroup.add(ceil);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 10 DISTINCT 3D ENVIRONMENT BUILDER FUNCTIONS
+    // -------------------------------------------------------------------------
+    function createModernGallery(wg, scene) {
+      scene.background = new THREE.Color(0xE2E8F0);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0xB45309, floorRoughness: 0.38, wallColor: 0xF8FAFC, ceilColor: 0xFFFFFF });
+      // Minimalist Center Bench
+      const bench = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.BoxGeometry(2.6, 0.45, 0.85)),
+        vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.4 }))
+      );
+      bench.position.set(0, 0.225, 1.2);
+      wg.add(bench);
+    }
+
+    function createBirthdayRoom(wg, scene) {
+      scene.background = new THREE.Color(0x2D122B);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x78350F, floorRoughness: 0.45, wallColor: 0xFFF1F2, ceilColor: 0xFFE4E6 });
+      // Decorative Gift Boxes around room corners
+      const boxCols = [0xEC4899, 0x3B82F6, 0xF59E0B, 0x10B981];
+      [[-4.2, 0.35, -4.5], [4.2, 0.35, -4.5], [-4.5, 0.28, 2.2], [4.5, 0.28, 2.2]].forEach((pos, idx) => {
+        const box = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.BoxGeometry(0.7, 0.7, 0.7)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: boxCols[idx] }))
+        );
+        box.position.set(...pos);
+        wg.add(box);
+      });
+    }
+
+    function createNeonLounge(wg, scene) {
+      scene.background = new THREE.Color(0x090414);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x0F172A, floorRoughness: 0.15, floorMetalness: 0.65, wallColor: 0x140A26, ceilColor: 0x090414 });
+      // Neon Tube Strips along walls
+      const pinkNeon = vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: 0xEC4899 }));
+      const cyanNeon = vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: 0x22D3EE }));
+      const bar1 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(11.6, 0.08, 0.08)), pinkNeon);
+      bar1.position.set(0, 4.6, -5.9);
+      const bar2 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(0.08, 0.08, 11.6)), cyanNeon);
+      bar2.position.set(-5.9, 4.6, 0);
+      const bar3 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(0.08, 0.08, 11.6)), cyanNeon);
+      bar3.position.set(5.9, 4.6, 0);
+      wg.add(bar1, bar2, bar3);
+    }
+
+    function createRoyalHall(wg, scene) {
+      scene.background = new THREE.Color(0x1C1105);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0xFEF3C7, floorRoughness: 0.22, floorMetalness: 0.2, wallColor: 0x451A03, ceilColor: 0x78350F });
+      // Red Velvet Carpet Runner
+      const carpet = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.PlaneGeometry(2.6, 11.5)),
+        vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x9F1239, roughness: 0.8 }))
+      );
+      carpet.rotation.x = -Math.PI / 2;
+      carpet.position.y = 0.01;
+      wg.add(carpet);
+      // 4 Golden Pillars
+      const goldMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xFBBF24, metalness: 0.82, roughness: 0.22 }));
+      [[-4.8, 2.6, -4.8], [4.8, 2.6, -4.8], [-4.8, 2.6, 1.5], [4.8, 2.6, 1.5]].forEach(p => {
+        const col = new THREE.Mesh(vgsTrackDisposable(new THREE.CylinderGeometry(0.32, 0.36, 5.2, 18)), goldMat);
+        col.position.set(...p);
+        wg.add(col);
+      });
+    }
+
+    function createEnchantedGarden(wg, scene) {
+      scene.background = new THREE.Color(0x064E3B);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x15803D, floorRoughness: 0.85, wallColor: 0x065F46, noCeiling: true });
+      // Stone Garden Pathway
+      const path = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.PlaneGeometry(2.2, 11.5)),
+        vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xCBD5E1, roughness: 0.9 }))
+      );
+      path.rotation.x = -Math.PI / 2;
+      path.position.y = 0.01;
+      wg.add(path);
+      // Flower Bushes & Animated Butterflies
+      const flowerCols = [0xF472B6, 0xFBBF24, 0xFB7185, 0xA78BFA];
+      for (let i = 0; i < 16; i++) {
+        const fl = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.DodecahedronGeometry(0.28)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: flowerCols[i % 4] }))
+        );
+        fl.position.set((i % 2 === 0 ? -1 : 1) * (1.8 + (i % 4) * 0.9), 0.25, -5 + i * 0.65);
+        wg.add(fl);
+      }
+      for (let b = 0; b < 6; b++) {
+        const bf = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.PlaneGeometry(0.22, 0.16)),
+          vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: 0xFDE047, side: THREE.DoubleSide }))
+        );
+        bf.position.set((Math.random() - 0.5) * 6, 1.8 + Math.random() * 1.5, -3 + Math.random() * 5);
+        wg.add(bf);
+        VGS_ENGINE.animatedItems.push({ mesh: bf, type: 'orbit', radius: 1.5 + b * 0.3, speed: 0.9 + b * 0.1, baseY: bf.position.y, phase: b });
+      }
+    }
+
+    function createRoseSuite(wg, scene) {
+      scene.background = new THREE.Color(0x2A0815);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x4C0519, floorRoughness: 0.5, wallColor: 0x881337, ceilColor: 0x4C0519 });
+      // Scattered Rose Petals & Pedestal Roses
+      const roseMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xE11D48, emissive: 0x881337, emissiveIntensity: 0.3 }));
+      for (let i = 0; i < 22; i++) {
+        const petal = new THREE.Mesh(vgsTrackDisposable(new THREE.CircleGeometry(0.14, 8)), roseMat);
+        petal.rotation.x = -Math.PI / 2;
+        petal.position.set((Math.random() - 0.5) * 8, 0.02, (Math.random() - 0.5) * 8);
+        wg.add(petal);
+      }
+    }
+
+    function createMemoryCinema(wg, scene) {
+      scene.background = new THREE.Color(0x05070E);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x1E1B4B, floorRoughness: 0.75, wallColor: 0x0F172A, ceilColor: 0x020617 });
+      // Theater Seats Rows
+      const seatMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0x991B1B, roughness: 0.6 }));
+      for (let row = 0; row < 2; row++) {
+        for (let col = -2; col <= 2; col++) {
+          const seat = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(0.75, 0.65, 0.7)), seatMat);
+          seat.position.set(col * 1.05, 0.33, 1.4 + row * 1.4);
+          wg.add(seat);
+        }
+      }
+    }
+
+    function createStarryObservatory(wg, scene) {
+      scene.background = new THREE.Color(0x03050C);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x0F172A, floorRoughness: 0.3, wallColor: 0x1E293B, noCeiling: true });
+      // Glowing Crescent/Full Moon & Starfield Dome
+      const moon = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.SphereGeometry(0.85, 20, 20)),
+        vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: 0xFEF08A }))
+      );
+      moon.position.set(3.2, 5.2, -4.5);
+      wg.add(moon);
+
+      const starGeo = vgsTrackDisposable(new THREE.BufferGeometry());
+      const starVerts = [];
+      for (let i = 0; i < 260; i++) {
+        starVerts.push((Math.random() - 0.5) * 26, 3.5 + Math.random() * 10, (Math.random() - 0.5) * 26);
+      }
+      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3));
+      const stars = new THREE.Points(starGeo, vgsTrackDisposable(new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.14 })));
+      wg.add(stars);
+      VGS_ENGINE.animatedItems.push({ mesh: stars, type: 'spinY', speed: 0.04 });
+    }
+
+    function createOceanDream(wg, scene) {
+      scene.background = new THREE.Color(0x042F49);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x0E7490, floorRoughness: 0.5, wallColor: 0x0369A1, ceilColor: 0x0284C7 });
+      // Coral Clusters & Swimming Fish
+      const coralCols = [0xFB7185, 0xFBBF24, 0xA78BFA, 0x34D399];
+      for (let c = 0; c < 10; c++) {
+        const coral = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.ConeGeometry(0.35, 0.9, 7)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: coralCols[c % 4] }))
+        );
+        coral.position.set((c % 2 === 0 ? -4.8 : 4.8), 0.45, -4.5 + c * 0.9);
+        wg.add(coral);
+      }
+      for (let f = 0; f < 7; f++) {
+        const fish = new THREE.Mesh(
+          vgsTrackDisposable(new THREE.ConeGeometry(0.14, 0.42, 8)),
+          vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: f % 2 === 0 ? 0xFBBF24 : 0x38BDF8 }))
+        );
+        fish.rotation.z = Math.PI / 2;
+        fish.position.set(0, 2.2 + (f % 3) * 0.7, -2 + f * 0.5);
+        wg.add(fish);
+        VGS_ENGINE.animatedItems.push({ mesh: fish, type: 'orbit', radius: 2.2 + f * 0.35, speed: 0.65 + f * 0.08, baseY: fish.position.y, phase: f });
+      }
+    }
+
+    function createDiscoHall(wg, scene) {
+      scene.background = new THREE.Color(0x12041C);
+      vgsBuildBaseRoomShell(wg, { floorColor: 0x1E1B4B, floorRoughness: 0.2, metalness: 0.5, wallColor: 0x2E1065, ceilColor: 0x090414 });
+      // Rotating Disco Ball
+      const discoBall = new THREE.Mesh(
+        vgsTrackDisposable(new THREE.SphereGeometry(0.65, 20, 20)),
+        vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xE2E8F0, metalness: 0.95, roughness: 0.12 }))
+      );
+      discoBall.position.set(0, 4.3, -1.5);
+      wg.add(discoBall);
+      VGS_ENGINE.animatedItems.push({ mesh: discoBall, type: 'spinY', speed: 1.1 });
+
+      // Glowing Dance Floor Tiles
+      const tileCols = [0xEC4899, 0x38BDF8, 0xFBBF24, 0xA855F7];
+      for (let x = -2; x <= 2; x++) {
+        for (let z = -2; z <= 2; z++) {
+          const tMat = vgsTrackDisposable(new THREE.MeshBasicMaterial({ color: tileCols[Math.abs(x + z) % 4] }));
+          const tile = new THREE.Mesh(vgsTrackDisposable(new THREE.PlaneGeometry(0.92, 0.92)), tMat);
+          tile.rotation.x = -Math.PI / 2;
+          tile.position.set(x, 0.02, z - 0.5);
+          wg.add(tile);
+        }
+      }
+    }
+
+    const VGS_ENV_BUILDERS = {
+      modern_gallery: createModernGallery,
+      birthday_room: createBirthdayRoom,
+      neon_lounge: createNeonLounge,
+      royal_hall: createRoyalHall,
+      enchanted_garden: createEnchantedGarden,
+      rose_suite: createRoseSuite,
+      memory_cinema: createMemoryCinema,
+      starry_observatory: createStarryObservatory,
+      ocean_dream: createOceanDream,
+      disco_hall: createDiscoHall
+    };
+
+    // -------------------------------------------------------------------------
+    // STAGE 1: 3D GIFT BOX ENTRANCE + STAGE 2 CAMERA TRANSITION INTO ROOM
+    // -------------------------------------------------------------------------
+    function vgsBuild3DEntranceGiftBox(scene) {
+      const boxGroup = new THREE.Group();
+      boxGroup.position.set(0, 1.35, 5.2);
+
+      const boxMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xE11D48, roughness: 0.32, metalness: 0.15 }));
+      const goldMat = vgsTrackDisposable(new THREE.MeshStandardMaterial({ color: 0xFBBF24, roughness: 0.22, metalness: 0.85 }));
+
+      const base = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(1.3, 1.1, 1.3)), boxMat);
+      const rib1 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(1.34, 1.12, 0.22)), goldMat);
+      const rib2 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(0.22, 1.12, 1.34)), goldMat);
+      boxGroup.add(base, rib1, rib2);
+
+      const lidPivot = new THREE.Group();
+      lidPivot.position.set(0, 0.55, -0.68);
+      const lidMesh = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(1.4, 0.26, 1.4)), boxMat);
+      lidMesh.position.set(0, 0.13, 0.68);
+      const lidRib1 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(1.43, 0.28, 0.24)), goldMat);
+      lidRib1.position.set(0, 0.13, 0.68);
+      const lidRib2 = new THREE.Mesh(vgsTrackDisposable(new THREE.BoxGeometry(0.24, 0.28, 1.43)), goldMat);
+      lidRib2.position.set(0, 0.13, 0.68);
+      lidPivot.add(lidMesh, lidRib1, lidRib2);
+      boxGroup.add(lidPivot);
+
+      scene.add(boxGroup);
+      VGS_ENGINE.entranceBoxGroup = boxGroup;
+      VGS_ENGINE.entranceLidPivot = lidPivot;
+    }
+
+    function vgsLaunch3DExperience(gift, isPreview = false) {
+      giftCurrentData = gift;
+      giftIsPreviewMode = isPreview;
+      VGS_ENGINE.inRoom = false;
+      giftStopMusic();
+
+      const overlay = document.getElementById('giftExperienceOverlay');
+      overlay.style.display = 'flex';
+      document.getElementById('giftStatusScreen').style.display = 'none';
+      document.getElementById('vgsWorldModal').style.display = 'none';
+      document.getElementById('vgsRoomDock').style.display = 'none';
+      document.getElementById('vgsResetCamBtn').style.display = 'none';
+      document.getElementById('giftPreviewBadge').style.display = isPreview ? 'inline-block' : 'none';
+
+      const occObj = VGS_OCCASIONS.find(o => o.id === (gift.occasion || 'birthday')) || VGS_OCCASIONS[0];
+      const tplObj = VGS_TEMPLATES.find(t => t.id === (gift.templateId || gift.template)) || VGS_TEMPLATES[0];
+
+      document.getElementById('vgsEntranceOccasionBadge').innerText = `${occObj.icon} ${gift.occasionLabel || occObj.label} • ${tplObj.name}`;
+      document.getElementById('giftStageRecipientName').innerText = `For ${gift.recipientName || 'You'}`;
+      document.getElementById('giftStageSubtext').innerText = `From ${gift.senderName || 'Someone Special'} • Tap below to walk inside`;
+      document.getElementById('giftClosedStage').style.display = 'flex';
+
+      const musicBtn = document.getElementById('giftMusicToggleBtn');
+      const mUrl = gift.musicUrl || gift.music;
+      if (mUrl) {
+        musicBtn.style.display = 'inline-block';
+        musicBtn.innerText = '🔊 Music';
+      } else {
+        musicBtn.style.display = 'none';
+      }
+
+      // Initialize WebGL Three.js Scene
+      const host = document.getElementById('vgsThreeCanvasHost');
+      if (typeof THREE === 'undefined') {
+        VGS_ENGINE.webglSupported = false;
+        host.innerHTML = '<div style="padding:40px; text-align:center; color:#FDE68A;">3D Engine unavailable — using interactive view.</div>';
+        return;
+      }
+
+      vgsDisposeScene();
+      if (!VGS_ENGINE.renderer) {
+        try {
+          VGS_ENGINE.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+          VGS_ENGINE.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+          VGS_ENGINE.renderer.setSize(window.innerWidth, window.innerHeight);
+          host.innerHTML = '';
+          host.appendChild(VGS_ENGINE.renderer.domElement);
+          window.addEventListener('resize', vgsOnWindowResize);
+          VGS_ENGINE.renderer.domElement.addEventListener('pointerdown', vgsOnCanvasPointerDown);
+        } catch(e) {
+          VGS_ENGINE.webglSupported = false;
+          return;
+        }
+      }
+
+      VGS_ENGINE.scene = new THREE.Scene();
+      VGS_ENGINE.clock = new THREE.Clock();
+      VGS_ENGINE.raycaster = new THREE.Raycaster();
+      VGS_ENGINE.pointer = new THREE.Vector2();
+
+      VGS_ENGINE.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 60);
+      VGS_ENGINE.camera.position.set(0, 2.2, 8.2);
+
+      if (typeof THREE.OrbitControls !== 'undefined') {
+        VGS_ENGINE.controls = new THREE.OrbitControls(VGS_ENGINE.camera, VGS_ENGINE.renderer.domElement);
+        VGS_ENGINE.controls.enableDamping = true;
+        VGS_ENGINE.controls.dampingFactor = 0.07;
+        VGS_ENGINE.controls.maxDistance = 9.5;
+        VGS_ENGINE.controls.minDistance = 1.2;
+        VGS_ENGINE.controls.maxPolarAngle = Math.PI * 0.49;
+        VGS_ENGINE.controls.target.set(0, 1.5, 5.2);
+        VGS_ENGINE.controls.enabled = false;
+      }
+
+      // Shared Lighting Management
+      const lightMode = gift.customization?.lighting || 'warm';
+      const ambIntensity = lightMode === 'bright' ? 1.05 : (lightMode === 'dramatic' ? 0.55 : 0.8);
+      const ambLight = new THREE.AmbientLight(0xFFFFFF, ambIntensity);
+      const ptLight = new THREE.PointLight(lightMode === 'warm' ? 0xFDE68A : 0xFFFFFF, 1.15, 22);
+      ptLight.position.set(0, 4.4, -1.5);
+      VGS_ENGINE.scene.add(ambLight, ptLight);
+
+      // Build Selected 3D Room + Wall Photo Frames + Occasion Props
+      VGS_ENGINE.worldGroup = new THREE.Group();
+      const tplKey = gift.templateId || gift.template || 'modern_gallery';
+      const builderFn = VGS_ENV_BUILDERS[tplKey] || createModernGallery;
+      builderFn(VGS_ENGINE.worldGroup, VGS_ENGINE.scene);
+      vgsPopulateWallFrames(VGS_ENGINE.worldGroup, gift);
+      vgsAddOccasionDecorations(VGS_ENGINE.worldGroup, gift);
+      VGS_ENGINE.scene.add(VGS_ENGINE.worldGroup);
+
+      // Build Stage 1 Entrance 3D Gift Box
+      vgsBuild3DEntranceGiftBox(VGS_ENGINE.scene);
+
+      // Start Render Loop
+      const animate = () => {
+        VGS_ENGINE.rafId = requestAnimationFrame(animate);
+        const dt = VGS_ENGINE.clock ? VGS_ENGINE.clock.getDelta() : 0.016;
+        const elapsed = VGS_ENGINE.clock ? VGS_ENGINE.clock.getElapsedTime() : 0;
+
+        if (!VGS_ENGINE.inRoom && VGS_ENGINE.entranceBoxGroup) {
+          VGS_ENGINE.entranceBoxGroup.rotation.y += dt * 0.55;
+          VGS_ENGINE.entranceBoxGroup.position.y = 1.35 + Math.sin(elapsed * 2.5) * 0.08;
+        }
+        VGS_ENGINE.animatedItems.forEach(it => {
+          if (!it.mesh) return;
+          if (it.type === 'spinY') it.mesh.rotation.y += dt * (it.speed || 0.5);
+          else if (it.type === 'float') it.mesh.position.y = it.baseY + Math.sin(elapsed * 2 + (it.phase || 0)) * 0.14;
+          else if (it.type === 'orbit') {
+            const a = elapsed * (it.speed || 0.7) + (it.phase || 0);
+            it.mesh.position.x = Math.cos(a) * (it.radius || 2);
+            it.mesh.position.z = Math.sin(a) * (it.radius || 2) - 1.5;
+            it.mesh.rotation.y = -a;
+          }
+        });
+        if (VGS_ENGINE.candlesLit && VGS_ENGINE.candleFlames.length) {
+          VGS_ENGINE.candleFlames.forEach((f, idx) => {
+            const s = 0.85 + Math.sin(elapsed * 14 + idx) * 0.18;
+            f.scale.set(0.75 * s, 1.45 * s, 0.75 * s);
+          });
+        }
+        if (VGS_ENGINE.controls && VGS_ENGINE.controls.enabled) {
+          VGS_ENGINE.controls.update();
+        }
+        if (VGS_ENGINE.renderer && VGS_ENGINE.scene && VGS_ENGINE.camera) {
+          VGS_ENGINE.renderer.render(VGS_ENGINE.scene, VGS_ENGINE.camera);
+        }
+      };
+      animate();
+    }
+
+    function vgsTriggerRevealSequence() {
+      if (VGS_ENGINE.inRoom) return;
+      document.getElementById('giftClosedStage').style.display = 'none';
+
+      const finishEnterRoom = () => {
+        VGS_ENGINE.inRoom = true;
+        if (VGS_ENGINE.entranceBoxGroup && VGS_ENGINE.scene) {
+          VGS_ENGINE.scene.remove(VGS_ENGINE.entranceBoxGroup);
+        }
+        if (VGS_ENGINE.controls) {
+          VGS_ENGINE.controls.target.set(0, 2.0, -3.5);
+          VGS_ENGINE.controls.enabled = true;
+        }
+        const g = giftCurrentData || {};
+        const tplObj = VGS_TEMPLATES.find(t => t.id === (g.templateId || g.template)) || VGS_TEMPLATES[0];
+        document.getElementById('vgsRoomBannerTitle').innerText = g.title || `For ${g.recipientName}`;
+        document.getElementById('vgsRoomTplBadge').innerText = `${tplObj.icon} #${tplObj.num}`;
+        document.getElementById('vgsDockCakeBtn').style.display = (g.occasion === 'birthday') ? 'inline-block' : 'none';
+        document.getElementById('vgsDockVideoBtn').style.display = g.videoUrl ? 'inline-block' : 'none';
+        document.getElementById('vgsResetCamBtn').style.display = 'inline-block';
+        document.getElementById('vgsRoomDock').style.display = 'flex';
+      };
+
+      if (typeof gsap !== 'undefined' && VGS_ENGINE.entranceLidPivot && VGS_ENGINE.camera) {
+        gsap.to(VGS_ENGINE.entranceLidPivot.rotation, { x: -2.1, duration: 0.75, ease: 'back.out(1.4)' });
+        gsap.to(VGS_ENGINE.camera.position, {
+          x: 0, y: 2.15, z: 2.6, duration: 1.55, delay: 0.35, ease: 'power3.inOut',
+          onUpdate: () => { VGS_ENGINE.camera.lookAt(0, 2.1, -4.5); },
+          onComplete: finishEnterRoom
+        });
+      } else {
+        if (VGS_ENGINE.camera) {
+          VGS_ENGINE.camera.position.set(0, 2.15, 2.6);
+          VGS_ENGINE.camera.lookAt(0, 2.1, -4.5);
+        }
+        finishEnterRoom();
+      }
+    }
+
+    function vgsResetCameraView() {
+      if (!VGS_ENGINE.camera) return;
+      if (typeof gsap !== 'undefined') {
+        gsap.to(VGS_ENGINE.camera.position, { x: 0, y: 2.15, z: 2.6, duration: 0.9, ease: 'power2.out' });
+        if (VGS_ENGINE.controls) {
+          gsap.to(VGS_ENGINE.controls.target, { x: 0, y: 2.0, z: -3.5, duration: 0.9 });
+        }
+      } else {
+        VGS_ENGINE.camera.position.set(0, 2.15, 2.6);
+        if (VGS_ENGINE.controls) VGS_ENGINE.controls.target.set(0, 2.0, -3.5);
+      }
+    }
+
+    function vgsOnCanvasPointerDown(ev) {
+      if (!VGS_ENGINE.inRoom || !VGS_ENGINE.raycaster || !VGS_ENGINE.camera) return;
+      const rect = VGS_ENGINE.renderer.domElement.getBoundingClientRect();
+      VGS_ENGINE.pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+      VGS_ENGINE.pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+      VGS_ENGINE.raycaster.setFromCamera(VGS_ENGINE.pointer, VGS_ENGINE.camera);
+      const hits = VGS_ENGINE.raycaster.intersectObjects(VGS_ENGINE.frameMeshes, false);
+      if (hits.length > 0 && hits[0].object?.userData?.isPhotoFrame) {
+        giftCurrentSlideIdx = hits[0].object.userData.photoIndex || 0;
+        vgsOpenWorldModal('photos');
+      }
+    }
+
+    function vgsOnWindowResize() {
+      if (!VGS_ENGINE.renderer || !VGS_ENGINE.camera) return;
+      VGS_ENGINE.camera.aspect = window.innerWidth / window.innerHeight;
+      VGS_ENGINE.camera.updateProjectionMatrix();
+      VGS_ENGINE.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // -------------------------------------------------------------------------
+    // IN-WORLD INTERACTIVE MODALS (LETTER, FULLSCREEN PHOTOS, VIDEO, FINALE)
+    // -------------------------------------------------------------------------
+    function vgsOpenWorldModal(type) {
+      const g = giftCurrentData;
+      if (!g) return;
+      const modal = document.getElementById('vgsWorldModal');
+      const body = document.getElementById('vgsWorldModalBody');
+      if (type === 'letter') {
+        body.innerHTML = `
+          <span class="gift-pre-badge">💌 PERSONAL LETTER</span>
+          <h3 style="font-size:1.2rem; color:#FDE68A; margin-bottom:4px;">${escHtml(g.title || 'For You')}</h3>
+          ${g.specialDate ? `<div style="font-size:0.74rem; color:#94A3B8;">📅 ${escHtml(g.specialDate)}</div>` : ''}
+          <div class="vgs-letter-paper">${escHtml(g.message || '')}</div>
+          <div style="font-size:0.9rem; font-weight:800; color:#F9A8D4; margin-bottom:14px;">With love, ${escHtml(g.senderName || '')}</div>
+          <button type="button" class="btn-action btn-edu" onclick="vgsCloseWorldModal()">Back to 3D Room</button>`;
+      } else if (type === 'photos') {
+        const photos = Array.isArray(g.photos) ? g.photos.filter(Boolean) : [];
+        if (photos.length === 0) {
+          body.innerHTML = `
+            <div style="font-size:2.4rem; margin-bottom:8px;">🖼️</div>
+            <h3 style="margin-bottom:6px;">Wall Gallery</h3>
+            <p style="font-size:0.82rem; color:#CBD5E1; margin-bottom:14px;">No custom photos were attached to this demo room.</p>
+            <button type="button" class="btn-action btn-edu" onclick="vgsCloseWorldModal()">Close</button>`;
+        } else {
+          const idx = (giftCurrentSlideIdx + photos.length) % photos.length;
+          giftCurrentSlideIdx = idx;
+          body.innerHTML = `
+            <span class="gift-pre-badge">🖼️ MEMORY ${idx + 1} OF ${photos.length}</span>
+            <img src="${photos[idx]}" style="width:100%; max-height:56vh; object-fit:contain; border-radius:14px; margin:8px 0; background:#000;">
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              ${photos.length > 1 ? `<button type="button" class="gift-glass-pill" style="flex:1;" onclick="giftCurrentSlideIdx--; vgsOpenWorldModal('photos')">◀ Prev</button>` : ''}
+              <button type="button" class="btn-action btn-edu" style="flex:1.4;" onclick="vgsCloseWorldModal()">Done</button>
+              ${photos.length > 1 ? `<button type="button" class="gift-glass-pill" style="flex:1;" onclick="giftCurrentSlideIdx++; vgsOpenWorldModal('photos')">Next ▶</button>` : ''}
+            </div>`;
+        }
+      } else if (type === 'video' && g.videoUrl) {
+        body.innerHTML = `
+          <span class="gift-pre-badge">🎬 VIDEO MESSAGE</span>
+          <video src="${escAttr(g.videoUrl)}" controls playsinline style="width:100%; border-radius:14px; margin:10px 0; background:#000;"></video>
+          <button type="button" class="btn-action btn-edu" onclick="vgsCloseWorldModal()">Back to 3D Room</button>`;
+      } else if (type === 'final') {
+        body.innerHTML = `
+          <div style="font-size:2.6rem; margin-bottom:6px;">✨🥂✨</div>
+          <h2 class="gift-recipient-title" style="font-size:1.45rem; margin-bottom:8px;">${escHtml(g.title || 'Cherish Every Moment')}</h2>
+          <p style="font-size:0.86rem; color:#E2E8F0; line-height:1.55; margin-bottom:12px;">
+            Prepared especially for <b>${escHtml(g.recipientName || '')}</b> by <b>${escHtml(g.senderName || '')}</b>.
+          </p>
+          <div style="font-size:0.72rem; color:#94A3B8; border-top:1px solid rgba(255,255,255,0.12); padding-top:10px; margin-bottom:14px;">
+            Crafted with Wolkite Digital Hub • 3D Virtual Gift Studio
+          </div>
+          <button type="button" class="btn-action btn-edu" onclick="vgsCloseWorldModal()">Continue Exploring Room</button>`;
+      }
+      modal.style.display = 'flex';
+    }
+
+    function vgsCloseWorldModal() {
+      document.getElementById('vgsWorldModal').style.display = 'none';
     }
 
     function giftExitExperience() {
       giftStopMusic();
-      if (giftSlideTimer) { clearInterval(giftSlideTimer); giftSlideTimer = null; }
-      if (giftConfettiAnimId) { cancelAnimationFrame(giftConfettiAnimId); giftConfettiAnimId = null; }
+      vgsDisposeScene();
+      document.getElementById('vgsWorldModal').style.display = 'none';
       document.getElementById('giftExperienceOverlay').style.display = 'none';
       if (!giftIsPreviewMode) {
         openHubScreen();
       }
     }
 
-    // Lightweight Zero-Dependency Web Audio Birthday Chime
+    // -------------------------------------------------------------------------
+    // WEB AUDIO SYNTHESIZER (USER-TRIGGERED ONLY, ZERO EXTERNAL MP3 DEPENDENCY)
+    // -------------------------------------------------------------------------
     function giftStartMusic(style = 'music_box') {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -6949,24 +7852,22 @@
         if (!giftAudioCtx) giftAudioCtx = new AudioCtx();
         if (giftAudioCtx.state === 'suspended') giftAudioCtx.resume();
 
-        // Happy Birthday melody notes (Hz) & durations (sec)
         const notes = [
           [261.63, 0.32], [261.63, 0.22], [293.66, 0.52], [261.63, 0.52], [349.23, 0.52], [329.63, 0.92],
           [261.63, 0.32], [261.63, 0.22], [293.66, 0.52], [261.63, 0.52], [392.00, 0.52], [349.23, 0.92],
           [261.63, 0.32], [261.63, 0.22], [523.25, 0.52], [440.00, 0.52], [349.23, 0.42], [329.63, 0.42], [293.66, 0.85],
           [466.16, 0.32], [466.16, 0.22], [440.00, 0.52], [349.23, 0.52], [392.00, 0.52], [349.23, 1.05]
         ];
-
         const playSequence = () => {
           if (!giftMusicPlaying || !giftAudioCtx) return;
           let t = giftAudioCtx.currentTime + 0.05;
           notes.forEach(([freq, dur]) => {
             const osc = giftAudioCtx.createOscillator();
             const gain = giftAudioCtx.createGain();
-            osc.type = style === 'piano_chime' ? 'triangle' : 'sine';
+            osc.type = style === 'disco_beat' ? 'sawtooth' : (style === 'piano_chime' ? 'triangle' : 'sine');
             osc.frequency.setValueAtTime(freq, t);
             gain.gain.setValueAtTime(0.001, t);
-            gain.gain.exponentialRampToValueAtTime(0.11, t + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.09, t + 0.03);
             gain.gain.exponentialRampToValueAtTime(0.0008, t + dur);
             osc.connect(gain);
             gain.connect(giftAudioCtx.destination);
@@ -6975,9 +7876,8 @@
             t += dur + 0.06;
           });
         };
-
         giftMusicPlaying = true;
-        document.getElementById('giftMusicToggleBtn').innerText = '⏸ Pause Music';
+        document.getElementById('giftMusicToggleBtn').innerText = '⏸ Pause';
         playSequence();
         giftMusicInterval = setInterval(playSequence, 13200);
       } catch(e) {}
@@ -6987,57 +7887,12 @@
       giftMusicPlaying = false;
       if (giftMusicInterval) { clearInterval(giftMusicInterval); giftMusicInterval = null; }
       const btn = document.getElementById('giftMusicToggleBtn');
-      if (btn) btn.innerText = '🔊 Play Music';
+      if (btn) btn.innerText = '🔊 Music';
     }
 
     function giftToggleMusic() {
       if (giftMusicPlaying) giftStopMusic();
-      else giftStartMusic((giftCurrentData && giftCurrentData.music) || 'music_box');
-    }
-
-    // Lightweight Canvas Confetti Burst
-    function giftLaunchConfettiBurst() {
-      const canvas = document.getElementById('giftConfettiCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const colors = ['#FBBF24', '#EC4899', '#38BDF8', '#34D399', '#A78BFA', '#F87171'];
-      const pieces = Array.from({ length: 75 }, () => ({
-        x: canvas.width * (0.2 + Math.random() * 0.6),
-        y: canvas.height * 0.45,
-        vx: (Math.random() - 0.5) * 9,
-        vy: -4 - Math.random() * 7,
-        size: 5 + Math.random() * 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rot: Math.random() * Math.PI * 2,
-        vrot: (Math.random() - 0.5) * 0.2
-      }));
-
-      if (giftConfettiAnimId) cancelAnimationFrame(giftConfettiAnimId);
-      let frames = 0;
-      const step = () => {
-        frames++;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += 0.24;
-          p.rot += p.vrot;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
-          ctx.restore();
-        });
-        if (frames < 140) {
-          giftConfettiAnimId = requestAnimationFrame(step);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      };
-      giftConfettiAnimId = requestAnimationFrame(step);
+      else giftStartMusic((giftCurrentData && (giftCurrentData.musicUrl || giftCurrentData.music)) || 'music_box');
     }
 
     // =========================================================================
